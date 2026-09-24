@@ -1,0 +1,459 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Typecase – Font Library</title>
+<style>
+/* UI font is the system stack on purpose: any web font here would be a free clue. */
+:root{
+  --bg:#f4f4f2; --side:#202124; --sideText:#e8e8e6; --sideMuted:#9a9b98; --sideHi:rgba(255,255,255,.08);
+  --panel:#ffffff; --panel2:#f7f7f5; --text:#1d1d1b; --muted:#6c6d69; --line:#e2e2de; --glyphBg:#fbfbfa; --grid:#ececea;
+  --brand:#e5484d; --brandSoft:#fde8e8; --hit:#2f9e62; --hitSoft:#dff3e7; --near:#c98a0b; --nearSoft:#fcf0d4; --miss:#8a8b87; --missSoft:#ececea;
+  --shadow:0 1px 2px rgba(0,0,0,.06),0 6px 18px rgba(0,0,0,.05);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#161615; --side:#0f0f0e; --sideText:#e6e6e3; --sideMuted:#8d8e8a; --sideHi:rgba(255,255,255,.07);
+    --panel:#1e1e1c; --panel2:#252523; --text:#ecece9; --muted:#9d9e99; --line:#31312e; --glyphBg:#1a1a18; --grid:#2a2a27;
+    --brand:#ff6b70; --brandSoft:#3d1c1e; --hit:#52c585; --hitSoft:#16321f; --near:#e8b340; --nearSoft:#3a2d10; --miss:#8d8e8a; --missSoft:#2b2b28;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 6px 18px rgba(0,0,0,.3);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#161615; --side:#0f0f0e; --sideText:#e6e6e3; --sideMuted:#8d8e8a; --sideHi:rgba(255,255,255,.07);
+  --panel:#1e1e1c; --panel2:#252523; --text:#ecece9; --muted:#9d9e99; --line:#31312e; --glyphBg:#1a1a18; --grid:#2a2a27;
+  --brand:#ff6b70; --brandSoft:#3d1c1e; --hit:#52c585; --hitSoft:#16321f; --near:#e8b340; --nearSoft:#3a2d10; --miss:#8d8e8a; --missSoft:#2b2b28;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 6px 18px rgba(0,0,0,.3);
+}
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;font-size:14px}
+button,input{font:inherit;color:inherit}
+button{background:none;border:0;cursor:pointer}
+button:focus-visible,input:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+.app{display:grid;grid-template-columns:230px minmax(0,1fr);grid-template-rows:auto minmax(0,1fr);height:100%}
+
+/* top */
+.top{grid-column:1/-1;display:flex;align-items:center;gap:14px;padding:10px 16px;background:var(--side);color:var(--sideText);border-bottom:1px solid rgba(255,255,255,.06)}
+.logo{display:flex;align-items:center;gap:9px;font-weight:700;font-size:16px;width:198px;flex:none}
+.logo i{width:26px;height:26px;border-radius:7px;background:var(--brand);display:grid;place-items:center;font-style:normal;font-family:Georgia,serif;font-weight:700;font-size:17px;color:#fff}
+.search{position:relative;flex:1;max-width:560px}
+.search input{width:100%;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:8px 12px 8px 34px;color:var(--sideText)}
+.search input::placeholder{color:var(--sideMuted)}
+.search svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);width:15px;height:15px;color:var(--sideMuted)}
+.sugg{position:absolute;left:0;right:0;top:calc(100% + 6px);background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:10px;box-shadow:0 14px 40px rgba(0,0,0,.25);max-height:min(360px,60vh);overflow:auto;z-index:30;padding:4px}
+.sugg button{display:flex;width:100%;justify-content:space-between;gap:10px;align-items:center;padding:8px 10px;border-radius:7px;text-align:left}
+.sugg button.on,.sugg button:hover{background:var(--panel2)}
+.sugg small{color:var(--muted);font-size:12px}
+.sugg .none{padding:10px;color:var(--muted)}
+.top .right{margin-left:auto;display:flex;align-items:center;gap:12px}
+.me{width:30px;height:30px;border-radius:50%;background:#c77d3a;color:#fff;display:grid;place-items:center;font-weight:700;font-size:13px;flex:none}
+.tbtn{background:rgba(255,255,255,.1);border-radius:8px;padding:7px 12px;font-weight:600;font-size:13px;white-space:nowrap}
+.tbtn:hover{background:rgba(255,255,255,.16)}
+
+/* sidebar */
+.side{background:var(--side);color:var(--sideText);padding:12px 10px;overflow-y:auto;display:flex;flex-direction:column;gap:2px}
+.side h3{margin:14px 10px 6px;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--sideMuted);font-weight:600}
+.side h3:first-child{margin-top:4px}
+.nav{display:flex;justify-content:space-between;align-items:center;width:100%;text-align:left;padding:7px 10px;border-radius:7px;color:var(--sideMuted);font-weight:500}
+.nav:hover{color:var(--sideText)}
+.nav.on{background:var(--sideHi);color:var(--sideText)}
+.nav small{font-size:12px;opacity:.8;font-variant-numeric:tabular-nums}
+.nav .dot{width:8px;height:8px;border-radius:50%;background:var(--brand);margin-left:6px}
+
+/* main */
+.main{overflow-y:auto;padding:20px 24px 40px;min-width:0}
+.cols{display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:20px;max-width:1180px;margin:0 auto;align-items:start}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow)}
+.head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.head h1{margin:0;font-size:22px;font-weight:700;letter-spacing:-.01em}
+.head .sub{color:var(--muted);font-size:13px;margin-top:2px}
+.pips{display:flex;gap:5px}
+.pips i{width:22px;height:8px;border-radius:4px;background:var(--line)}
+.pips i.x{background:var(--brand)}
+.pips i.w{background:var(--hit)}
+
+.glyphs{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;padding:14px}
+.gl{aspect-ratio:1/1.12;border-radius:10px;background:var(--glyphBg);border:1px solid var(--line);position:relative;display:grid;place-items:center;overflow:hidden;background-image:linear-gradient(var(--grid) 1px,transparent 1px);background-size:100% 25%;background-position:0 12.5%}
+.gl span{font-size:clamp(34px,6.4vw,86px);line-height:1;color:var(--text)}
+.gl.hid span{visibility:hidden}
+.gl.hid::after{content:"?";position:absolute;inset:0;display:grid;place-items:center;font-size:clamp(20px,3vw,34px);color:var(--muted);opacity:.5}
+.gl.hid{border-style:dashed;background-image:none}
+.gl small{position:absolute;left:8px;top:6px;font-size:11px;color:var(--muted);font-family:ui-monospace,Menlo,Consolas,monospace}
+.gl.new span{animation:rise .35s ease}
+@keyframes rise{from{transform:translateY(8px);opacity:0}to{transform:none;opacity:1}}
+.loading{padding:40px 14px;text-align:center;color:var(--muted)}
+.specimen{border-top:1px solid var(--line);padding:16px 18px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.specimen .word{font-size:clamp(30px,5vw,58px);line-height:1.1;overflow-wrap:anywhere}
+.specimen .ans{font-size:13px;color:var(--muted)}
+.specimen .ans b{display:block;font-size:17px;color:var(--text)}
+.result{display:flex;gap:8px;flex-wrap:wrap}
+.btn{border-radius:8px;padding:8px 14px;font-weight:600;font-size:13px;background:var(--panel2);border:1px solid var(--line)}
+.btn:hover{border-color:var(--muted)}
+.btn.pri{background:var(--brand);border-color:var(--brand);color:#fff}
+
+.guesses{margin-top:16px}
+.guesses h2,.side2 h2{margin:0;padding:12px 14px;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:700;border-bottom:1px solid var(--line);display:flex;justify-content:space-between}
+.g{display:grid;grid-template-columns:26px minmax(0,1.3fr) auto minmax(0,1.4fr);gap:12px;align-items:center;padding:10px 14px;border-bottom:1px solid var(--line)}
+.g:last-child{border-bottom:0}
+.g .k{color:var(--muted);font-size:12px;font-variant-numeric:tabular-nums}
+.g .nm{font-size:21px;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.g .nm small{display:block;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;font-size:11.5px;color:var(--muted)}
+.tag{display:inline-block;font-size:11.5px;font-weight:600;border-radius:999px;padding:2px 8px;background:var(--missSoft);color:var(--muted);margin:2px 4px 2px 0;white-space:nowrap}
+.tag.hit{background:var(--hitSoft);color:var(--hit)}
+.tag.near{background:var(--nearSoft);color:var(--near)}
+.g.win{background:var(--hitSoft)}
+.g.empty{color:var(--muted);font-size:13px;grid-template-columns:1fr;padding:16px 14px}
+.legend{padding:10px 14px;font-size:12px;color:var(--muted);display:flex;gap:12px;flex-wrap:wrap;border-top:1px solid var(--line)}
+
+.side2{display:flex;flex-direction:column;gap:16px}
+.sgrid{display:grid;grid-template-columns:repeat(4,1fr);text-align:center;padding:12px 8px 4px}
+.sgrid b{display:block;font-size:22px;font-weight:700;font-variant-numeric:tabular-nums}
+.sgrid span{font-size:11px;color:var(--muted)}
+.dist{padding:10px 14px 14px;display:grid;gap:5px}
+.dist div{display:grid;grid-template-columns:14px 1fr;gap:8px;align-items:center;font-size:12px;font-variant-numeric:tabular-nums}
+.dist i{display:block;height:18px;border-radius:4px;background:var(--line);color:var(--text);font-style:normal;text-align:right;padding-right:6px;line-height:18px;min-width:22px;font-size:11.5px;font-weight:600}
+.dist i.cur{background:var(--hit);color:#fff}
+.how{padding:12px 14px;font-size:13px;color:var(--muted);line-height:1.5}
+.how p{margin:0 0 6px}
+.cats{display:none}
+
+/* decoy */
+.decoy{display:none}
+body.boss .decoy{display:block}
+body.boss .game{display:none!important}
+.fl{width:100%;border-collapse:collapse}
+.fl td{padding:14px 16px;border-bottom:1px solid var(--line);vertical-align:middle}
+.fl tr:last-child td{border-bottom:0}
+.fl .fn{font-size:13px;font-weight:600;white-space:nowrap}
+.fl .fn small{display:block;font-weight:400;color:var(--muted);font-size:12px}
+.fl .sp{font-size:26px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:0;width:100%}
+.sw{width:34px;height:20px;border-radius:10px;background:var(--hit);position:relative;display:inline-block}
+.sw::after{content:"";position:absolute;right:3px;top:3px;width:14px;height:14px;border-radius:50%;background:#fff}
+.sw.off{background:var(--line)}
+.sw.off::after{right:auto;left:3px}
+
+.toast{position:fixed;left:50%;transform:translateX(-50%);top:70px;background:var(--text);color:var(--panel);padding:10px 16px;border-radius:9px;box-shadow:0 10px 30px rgba(0,0,0,.25);max-width:min(440px,calc(100vw - 32px));z-index:50;font-size:13.5px;line-height:1.45;font-weight:500}
+
+@media (max-width:1080px){.cols{grid-template-columns:minmax(0,1fr)}.side2{display:grid;grid-template-columns:1fr 1fr}}
+@media (max-width:760px){
+  .app{grid-template-columns:minmax(0,1fr)}
+  .side{display:none}
+  .logo{width:auto}.logo span{display:none}
+  .top{gap:10px;padding:8px 10px}
+  .top .right .tbtn span{display:none}
+  .main{padding:14px 10px 30px}
+  .glyphs{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;padding:10px}
+  .gl span{font-size:clamp(40px,14vw,70px)}
+  .g{grid-template-columns:20px minmax(0,1fr) auto;gap:8px}
+  .g .tags{grid-column:2/-1}
+  .side2{grid-template-columns:minmax(0,1fr)}
+  .cats{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:0 0 12px}
+  .cats button{flex:none;border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:5px 11px;font-size:12.5px;font-weight:600;color:var(--muted)}
+  .cats button.on{background:var(--text);color:var(--panel);border-color:var(--text)}
+  .fl .hide-m{display:none}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<div class="app">
+  <header class="top">
+    <div class="logo"><i>Aa</i><span>Typecase</span></div>
+    <div class="search">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="7" cy="7" r="4.8"/><path d="m10.5 10.5 3.5 3.5"/></svg>
+      <input id="q" type="text" placeholder="Search fonts…" autocomplete="off" spellcheck="false" aria-label="Guess the font" role="combobox" aria-expanded="false" aria-controls="sugg">
+      <div class="sugg" id="sugg" role="listbox" hidden></div>
+    </div>
+    <div class="right">
+      <button class="tbtn" id="viewBtn" title="Library view (Esc)">Library<span> view</span></button>
+      <span class="me">F</span>
+    </div>
+  </header>
+
+  <aside class="side">
+    <div class="game">
+      <h3>Library</h3>
+      <button class="nav" data-mode="daily"><span>Today’s mystery font<span class="dot" id="dailyDot" hidden></span></span><small id="dailyN"></small></button>
+      <button class="nav" data-mode="practice"><span>Practice</span><small>∞</small></button>
+      <button class="nav" data-mode="hard"><span>All fonts (hard)</span><small id="allN"></small></button>
+      <h3>Filter guesses</h3>
+      <div id="catNav"></div>
+    </div>
+    <div class="decoy">
+      <h3>Library</h3>
+      <button class="nav"><span>All fonts</span><small>214</small></button>
+      <button class="nav on"><span>Activated</span><small>8</small></button>
+      <button class="nav"><span>Recently added</span><small>12</small></button>
+      <button class="nav"><span>Favourites</span><small>5</small></button>
+      <h3>Sources</h3>
+      <button class="nav"><span>System</span><small>96</small></button>
+      <button class="nav"><span>Team library</span><small>41</small></button>
+      <button class="nav"><span>Adobe Fonts</span><small>77</small></button>
+    </div>
+    <h3>Collections</h3>
+    <button class="nav"><span>Brand refresh</span><small>6</small></button>
+    <button class="nav"><span>Pitch deck</span><small>3</small></button>
+    <button class="nav"><span>Northwind – packaging</span><small>9</small></button>
+  </aside>
+
+  <main class="main">
+    <div class="cols game">
+      <div>
+        <div class="head">
+          <div><h1 id="title">Mystery font</h1><div class="sub" id="sub">Guess the typeface. Every miss reveals another glyph.</div></div>
+          <div class="pips" id="pips"></div>
+        </div>
+        <div class="cats" id="cats"></div>
+        <section class="card">
+          <div class="glyphs" id="glyphs"><div class="loading">Loading fonts…</div></div>
+          <div class="specimen" id="spec" hidden></div>
+        </section>
+        <section class="card guesses">
+          <h2><span>Your guesses</span><span id="left"></span></h2>
+          <div id="rows"></div>
+          <div class="legend"><span><span class="tag hit">green</span> matches the mystery font</span><span><span class="tag">grey</span> doesn’t</span></div>
+        </section>
+      </div>
+      <aside class="side2">
+        <section class="card">
+          <h2><span id="statsH">Statistics</span></h2>
+          <div class="sgrid"><div><b id="sP">0</b><span>Played</span></div><div><b id="sW">0</b><span>Win %</span></div><div><b id="sS">0</b><span>Streak</span></div><div><b id="sM">0</b><span>Best streak</span></div></div>
+          <div class="dist" id="dist"></div>
+        </section>
+        <section class="card how">
+          <p><b style="color:var(--text)">How it works.</b> Search the library above and pick a font to guess. You get six tries.</p>
+          <p>Each miss shows another glyph. Guesses show their category and traits: green ones match the mystery font.</p>
+          <p>Use the filters to narrow it down. Esc swaps to a normal library.</p>
+        </section>
+      </aside>
+    </div>
+
+    <!-- the disguise -->
+    <div class="decoy" style="max-width:1180px;margin:0 auto">
+      <div class="head"><div><h1>Activated fonts</h1><div class="sub">8 families · synced to your team library</div></div></div>
+      <section class="card"><table class="fl" id="decoy"></table></section>
+    </div>
+  </main>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+(function(){
+const $=id=>document.getElementById(id);
+/* [family, category, traits, popular] */
+const F=[
+ ['Playfair Display','Serif',['high contrast'],1],['Merriweather','Serif',['large x-height'],1],['Lora','Serif',['calligraphic'],0],
+ ['Libre Baskerville','Serif',['transitional','large x-height'],0],['EB Garamond','Serif',['old-style'],1],['Cormorant Garamond','Serif',['old-style','high contrast'],0],
+ ['DM Serif Display','Serif',['high contrast','heavy'],0],['Bodoni Moda','Serif',['high contrast'],0],['Fraunces','Serif',['quirky'],0],
+ ['Instrument Serif','Serif',['condensed'],0],['Cinzel','Serif',['caps only'],1],['Old Standard TT','Serif',['high contrast'],0],['Italiana','Serif',['thin','high contrast'],0],
+ ['Roboto','Sans',['grotesque'],1],['Inter','Sans',['grotesque','large x-height'],0],['Montserrat','Sans',['geometric','wide'],1],
+ ['Poppins','Sans',['geometric'],1],['Raleway','Sans',['geometric'],1],['Josefin Sans','Sans',['geometric','retro'],1],
+ ['Work Sans','Sans',['grotesque'],0],['Space Grotesk','Sans',['grotesque','quirky'],1],['Oswald','Sans',['condensed'],1],
+ ['Barlow Condensed','Sans',['condensed'],0],['Nunito','Sans',['rounded'],1],['Quicksand','Sans',['rounded','geometric'],0],
+ ['Rubik','Sans',['rounded'],0],['Outfit','Sans',['geometric'],0],['League Spartan','Sans',['geometric'],0],['Syne','Sans',['quirky','wide'],0],
+ ['Lexend','Sans',['wide'],0],['Comfortaa','Sans',['rounded','geometric'],1],['Fredoka','Sans',['rounded'],0],['Chivo','Sans',['grotesque'],0],
+ ['Roboto Slab','Slab',[],1],['Zilla Slab','Slab',[],0],['Arvo','Slab',['geometric'],1],['Bitter','Slab',[],0],['Alfa Slab One','Slab',['heavy'],0],['Josefin Slab','Slab',['geometric','thin','retro'],0],
+ ['Abril Fatface','Display',['high contrast','heavy'],1],['Bebas Neue','Display',['condensed','caps only'],1],['Anton','Display',['condensed','heavy'],1],
+ ['Archivo Black','Display',['grotesque','heavy'],0],['Righteous','Display',['rounded','retro'],1],['Monoton','Display',['retro','caps only'],1],
+ ['Bungee','Display',['caps only','heavy'],1],['Shrikhand','Display',['heavy','retro'],0],['Lilita One','Display',['heavy','rounded'],0],
+ ['Ultra','Display',['heavy'],0],['Rye','Display',['retro'],0],['UnifrakturMaguntia','Display',['blackletter'],1],['Bangers','Display',['comic','caps only'],1],
+ ['Black Ops One','Display',['stencil','heavy'],1],['Poiret One','Display',['thin','geometric','retro'],0],['Staatliches','Display',['caps only','condensed'],0],
+ ['Unbounded','Display',['wide','rounded'],0],['Silkscreen','Display',['pixel'],0],
+ ['Lobster','Script',['heavy','retro'],1],['Pacifico','Script',['heavy','retro'],1],['Dancing Script','Script',[],1],['Great Vibes','Script',['formal'],1],
+ ['Yellowtail','Script',['retro'],0],['Sacramento','Script',['thin'],0],['Satisfy','Script',[],0],
+ ['Caveat','Handwritten',[],1],['Permanent Marker','Handwritten',['marker'],1],['Rock Salt','Handwritten',['marker'],0],['Amatic SC','Handwritten',['condensed','caps only'],1],
+ ['Gloria Hallelujah','Handwritten',['comic'],0],['Kalam','Handwritten',[],0],
+ ['Space Mono','Mono',['quirky','geometric'],1],['Fira Code','Mono',[],0],['IBM Plex Mono','Mono',[],0],['Courier Prime','Mono',['typewriter'],1],
+ ['VT323','Mono',['pixel'],0],['Major Mono Display','Mono',['quirky','thin'],0],['Special Elite','Mono',['typewriter'],1],['Press Start 2P','Mono',['pixel','wide'],1],
+].map(([n,c,t,p])=>({n,c,t,p:!!p}));
+const CATS=['Serif','Sans','Slab','Display','Script','Handwritten','Mono'];
+const GLYPHS=['g','R','a','Q','&','e'];
+const WORD='Handgloves';
+const TRIES=6;
+
+/* fonts: one subset request, files only download when a face is used */
+const TEXT='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789&';
+const cssUrl='https://fonts.googleapis.com/css2?'+F.map(f=>'family='+f.n.replace(/ /g,'+')).join('&')+'&text='+encodeURIComponent(TEXT)+'&display=block';
+let cssReady=new Promise(res=>{const l=document.createElement('link');l.rel='stylesheet';l.href=cssUrl;l.onload=()=>res(true);l.onerror=()=>res(false);document.head.appendChild(l)});
+const fam=f=>`'${f.n}', system-ui, sans-serif`;
+async function loadFont(f){
+  if(!(await cssReady))return false;
+  try{const r=await Promise.race([document.fonts.load(`64px "${f.n}"`,TEXT),new Promise(res=>setTimeout(()=>res([]),8000))]);return r.length>0}catch(e){return false}
+}
+
+/* stats */
+let stats={};try{stats=JSON.parse(localStorage.getItem('fl-stats')||'{}')||{}}catch(e){}
+const st=k=>stats[k]||(stats[k]={played:0,won:0,streak:0,max:0,dist:[0,0,0,0,0,0,0]});
+const saveStats=()=>{try{localStorage.setItem('fl-stats',JSON.stringify(stats))}catch(e){}};
+
+/* state */
+let mode='daily',R=null,boss=false,filter=null,suggIdx=0,token=0;
+const todayKey=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
+const dayNo=()=>Math.floor((Date.parse(todayKey())-Date.parse('2026-01-01'))/864e5)+1;
+function hash(s){let h=2166136261;for(const ch of s){h^=ch.charCodeAt(0);h=Math.imul(h,16777619)}return h>>>0}
+const pool=()=>mode==='hard'?F:F.filter(f=>f.p);
+
+async function startRound(){
+  const my=++token;
+  let answer,guesses=[];
+  if(mode==='daily'){
+    const P=F.filter(f=>f.p);answer=P[hash('typecase'+todayKey())%P.length];
+    try{const s=JSON.parse(localStorage.getItem('fl-daily')||'null');if(s&&s.date===todayKey())guesses=s.guesses.map(n=>F.find(f=>f.n===n)).filter(Boolean)}catch(e){}
+  }else{
+    const P=pool().filter(f=>!R||f!==R.answer);answer=P[Math.floor(Math.random()*P.length)];
+  }
+  R={answer,guesses,over:false,won:false,ready:false,revealAt:-1};
+  R.over=guesses.includes(answer)||guesses.length>=TRIES;R.won=guesses.includes(answer);
+  render();
+  const ok=await loadFont(answer);
+  if(my!==token)return;
+  if(!ok){
+    if(mode!=='daily'){const alt=pool().filter(f=>f!==answer);for(let i=0;i<4;i++){const f=alt[Math.floor(Math.random()*alt.length)];if(await loadFont(f)){if(my!==token)return;R.answer=f;R.ready=true;render();return}}}
+    $('glyphs').innerHTML='<div class="loading" style="grid-column:1/-1">Couldn’t reach the font server. Check your connection and try again.</div>';return;
+  }
+  R.ready=true;render();
+}
+function saveDaily(){if(mode!=='daily')return;try{localStorage.setItem('fl-daily',JSON.stringify({date:todayKey(),guesses:R.guesses.map(f=>f.n)}))}catch(e){}}
+
+/* ---------- render ---------- */
+function render(){
+  const titles={daily:['Mystery font #'+dayNo(),'Today’s font. Same one for everyone, new one tomorrow.'],practice:['Practice','Popular fonts only. As many rounds as you like.'],hard:['All fonts','Every font in the library. Good luck.']};
+  $('title').textContent=titles[mode][0];$('sub').textContent=titles[mode][1];
+  document.querySelectorAll('.nav[data-mode]').forEach(b=>b.classList.toggle('on',b.dataset.mode===mode));
+  $('dailyN').textContent='#'+dayNo();$('allN').textContent=F.length;
+  $('dailyDot').hidden=mode==='daily'||dailyDone();
+  renderGlyphs();renderRows();renderPips();renderStats();renderCats();
+  $('q').placeholder=R&&R.over?'Round over':'Search '+pool().length+' fonts to guess…';
+  $('q').disabled=!!(R&&R.over);
+}
+function dailyDone(){try{const s=JSON.parse(localStorage.getItem('fl-daily')||'null');if(!s||s.date!==todayKey())return false;const P=F.filter(f=>f.p),a=P[hash('typecase'+todayKey())%P.length];return s.guesses.length>=TRIES||s.guesses.includes(a.n)}catch(e){return false}}
+function shown(){return R.over?GLYPHS.length:Math.min(GLYPHS.length,R.guesses.length+1)}
+function renderGlyphs(){
+  if(!R||!R.ready){$('glyphs').innerHTML='<div class="loading" style="grid-column:1/-1">Loading fonts…</div>';$('spec').hidden=true;return}
+  const n=shown();
+  $('glyphs').innerHTML=GLYPHS.map((g,i)=>`<div class="gl${i<n?'':' hid'}${i===n-1&&R.revealAt===i?' new':''}"><span style="font-family:${fam(R.answer)}">${g==='&'?'&amp;':g}</span><small>${i<n?'U+'+g.charCodeAt(0).toString(16).toUpperCase().padStart(4,'0'):''}</small></div>`).join('');
+  const sp=$('spec');
+  if(R.over){
+    sp.hidden=false;
+    const p=R.won?R.guesses.length:'X';
+    sp.innerHTML=`<div class="word" style="font-family:${fam(R.answer)}">${WORD}</div>
+      <div class="ans"><span>${R.won?'Nailed it in '+R.guesses.length+'/6':'It was'}</span><b>${R.answer.n}</b>${R.answer.c}${R.answer.t.length?' · '+R.answer.t.join(', '):''}</div>
+      <div class="result"><button class="btn" id="shareBtn">Copy result</button>${mode==='daily'?'<button class="btn pri" data-go="practice">Practice round</button>':'<button class="btn pri" id="nextBtn">Next font</button>'}</div>`;
+    $('shareBtn').onclick=share;
+    const nb=$('nextBtn');if(nb)nb.onclick=()=>startRound();
+    const go=sp.querySelector('[data-go]');if(go)go.onclick=()=>setMode(go.dataset.go);
+  }else sp.hidden=true;
+}
+function renderRows(){
+  if(!R)return;
+  const a=R.answer;
+  $('rows').innerHTML=R.guesses.length?R.guesses.map((f,i)=>{
+    const win=f===a;
+    return `<div class="g${win?' win':''}"><span class="k">${i+1}</span>
+      <div class="nm" style="font-family:${fam(f)}">${f.n}<small>${f.n}</small></div>
+      <span class="tag${f.c===a.c?' hit':''}">${f.c}</span>
+      <div class="tags">${f.t.map(t=>`<span class="tag${a.t.includes(t)?' hit':''}">${t}</span>`).join('')||'<span class="tag">no traits</span>'}</div></div>`}).join('')
+    :'<div class="g empty">No guesses yet. Start typing a font name in the search bar.</div>';
+  $('left').textContent=R.over?(R.won?'Solved':'Out of guesses'):(TRIES-R.guesses.length)+' left';
+}
+function renderPips(){
+  if(!R)return;
+  $('pips').innerHTML=Array.from({length:TRIES},(_,i)=>{const g=R.guesses[i];return `<i class="${g?(g===R.answer?'w':'x'):''}"></i>`}).join('');
+}
+function renderStats(){
+  const k=mode==='daily'?'daily':'practice',s=st(k);
+  $('statsH').textContent=mode==='daily'?'Daily statistics':'Practice statistics';
+  $('sP').textContent=s.played;$('sW').textContent=s.played?Math.round(s.won/s.played*100):0;$('sS').textContent=s.streak;$('sM').textContent=s.max;
+  const mx=Math.max(1,...s.dist);
+  const cur=R&&R.over&&R.won?R.guesses.length:-1;
+  $('dist').innerHTML=s.dist.slice(1).map((v,i)=>`<div><span>${i+1}</span><i class="${cur===i+1?'cur':''}" style="width:${Math.max(8,v/mx*100)}%">${v}</i></div>`).join('')+`<div><span>✗</span><i style="width:${Math.max(8,s.dist[0]/mx*100)}%">${s.dist[0]}</i></div>`;
+}
+function renderCats(){
+  const P=pool(),cnt=c=>P.filter(f=>f.c===c).length;
+  $('catNav').innerHTML=[`<button class="nav${filter?'':' on'}" data-cat=""><span>All categories</span><small>${P.length}</small></button>`,...CATS.map(c=>`<button class="nav${filter===c?' on':''}" data-cat="${c}"><span>${c}</span><small>${cnt(c)}</small></button>`)].join('');
+  $('cats').innerHTML=[`<button class="${filter?'':'on'}" data-cat="">All</button>`,...CATS.map(c=>`<button class="${filter===c?'on':''}" data-cat="${c}">${c} ${cnt(c)}</button>`)].join('');
+}
+
+/* ---------- guessing ---------- */
+function matches(){
+  const q=$('q').value.trim().toLowerCase();
+  return pool().filter(f=>(!filter||f.c===filter)&&!R.guesses.includes(f)&&(!q||f.n.toLowerCase().includes(q)))
+    .sort((a,b)=>{const qa=a.n.toLowerCase().startsWith(q),qb=b.n.toLowerCase().startsWith(q);return qa===qb?a.n.localeCompare(b.n):qa?-1:1});
+}
+function showSugg(){
+  if(!R||R.over||!R.ready||boss){hideSugg();return}
+  const m=matches();suggIdx=Math.min(suggIdx,Math.max(0,m.length-1));
+  $('sugg').innerHTML=m.length?m.map((f,i)=>`<button role="option" data-f="${f.n}" class="${i===suggIdx?'on':''}"><span>${f.n}</span><small>${f.c}</small></button>`).join(''):'<div class="none">No fonts match. Try another name or clear the filter.</div>';
+  $('sugg').hidden=false;$('q').setAttribute('aria-expanded','true');
+  const on=$('sugg').querySelector('.on');if(on)on.scrollIntoView({block:'nearest'});
+}
+function hideSugg(){$('sugg').hidden=true;$('q').setAttribute('aria-expanded','false')}
+function guess(f){
+  if(!R||R.over||!R.ready||R.guesses.includes(f))return;
+  R.guesses.push(f);$('q').value='';hideSugg();
+  if(f===R.answer){R.over=true;R.won=true}
+  else if(R.guesses.length>=TRIES){R.over=true}
+  else R.revealAt=R.guesses.length;
+  saveDaily();
+  if(R.over){
+    const k=mode==='daily'?'daily':'practice',s=st(k);s.played++;
+    if(R.won){s.won++;s.streak++;s.max=Math.max(s.max,s.streak);s.dist[R.guesses.length]++}else{s.streak=0;s.dist[0]++}
+    saveStats();
+    toast(R.won?['Spot on.','Typographer’s eye.','Kerning-level precision.','You’ve clearly spent too long in the font menu.','Got there.','Phew. Last glyph.'][R.guesses.length-1]:`It was ${R.answer.n}. The client won’t know either.`);
+  }
+  render();
+  if(!R.over)$('q').focus();
+}
+function share(){
+  const rows=R.guesses.map(f=>f===R.answer?'🟩':f.c===R.answer.c?'🟨':'⬛').join('');
+  const txt=`Typecase ${mode==='daily'?'#'+dayNo():mode==='hard'?'(all fonts)':'(practice)'} ${R.won?R.guesses.length:'X'}/6\n${rows}`;
+  const done=()=>toast('Result copied. Paste it in the team chat, nobody will suspect a thing.');
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(txt).then(done,()=>fallbackCopy(txt,done));else fallbackCopy(txt,done);
+}
+function fallbackCopy(t,done){const a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy');done()}catch(e){toast(t)}a.remove()}
+
+let toastT;function toast(t){$('toast').textContent=t;$('toast').hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>$('toast').hidden=true,3600)}
+
+/* ---------- disguise ---------- */
+const DECOY=[['Helvetica Neue','Helvetica Neue, Helvetica, Arial, sans-serif',8,'Brand primary'],['Georgia','Georgia, serif',4,'Editorial'],['Arial','Arial, sans-serif',4,'Office templates'],['Times New Roman','"Times New Roman", Times, serif',4,'Legal'],['Verdana','Verdana, sans-serif',4,'Web fallback'],['Courier New','"Courier New", monospace',4,'Code samples'],['Trebuchet MS','"Trebuchet MS", sans-serif',4,'Presentations'],['Palatino','Palatino, "Palatino Linotype", "Book Antiqua", serif',4,'Print']];
+$('decoy').innerHTML=DECOY.map(([n,f,s,c],i)=>`<tr><td class="fn">${n}<small>${s} styles · ${c}</small></td><td class="sp" style="font-family:${f}">The quick brown fox jumps over the lazy dog</td><td class="hide-m" style="color:var(--muted);font-size:12px;white-space:nowrap">System</td><td><span class="sw${i===6?' off':''}"></span></td></tr>`).join('');
+function toggleBoss(){
+  boss=!boss;document.body.classList.toggle('boss',boss);hideSugg();$('toast').hidden=true;
+  $('viewBtn').innerHTML=boss?'Glyph<span> view</span>':'Library<span> view</span>';
+  $('q').placeholder=boss?'Search fonts…':(R&&R.over?'Round over':'Search '+pool().length+' fonts to guess…');
+  if(boss){$('q').value='';$('q').blur()}
+}
+
+/* ---------- input ---------- */
+function setMode(m){if(boss||m===mode&&m==='daily')return;mode=m;filter=null;startRound()}
+document.querySelectorAll('.nav[data-mode]').forEach(b=>b.onclick=()=>setMode(b.dataset.mode));
+function onCat(e){const b=e.target.closest('[data-cat]');if(!b)return;filter=b.dataset.cat||null;renderCats();if(document.activeElement===$('q')||!$('sugg').hidden)showSugg();else{$('q').focus()}}
+$('catNav').addEventListener('click',onCat);$('cats').addEventListener('click',onCat);
+$('q').addEventListener('input',()=>{suggIdx=0;showSugg()});
+$('q').addEventListener('focus',showSugg);
+$('q').addEventListener('keydown',e=>{
+  if(e.key==='ArrowDown'||e.key==='ArrowUp'){e.preventDefault();const m=matches();if(!m.length)return;suggIdx=(suggIdx+(e.key==='ArrowDown'?1:-1)+m.length)%m.length;showSugg();return}
+  if(e.key==='Enter'){e.preventDefault();const m=matches();if(m[suggIdx])guess(m[suggIdx])}
+});
+$('sugg').addEventListener('mousedown',e=>e.preventDefault());
+$('sugg').addEventListener('click',e=>{const b=e.target.closest('[data-f]');if(b)guess(F.find(f=>f.n===b.dataset.f))});
+document.addEventListener('click',e=>{if(!e.target.closest('.search')&&!e.target.closest('[data-cat]'))hideSugg()});
+$('viewBtn').onclick=toggleBoss;
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){e.preventDefault();toggleBoss();return}
+  if(boss||e.ctrlKey||e.metaKey||e.altKey||document.activeElement===$('q'))return;
+  if(e.key==='/'){e.preventDefault();$('q').focus();return}
+  if((e.key==='n'||e.key==='N')&&R&&R.over&&mode!=='daily')startRound();
+});
+
+/* boot */
+startRound();
+let first=false;try{first=!localStorage.getItem('fl-seen');localStorage.setItem('fl-seen','1')}catch(e){}
+if(first)setTimeout(()=>toast('Guess the typeface from its glyphs. Type in the search bar to guess. Esc hides it.'),400);
+})();
+</script>
+
+</html>
