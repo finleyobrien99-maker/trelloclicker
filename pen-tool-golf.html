@@ -1,0 +1,404 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>hole_01_final.psd</title>
+<style>
+/* Deliberately single-theme: it has to pass as a dark image editor. */
+:root{
+  --app:#232323; --bar:#2b2b2b; --panel:#313131; --panel2:#3a3a3a; --board:#1b1b1b; --line:#1a1a1a; --lineL:#444;
+  --text:#d8d8d8; --muted:#9a9a9a; --dim:#6f6f6f; --blue:#2d8ceb; --blueDk:#1f6fbf; --sel:#3d5a7a; --good:#5cc27a; --warn:#e0a44a;
+}
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{background:var(--app);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:12px;overflow:hidden;color-scheme:dark;user-select:none;-webkit-user-select:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+button:focus-visible{outline:2px solid var(--blue);outline-offset:1px}
+.app{display:grid;grid-template-columns:44px minmax(0,1fr) 260px;grid-template-rows:28px 40px minmax(0,1fr) 24px;height:100%}
+
+.menu{grid-column:1/-1;background:var(--bar);display:flex;align-items:center;gap:2px;padding:0 8px;border-bottom:1px solid var(--line);font-size:13px}
+.menu .ps{width:18px;height:18px;border-radius:3px;background:#0b2a45;color:#4aa3ff;display:grid;place-items:center;font-weight:800;font-size:10px;margin-right:8px;border:1px solid #1e5a90}
+.menu span{padding:3px 8px;border-radius:3px;color:var(--text)}
+.opts{grid-column:1/-1;background:var(--bar);display:flex;align-items:center;gap:6px;padding:0 10px;border-bottom:1px solid var(--line);overflow-x:auto;scrollbar-width:none;white-space:nowrap}
+.opts::-webkit-scrollbar{display:none}
+.opts .dd{border:1px solid var(--lineL);border-radius:3px;padding:3px 8px;color:var(--text);background:var(--panel)}
+.opts .lab{color:var(--muted)}
+.sep{width:1px;height:22px;background:var(--lineL);margin:0 6px;flex:none}
+.ob{border:1px solid var(--lineL);background:var(--panel2);border-radius:3px;padding:4px 10px;color:var(--text);display:flex;align-items:center;gap:6px}
+.ob:hover:not(:disabled){background:#474747}
+.ob:disabled{opacity:.4;cursor:default}
+.ob.go{background:var(--blue);border-color:var(--blueDk);color:#fff;font-weight:600}
+.ob.go:hover:not(:disabled){background:#3c98f0}
+.ob kbd{font:10px ui-monospace,Menlo,monospace;opacity:.7}
+.cnt{color:var(--muted);font-variant-numeric:tabular-nums}
+.cnt b{color:var(--text)}
+
+.tools{background:var(--bar);border-right:1px solid var(--line);display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0;overflow:hidden}
+.tools span{width:30px;height:28px;border-radius:3px;display:grid;place-items:center;color:#bbb}
+.tools span.on{background:#4a4a4a;color:#fff}
+.tools .sw{margin-top:8px;position:relative;width:30px;height:30px}
+.tools .sw i{position:absolute;width:18px;height:18px;border:1px solid #888}
+.tools .sw i:first-child{left:2px;top:2px;background:#111;z-index:1}
+.tools .sw i:last-child{right:2px;bottom:2px;background:#fff}
+
+.center{display:flex;flex-direction:column;min-width:0;min-height:0;background:var(--board)}
+.tabs{display:flex;background:var(--bar);border-bottom:1px solid var(--line);height:30px;flex:none}
+.tab{padding:0 14px;display:flex;align-items:center;gap:10px;background:var(--board);border-right:1px solid var(--line);color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.tab .x{color:var(--muted)}
+.board{flex:1;min-height:0;display:grid;place-items:center;padding:20px;position:relative}
+canvas{display:block;box-shadow:0 0 0 1px #000,0 8px 30px rgba(0,0,0,.5);cursor:crosshair;touch-action:none;max-width:100%}
+.dlg{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:var(--panel);border:1px solid #111;border-radius:6px;box-shadow:0 14px 40px rgba(0,0,0,.6);width:min(360px,calc(100% - 32px));z-index:10}
+.dlg h3{margin:0;padding:9px 14px;font-size:12px;font-weight:600;background:var(--bar);border-bottom:1px solid var(--line);border-radius:6px 6px 0 0}
+.dlg .in{padding:14px 16px;font-size:13px;line-height:1.5}
+.dlg .big{font-size:22px;font-weight:700;margin:0 0 4px}
+.dlg p{margin:0 0 8px;color:#c8c8c8}
+.dlg .acts{display:flex;justify-content:flex-end;gap:8px;padding:0 16px 14px}
+
+.status{grid-column:1/-1;background:var(--bar);border-top:1px solid var(--line);display:flex;align-items:center;gap:16px;padding:0 10px;color:var(--muted);white-space:nowrap;overflow:hidden}
+.status .msg{color:var(--text)}
+.status .msg.bad{color:var(--warn)}.status .msg.ok{color:var(--good)}
+
+.right{background:var(--panel);border-left:1px solid var(--line);display:flex;flex-direction:column;min-height:0;overflow-y:auto}
+.pnl{border-bottom:1px solid var(--line)}
+.ph{display:flex;gap:14px;padding:6px 10px;background:var(--bar);font-weight:600;color:var(--muted)}
+.ph span.on{color:var(--text)}
+.info{padding:10px 12px;display:grid;grid-template-columns:auto 1fr;gap:5px 12px;font-variant-numeric:tabular-nums}
+.info dt{color:var(--muted)}.info dd{margin:0;text-align:right}
+.holes{display:grid;grid-template-columns:repeat(8,1fr);gap:3px;padding:0 12px 12px}
+.holes button{height:22px;border-radius:3px;background:var(--panel2);border:1px solid var(--lineL);font-size:11px;color:var(--text)}
+.holes button.on{background:var(--blue);border-color:var(--blueDk);color:#fff}
+.holes button:disabled{opacity:.35;cursor:default}
+.holes button .sc{display:block;font-size:8px;line-height:1}
+.hist{max-height:160px;overflow-y:auto;padding:4px 0}
+.hist div{padding:3px 12px 3px 30px;position:relative;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hist div::before{content:"";position:absolute;left:12px;top:6px;width:10px;height:8px;border:1px solid #777;border-radius:1px}
+.hist div.cur{background:var(--sel)}
+.layers{padding:4px 0}
+.ly{display:grid;grid-template-columns:18px 30px 1fr;gap:8px;align-items:center;padding:3px 10px;border-bottom:1px solid #2a2a2a}
+.ly.on{background:var(--sel)}
+.ly .eye{color:#bbb;font-size:11px;text-align:center}
+.ly .th{width:30px;height:22px;border:1px solid #111;background:#fff}
+.ly span:last-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.strip{display:none;gap:12px;padding:4px 10px;background:var(--bar);border-bottom:1px solid var(--line);color:var(--muted);font-variant-numeric:tabular-nums;flex-wrap:wrap}
+.strip b{color:var(--text)}
+
+@media (max-width:980px){.app{grid-template-columns:44px minmax(0,1fr)}.right{display:none}.strip{display:flex}}
+@media (max-width:620px){
+  .app{grid-template-columns:minmax(0,1fr);grid-template-rows:28px auto minmax(0,1fr) 24px}
+  .tools{display:none}
+  .menu span:nth-child(n+5){display:none}
+  .opts{flex-wrap:wrap;padding:6px 10px;row-gap:6px;white-space:normal}
+  .opts .deco{display:none}
+  .board{padding:10px}
+}
+</style>
+
+<div class="app">
+  <nav class="menu" aria-hidden="true"><span class="ps">Px</span><span>File</span><span>Edit</span><span>Image</span><span>Layer</span><span>Type</span><span>Select</span><span>Filter</span><span>View</span><span>Window</span><span>Help</span></nav>
+
+  <div class="opts" role="toolbar" aria-label="Pen options">
+    <svg class="deco" width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="#ddd" stroke-width="1.2"><path d="M8 1.5 12 9l-4 5.5L4 9z"/><circle cx="8" cy="8.5" r="1"/></svg>
+    <span class="dd deco">Path ▾</span><span class="lab deco">Make:</span><span class="dd deco">Selection…</span><span class="dd deco">Mask</span><span class="dd deco">Shape</span>
+    <span class="sep deco"></span>
+    <button class="ob go" id="runBtn" title="Stroke Path (Enter)">Stroke Path <kbd>⏎</kbd></button>
+    <button class="ob" id="undoBtn" title="Remove last anchor (Backspace)">Remove Anchor <kbd>⌫</kbd></button>
+    <button class="ob" id="clearBtn" title="Delete path">Delete Path</button>
+    <span class="sep"></span>
+    <span class="cnt">Anchors <b id="aCnt">0/4</b></span>
+    <span class="sep deco"></span>
+    <span class="lab deco">☐ Auto Add/Delete</span><span class="lab deco">☑ Align Edges</span>
+  </div>
+
+  <aside class="tools" aria-hidden="true">
+    <span>✥</span><span>⬚</span><span>➰</span><span>⌗</span><span>✑</span><span>🖌</span><span>⌫</span><span>▦</span>
+    <span class="on"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M8 1.5 12 9l-4 5.5L4 9z"/><circle cx="8" cy="8.5" r="1"/></svg></span>
+    <span style="font-family:serif;font-weight:700">T</span><span>▭</span><span>✋</span><span>⌕</span>
+    <span class="sw"><i></i><i></i></span>
+  </aside>
+
+  <section class="center">
+    <div class="tabs"><div class="tab"><span id="docName">hole_01_final.psd @ 100% (RGB/8)</span><span class="x">×</span></div></div>
+    <div class="strip" id="strip"></div>
+    <div class="board" id="board">
+      <canvas id="cv"></canvas>
+      <div class="dlg" id="dlg" hidden></div>
+    </div>
+  </section>
+
+  <aside class="right">
+    <div class="pnl">
+      <div class="ph"><span class="on">Info</span><span>Properties</span></div>
+      <dl class="info">
+        <dt>Hole</dt><dd id="iHole">1 of 8</dd>
+        <dt>Par</dt><dd id="iPar">1</dd>
+        <dt>Strokes</dt><dd id="iStr">0</dd>
+        <dt>Total vs par</dt><dd id="iTot">E</dd>
+      </dl>
+      <div class="holes" id="holes"></div>
+    </div>
+    <div class="pnl">
+      <div class="ph"><span class="on">History</span><span>Actions</span></div>
+      <div class="hist" id="hist"></div>
+    </div>
+    <div class="pnl">
+      <div class="ph"><span class="on">Layers</span><span>Channels</span><span>Paths</span></div>
+      <div class="layers" id="layers"></div>
+    </div>
+  </aside>
+
+  <footer class="status"><span>100%</span><span id="docSize">Doc: 1.14M/2.86M</span><span class="msg" id="msg">Pen tool: click to add anchors, drag to pull curve handles. Press Enter to stroke the path.</span></footer>
+</div>
+
+<script>
+(function(){
+const $=id=>document.getElementById(id);
+const cv=$('cv'),ctx=cv.getContext('2d');
+const W=800,H=500,R=9,G=900,FY=440;
+
+/* ---------- level helpers ---------- */
+// floor with a cup cut into it at cx
+function floorWithCup(cx,y=FY,from=0,to=W,col='#3f5a4a'){return [[from,y,cx-from,H-y,col,'Ground'],[cx+34,y,to-cx-34,H-y,col,'Ground copy'],[cx,y+30,34,H-y-30,col,'Cup base']]}
+const cupAt=(cx,y=FY)=>({x:cx,y:y,w:34,h:30});
+const L=[
+ {name:'Welcome',par:1,max:4,bg:'#dfe8e6',ball:[110,151],solids:[[40,160,150,18,'#c96b4b','Ledge'],...floorWithCup(620)],cup:cupAt(620),tip:'Click on the canvas to drop anchors from the ball towards the flag. Drag while clicking to curve. Then Stroke Path.'},
+ {name:'The Wall',par:2,max:4,bg:'#e7e1d6',ball:[90,111],solids:[[30,120,140,18,'#6b6fc2','Ledge'],[390,270,34,170,'#c96b4b','Wall'],...floorWithCup(640)],cup:cupAt(640),tip:'The ball can’t climb higher than it started. Dip down, then swoop up to launch it over the wall.'},
+ {name:'Up on the Shelf',par:2,max:5,bg:'#e3e6ee',ball:[70,81],solids:[[20,90,120,18,'#3f8f8a','Ledge'],[0,FY,W,H-FY,'#3f5a4a','Ground'],...floorWithCup(640,300,500,760,'#c9a04b')],cup:cupAt(640,300),tip:'The hole’s on a shelf. Land it softly.'},
+ {name:'Low Ceiling',par:2,max:5,bg:'#ece3dc',ball:[80,71],solids:[[20,80,130,18,'#a0376a','Ledge'],[280,0,60,280,'#3f5a4a','Overhang'],[560,380,22,60,'#c96b4b','Kerb'],...floorWithCup(680)],cup:cupAt(680),tip:'Go under the overhang, then hop the kerb.'},
+ {name:'Mind the Gap',par:2,max:5,bg:'#dde7ef',ball:[60,101],solids:[[10,110,120,18,'#6b6fc2','Ledge'],[0,FY,300,H-FY,'#3f5a4a','Ground'],...floorWithCup(700,FY,540,W)],cup:cupAt(700),tip:'There’s no floor in the middle. Clear the pit.'},
+ {name:'Zig Zag',par:3,max:6,bg:'#eae6dc',ball:[60,61],solids:[[10,70,110,18,'#3f8f8a','Ledge'],[240,160,30,280,'#c96b4b','Wall 1'],[470,0,30,300,'#a0376a','Wall 2'],...floorWithCup(680)],cup:cupAt(680),tip:'Over the first wall, under the second.'},
+ {name:'Pillar',par:3,max:5,bg:'#e4e8e1',ball:[60,51],solids:[[10,60,110,18,'#6b6fc2','Ledge'],[0,FY,W,H-FY,'#3f5a4a','Ground'],[430,290,100,150,'#c9a04b','Pillar'],[430,260,33,30,'#c9a04b','Pillar cap L'],[497,260,33,30,'#c9a04b','Pillar cap R'],[463,285,34,5,'#c9a04b','Cup base']],cup:{x:463,y:262,w:34,h:24},tip:'The hole sits on top of a pillar. Precision time.'},
+ {name:'final_FINAL',par:3,max:4,bg:'#efe2e0',ball:[50,51],solids:[[0,60,110,18,'#a0376a','Ledge'],[200,120,30,320,'#3f5a4a','Wall 1'],[360,0,30,330,'#c96b4b','Wall 2'],[520,200,30,240,'#6b6fc2','Wall 3'],...floorWithCup(700)],cup:cupAt(700),tip:'Only four anchors. Good luck.'},
+];
+
+/* ---------- save ---------- */
+let SV={unlocked:1,best:{}};
+try{const s=JSON.parse(localStorage.getItem('pg-save')||'null');if(s&&s.unlocked)SV=s}catch(e){}
+const save=()=>{try{localStorage.setItem('pg-save',JSON.stringify(SV))}catch(e){}};
+
+/* ---------- state ---------- */
+let lastTrail=null,lastBall=null,lv=0,anchors=[],drag=null,hover=null,strokes=0,run=null,hist=[],boss=false,lastPath=null;
+function load(i){
+  lv=i;anchors=[];lastTrail=null;lastBall=null;strokes=0;run=null;hist=['Open','Pen'];lastPath=null;
+  $('dlg').hidden=true;
+  $('docName').textContent=`hole_${String(i+1).padStart(2,'0')}_${L[i].name.toLowerCase().replace(/[^a-z]+/g,'_')}.psd @ 100% (RGB/8)`;
+  document.title=`hole_${String(i+1).padStart(2,'0')}_final.psd`;
+  status(L[i].tip);ui();draw();
+}
+const ball0=()=>({x:L[lv].ball[0],y:L[lv].ball[1]});
+
+/* ---------- path geometry ---------- */
+function nodes(){const b=ball0();return [{x:b.x,y:b.y,h:{x:0,y:0}},...anchors]}
+function sample(ns){
+  const pts=[];
+  for(let i=0;i<ns.length-1;i++){
+    const a=ns[i],b=ns[i+1],c1={x:a.x+a.h.x,y:a.y+a.h.y},c2={x:b.x-b.h.x,y:b.y-b.h.y};
+    for(let k=(i?1:0);k<=40;k++){const t=k/40,u=1-t;
+      pts.push({x:u*u*u*a.x+3*u*u*t*c1.x+3*u*t*t*c2.x+t*t*t*b.x,y:u*u*u*a.y+3*u*u*t*c1.y+3*u*t*t*c2.y+t*t*t*b.y})}
+  }
+  let s=0;pts.forEach((p,i)=>{if(i)s+=Math.hypot(p.x-pts[i-1].x,p.y-pts[i-1].y);p.s=s});
+  return pts;
+}
+function at(pts,s){
+  let lo=0,hi=pts.length-1;while(hi-lo>1){const m=(lo+hi)>>1;if(pts[m].s<s)lo=m;else hi=m}
+  const a=pts[lo],b=pts[hi],d=(b.s-a.s)||1e-6,t=Math.max(0,Math.min(1,(s-a.s)/d));
+  return {x:a.x+(b.x-a.x)*t,y:a.y+(b.y-a.y)*t,tx:(b.x-a.x)/d,ty:(b.y-a.y)/d};
+}
+
+/* ---------- physics ---------- */
+function hitsSolid(x,y,r,skip){for(const s of L[lv].solids){if(s===skip)continue;const cx=Math.max(s[0],Math.min(x,s[0]+s[2])),cy=Math.max(s[1],Math.min(y,s[1]+s[3]));if((x-cx)**2+(y-cy)**2<r*r)return s}return null}
+const inCup=(x,y)=>{const c=L[lv].cup;return x>c.x+2&&x<c.x+c.w-2&&y>c.y+4&&y<c.y+c.h+4};
+function stroke(){
+  if(run||boss||!anchors.length)return;
+  strokes++;const pts=sample(nodes());lastPath=pts;
+  run={mode:'rail',pts,s:0,v:70,x:pts[0].x,y:pts[0].y,vx:0,vy:0,still:0,trail:[],t:0};
+  hist.push('Stroke Path');ui();status('Stroking path…');
+}
+function step(dt){
+  const r=run;r.t+=dt;
+  if(r.mode==='rail'){
+    const p=at(r.pts,r.s);
+    r.v+=(G*p.ty-r.v*0.08)*dt;r.s+=r.v*dt;
+    const q=at(r.pts,r.s);r.x=q.x;r.y=q.y;
+    if(r.s>=r.pts[r.pts.length-1].s){r.mode='free';r.vx=q.tx*r.v;r.vy=q.ty*r.v}
+    else if(r.s<=0&&r.v<0)return fail('The ball rolled back. It can’t climb higher than where it started.');
+    else if(Math.abs(r.v)<4){r.still+=dt;if(r.still>1)return fail('The ball stalled on the path. Needs more downhill.')}
+    else r.still=0;
+    if(hitsSolid(r.x,r.y,R*.5,L[lv].solids[0])){r.mode='free';r.vx=q.tx*r.v;r.vy=q.ty*r.v}
+  }else{
+    r.vy+=G*dt;r.x+=r.vx*dt;r.y+=r.vy*dt;
+    for(let k=0;k<2;k++){
+      for(const s of L[lv].solids){
+        const cx=Math.max(s[0],Math.min(r.x,s[0]+s[2])),cy=Math.max(s[1],Math.min(r.y,s[1]+s[3]));
+        const dx=r.x-cx,dy=r.y-cy,d2=dx*dx+dy*dy;
+        if(d2<R*R){let nx,ny,d=Math.sqrt(d2);
+          if(d<1e-4){nx=0;ny=-1;d=0}else{nx=dx/d;ny=dy/d}
+          r.x+=nx*(R-d);r.y+=ny*(R-d);
+          const vn=r.vx*nx+r.vy*ny;
+          if(vn<0){r.vx-=1.42*vn*nx;r.vy-=1.42*vn*ny;const tx=-ny,ty=nx,vt=r.vx*tx+r.vy*ty;r.vx-=vt*tx*.0016;r.vy-=vt*ty*.0016}
+          
+        }
+      }
+    }
+    if(Math.hypot(r.vx,r.vy)<10){r.still+=dt;if(r.still>.7)return fail('The ball came to rest short of the hole.')}else r.still=0;
+    if(r.x<-40||r.x>W+40||r.y>H+40)return fail('Out of bounds. The ball left the canvas.');
+  }
+  if(r.t%0.03<dt)r.trail.push({x:r.x,y:r.y});
+  if(inCup(r.x,r.y))return win();
+  const cp=L[lv].cup;if(r.mode==='free'&&r.x>cp.x+3&&r.x<cp.x+cp.w-3&&r.y>=cp.y-R-1&&r.vy>=0&&Math.hypot(r.vx,r.vy)<560)return win();
+}
+function fail(why){lastTrail=run.trail.concat([{x:run.x,y:run.y}]);lastBall={x:run.x,y:run.y};run=null;hist.push('Stroke Path — missed');status(why+' Adjust the path and try again.','bad');ui();draw()}
+function win(){
+  const n=strokes,par=L[lv].par,diff=n-par;run=null;
+  const name=n===1?'Hole in one!':diff<=-2?'Eagle':diff===-1?'Birdie':diff===0?'Par':diff===1?'Bogey':diff===2?'Double bogey':`+${diff}`;
+  const prev=SV.best[lv];if(prev==null||n<prev)SV.best[lv]=n;
+  SV.unlocked=Math.max(SV.unlocked,Math.min(L.length,lv+2));save();
+  hist.push('Stroke Path — holed');ui();draw();status(`${name} Holed in ${n}.`,'ok');
+  const last=lv===L.length-1;
+  const tot=totalVsPar();
+  dialog('Save As',`<div class="big">${name}</div><p>Hole ${lv+1}, ${L[lv].name}: ${n} stroke${n>1?'s':''}, par ${par}.</p><p>Course total: ${tot.txt} after ${tot.played} hole${tot.played>1?'s':''}.</p>${last?'<p>That’s the course done. Save it as final_final_ACTUALLY_FINAL.psd.</p>':''}`,
+   last?[['Play again',()=>{load(lv)}],['Back to hole 1',()=>load(0),1]]:[['Replay',()=>load(lv)],['Next hole',()=>load(lv+1),1]]);
+}
+function totalVsPar(){let d=0,n=0;L.forEach((l,i)=>{if(SV.best[i]!=null){d+=SV.best[i]-l.par;n++}});return {txt:d===0?'level par':d>0?`+${d}`:`${d}`,d,played:n}}
+
+/* ---------- input ---------- */
+let scale=1;
+function fit(){
+  const b=$('board').getBoundingClientRect();const pad=window.innerWidth<620?20:40;
+  scale=Math.min((b.width-pad)/W,(b.height-pad)/H,1.4);scale=Math.max(scale,.3);
+  const dpr=Math.min(2,window.devicePixelRatio||1);
+  cv.style.width=W*scale+'px';cv.style.height=H*scale+'px';cv.width=Math.round(W*scale*dpr);cv.height=Math.round(H*scale*dpr);
+  ctx.setTransform(scale*dpr,0,0,scale*dpr,0,0);draw();
+}
+const pos=e=>{const r=cv.getBoundingClientRect();return {x:(e.clientX-r.left)/scale,y:(e.clientY-r.top)/scale}};
+cv.addEventListener('pointerdown',e=>{
+  if(run||boss||!$('dlg').hidden)return;
+  if(anchors.length>=L[lv].max){status(`Anchor limit reached (${L[lv].max}). Remove one or stroke the path.`,'bad');return}
+  const p=pos(e);drag={x:p.x,y:p.y,h:{x:0,y:0}};anchors.push(drag);cv.setPointerCapture(e.pointerId);
+  if(hist[hist.length-1]!=='Add Anchor Point')hist.push('Add Anchor Point');ui();draw();
+});
+cv.addEventListener('pointermove',e=>{
+  const p=pos(e);
+  if(drag){drag.h={x:p.x-drag.x,y:p.y-drag.y};draw();return}
+  hover=e.pointerType==='mouse'?p:null;if(!run)draw();
+});
+cv.addEventListener('pointerup',()=>{drag=null;ui()});
+cv.addEventListener('pointerleave',()=>{hover=null;if(!run)draw()});
+function undoAnchor(){if(run||boss)return;anchors.pop();hist.push('Delete Anchor Point');ui();draw()}
+function clearPath(){if(run||boss)return;anchors=[];lastPath=null;hist.push('Delete Path');ui();draw()}
+$('runBtn').onclick=stroke;$('undoBtn').onclick=undoAnchor;$('clearBtn').onclick=clearPath;
+addEventListener('keydown',e=>{
+  if(e.key==='Escape'){e.preventDefault();toggleBoss();return}
+  if(boss)return;
+  if(!$('dlg').hidden){if(e.key==='Enter'){e.preventDefault();const b=$('dlg').querySelector('.go');b&&b.click()}return}
+  if(e.key==='Enter'){e.preventDefault();stroke()}
+  else if(e.key==='Backspace'||e.key==='Delete'){e.preventDefault();undoAnchor()}
+  else if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'){e.preventDefault();undoAnchor()}
+});
+
+/* ---------- drawing ---------- */
+function roundRect(x,y,w,h,r){ctx.beginPath();ctx.roundRect(x,y,w,h,r)}
+function draw(){
+  if(boss)return drawDecoy();
+  const l=L[lv];
+  ctx.fillStyle=l.bg;ctx.fillRect(0,0,W,H);
+  // faint guides like a design comp
+  ctx.strokeStyle='rgba(0,180,255,.18)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(W/2,0);ctx.lineTo(W/2,H);ctx.moveTo(0,H/2);ctx.lineTo(W,H/2);ctx.stroke();
+  // cup (shadow inside the hole)
+  const c=l.cup;ctx.fillStyle='rgba(0,0,0,.28)';ctx.fillRect(c.x,c.y,c.w,c.h);
+  // solids
+  for(const s of l.solids){ctx.fillStyle=s[4];ctx.fillRect(s[0],s[1],s[2],s[3])}
+  // flag
+  ctx.strokeStyle='#222';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(c.x+c.w/2,c.y+c.h);ctx.lineTo(c.x+c.w/2,c.y-60);ctx.stroke();
+  ctx.fillStyle='#e0473a';ctx.beginPath();ctx.moveTo(c.x+c.w/2,c.y-60);ctx.lineTo(c.x+c.w/2+30,c.y-50);ctx.lineTo(c.x+c.w/2,c.y-40);ctx.fill();
+  // where the last attempt actually went
+  if(lastTrail&&!run){ctx.strokeStyle='rgba(0,0,0,.22)';ctx.lineWidth=2;ctx.setLineDash([2,5]);poly(lastTrail);ctx.setLineDash([]);ctx.strokeStyle='rgba(0,0,0,.35)';ctx.beginPath();ctx.arc(lastBall.x,lastBall.y,R,0,7);ctx.stroke()}
+  // the path being edited
+  const ns=nodes();
+  if(ns.length>1){const pts=sample(ns);ctx.strokeStyle=run?'rgba(45,140,235,.45)':'#2d8ceb';ctx.lineWidth=1.5;poly(pts)}
+  if(!run){
+    // rubber band preview
+    if(hover&&!drag&&anchors.length<l.max){const a=ns[ns.length-1];const pts=sample([a,{x:hover.x,y:hover.y,h:{x:0,y:0}}]);ctx.strokeStyle='rgba(45,140,235,.6)';ctx.setLineDash([4,4]);ctx.lineWidth=1;poly(pts);ctx.setLineDash([])}
+    // handles and anchors
+    ns.forEach((n,i)=>{
+      if(i&&(n.h.x||n.h.y)){ctx.strokeStyle='#2d8ceb';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(n.x-n.h.x,n.y-n.h.y);ctx.lineTo(n.x+n.h.x,n.y+n.h.y);ctx.stroke();
+        [[n.x-n.h.x,n.y-n.h.y],[n.x+n.h.x,n.y+n.h.y]].forEach(([x,y])=>{ctx.fillStyle='#2d8ceb';ctx.beginPath();ctx.arc(x,y,3,0,7);ctx.fill()})}
+      if(i){ctx.fillStyle=i===ns.length-1?'#2d8ceb':'#fff';ctx.strokeStyle='#2d8ceb';ctx.lineWidth=1;ctx.fillRect(n.x-3.5,n.y-3.5,7,7);ctx.strokeRect(n.x-3.5,n.y-3.5,7,7)}
+    });
+  }
+  // trail + ball
+  if(run){ctx.strokeStyle='rgba(255,255,255,.7)';ctx.lineWidth=3;poly(run.trail)}
+  const b=run||ball0();
+  ctx.fillStyle='rgba(0,0,0,.18)';ctx.beginPath();ctx.ellipse(b.x+2,b.y+R-1,R*.8,2.5,0,0,7);ctx.fill();
+  const g=ctx.createRadialGradient(b.x-3,b.y-3,1,b.x,b.y,R);g.addColorStop(0,'#fff');g.addColorStop(1,'#cfd3d6');
+  ctx.fillStyle=g;ctx.beginPath();ctx.arc(b.x,b.y,R,0,7);ctx.fill();ctx.strokeStyle='rgba(0,0,0,.25)';ctx.lineWidth=1;ctx.stroke();
+}
+function poly(pts){if(pts.length<2)return;ctx.beginPath();pts.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));ctx.stroke()}
+function drawDecoy(){
+  ctx.fillStyle='#efe6d8';ctx.fillRect(0,0,W,H);
+  ctx.fillStyle='#d9573b';ctx.beginPath();ctx.arc(600,210,150,0,7);ctx.fill();
+  ctx.fillStyle='#2f4b58';ctx.fillRect(0,360,W,140);
+  ctx.fillStyle='#f3c14b';ctx.fillRect(520,330,170,40);
+  ctx.fillStyle='#1e2b31';ctx.font='700 86px Georgia,serif';ctx.textBaseline='alphabetic';ctx.fillText('Spring',50,170);
+  ctx.font='italic 400 86px Georgia,serif';ctx.fillText('Edit.',50,255);
+  ctx.font='600 16px system-ui,sans-serif';ctx.fillStyle='#1e2b31';ctx.fillText('NEW SEASON · IN STORE FRIDAY',54,300);
+  ctx.fillStyle='#efe6d8';ctx.font='600 15px system-ui,sans-serif';ctx.fillText('studioops.co.uk',54,440);
+  ctx.strokeStyle='rgba(0,180,255,.5)';ctx.lineWidth=1;ctx.setLineDash([4,3]);ctx.strokeRect(46,110,330,160);ctx.setLineDash([]);
+  [[46,110],[376,110],[46,270],[376,270]].forEach(([x,y])=>{ctx.fillStyle='#fff';ctx.strokeStyle='#2d8ceb';ctx.fillRect(x-3,y-3,6,6);ctx.strokeRect(x-3,y-3,6,6)});
+}
+
+/* ---------- panels ---------- */
+function ui(){
+  const l=L[lv];
+  $('aCnt').textContent=`${anchors.length}/${l.max}`;
+  $('runBtn').disabled=!anchors.length||!!run||boss;$('undoBtn').disabled=!anchors.length||!!run;$('clearBtn').disabled=!anchors.length||!!run;
+  $('iHole').textContent=`${lv+1} of ${L.length}`;$('iPar').textContent=l.par;$('iStr').textContent=strokes;
+  const t=totalVsPar();$('iTot').textContent=t.played?t.txt:'—';
+  $('holes').innerHTML=L.map((h,i)=>`<button data-h="${i}" class="${i===lv?'on':''}" ${i>=SV.unlocked?'disabled':''} title="${h.name}">${i+1}<span class="sc">${SV.best[i]!=null?SV.best[i]:''}</span></button>`).join('');
+  $('holes').querySelectorAll('[data-h]').forEach(b=>b.onclick=()=>{if(!run&&!boss)load(+b.dataset.h)});
+  $('hist').innerHTML=hist.slice(-14).map((h,i,a)=>`<div class="${i===a.length-1?'cur':''}">${h}</div>`).join('');
+  const hs=$('hist');hs.scrollTop=hs.scrollHeight;
+  const layers=[['Flag','#e0473a'],['Ball','#e6e8ea'],['Work Path','transparent'],...l.solids.slice().reverse().map(s=>[s[5],s[4]]),['Background',l.bg]];
+  $('layers').innerHTML=layers.map((x,i)=>`<div class="ly${x[0]==='Work Path'?' on':''}"><span class="eye">👁</span><span class="th" style="background:${x[1]==='transparent'?'repeating-conic-gradient(#ccc 0 25%,#fff 0 50%) 0 0/8px 8px':x[1]}"></span><span>${x[0]}</span></div>`).join('');
+  $('strip').innerHTML=`<span>Hole <b>${lv+1}/${L.length}</b></span><span>Par <b>${l.par}</b></span><span>Strokes <b>${strokes}</b></span><span>Total <b>${t.played?t.txt:'—'}</b></span>`;
+}
+function status(t,k){const m=$('msg');m.textContent=t;m.className='msg'+(k?' '+k:'')}
+function dialog(title,html,btns){
+  const d=$('dlg');d.hidden=false;
+  d.innerHTML=`<h3>${title}</h3><div class="in">${html}</div><div class="acts">${btns.map((b,i)=>`<button class="ob${b[2]?' go':''}" data-i="${i}">${b[0]}</button>`).join('')}</div>`;
+  d.querySelectorAll('[data-i]').forEach(b=>b.onclick=()=>{d.hidden=true;btns[+b.dataset.i][1]()});
+  const go=d.querySelector('.go');go&&go.focus();
+}
+
+/* ---------- boss ---------- */
+let saved=null;
+function toggleBoss(){
+  boss=!boss;
+  if(boss){
+    saved={doc:$('docName').textContent,title:document.title,msg:$('msg').textContent,dlg:!$('dlg').hidden};$('dlg').hidden=true;
+    $('docName').textContent='spring_edit_poster_v4.psd @ 66.7% (CMYK/8)';document.title='spring_edit_poster_v4.psd';status('Click and drag to move the selection.');
+    $('hist').innerHTML=['Open','Place Embedded','Free Transform','Type Layer','Move','Ellipse Tool','Rectangle Tool','Nudge'].map((h,i,a)=>`<div class="${i===a.length-1?'cur':''}">${h}</div>`).join('');
+    $('layers').innerHTML=[['Headline','#1e2b31'],['Subhead','#1e2b31'],['URL','#efe6d8'],['Price tag','#f3c14b'],['Sun','#d9573b'],['Band','#2f4b58'],['Background','#efe6d8']].map((x,i)=>`<div class="ly${i===0?' on':''}"><span class="eye">👁</span><span class="th" style="background:${x[1]}"></span><span>${x[0]}</span></div>`).join('');
+    $('strip').innerHTML='<span>66.7%</span><span>CMYK/8</span>';$('aCnt').textContent='—';
+    draw();
+  }else{
+    $('docName').textContent=saved.doc;document.title=saved.title;status(saved.msg);if(saved.dlg)$('dlg').hidden=false;ui();draw();
+  }
+}
+
+/* ---------- loop ---------- */
+let last=performance.now();
+function frame(t){
+  const dt=Math.min(.05,(t-last)/1000);last=t;
+  if(run&&!boss){const n=8;for(let i=0;i<n&&run;i++)step(dt/n);draw();if(!run)ui()}
+  requestAnimationFrame(frame);
+}
+addEventListener('resize',fit);
+load(Math.min(SV.unlocked-1,L.length-1));fit();requestAnimationFrame(frame);
+if(SV.unlocked===1&&!Object.keys(SV.best).length)dialog('Pen Tool Golf',`<p>Get the ball into the hole by drawing its path with the pen tool.</p><p><b>Click</b> to add an anchor. <b>Click and drag</b> to pull out curve handles. The path always starts at the ball. Press <b>Enter</b> (or Stroke Path) and the ball rolls along it, then flies off the end.</p><p>Gravity is real: the ball can’t climb higher than it started. Each attempt is a stroke. Esc hides everything.</p>`,[['Got it',()=>{},1]]);
+})();
+</script>
+
+</html>

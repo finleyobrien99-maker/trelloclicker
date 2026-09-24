@@ -1,0 +1,360 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>New chat – Assistant</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500&display=swap">
+<style>
+:root{
+  --bg:#f6f6f3; --side:#eeeeea; --card:#ffffff; --text:#22231f; --muted:#6c6d66; --line:#dddcd5;
+  --bubble:#e7e6df; --accent:#2b5f75; --accentSoft:#dde9ee; --danger:#b8412f; --gold:#a57a17;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#1f201d; --side:#191a18; --card:#2a2b27; --text:#ecebe5; --muted:#a3a39a; --line:#3a3b36;
+    --bubble:#34352f; --accent:#7fb6cc; --accentSoft:#28404a; --danger:#e07a63; --gold:#d8b25a;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#1f201d; --side:#191a18; --card:#2a2b27; --text:#ecebe5; --muted:#a3a39a; --line:#3a3b36;
+  --bubble:#34352f; --accent:#7fb6cc; --accentSoft:#28404a; --danger:#e07a63; --gold:#d8b25a;
+}
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{background:var(--bg);color:var(--text);font-family:Figtree,system-ui,-apple-system,"Segoe UI",sans-serif;font-size:15px;overflow:hidden}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.app{display:grid;grid-template-columns:260px minmax(0,1fr);height:100%}
+
+/* sidebar */
+.side{background:var(--side);border-right:1px solid var(--line);display:flex;flex-direction:column;padding:14px 10px;gap:14px;min-height:0}
+.brand{display:flex;align-items:center;gap:10px;padding:4px 8px;font-weight:600;font-size:17px}
+.mark{width:26px;height:26px;border-radius:8px;background:var(--accent);display:grid;place-items:center}
+.mark i{width:10px;height:10px;border-radius:50%;background:var(--bg)}
+.newchat{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:10px;font-weight:500}
+.newchat:hover{background:var(--line)}
+.newchat span{width:22px;height:22px;border-radius:50%;background:var(--accent);color:var(--bg);display:grid;place-items:center;font-size:16px;line-height:1}
+.recents{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:1px}
+.recents h4{margin:6px 10px 6px;font-size:12px;font-weight:500;color:var(--muted)}
+.recents div{padding:7px 10px;border-radius:8px;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text)}
+.recents div.on{background:var(--line)}
+.who{display:flex;align-items:center;gap:10px;padding:8px;border-top:1px solid var(--line);font-size:14px}
+.who .av{width:30px;height:30px;border-radius:50%;background:#c77d3a;color:#fff;display:grid;place-items:center;font-weight:600;font-size:13px}
+.who small{display:block;color:var(--muted);font-size:12px}
+
+/* main */
+.main{display:flex;flex-direction:column;min-height:0;min-width:0}
+.top{display:flex;align-items:center;gap:10px;padding:12px 20px;min-height:56px}
+.top .t{font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chips{margin-left:auto;display:flex;gap:8px;flex:none}
+.chip{border:1px solid var(--line);border-radius:999px;padding:4px 11px;font-size:13px;color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums;background:var(--card)}
+.chip b{color:var(--text);font-weight:600}
+.menu{display:none;padding:6px;border-radius:8px}
+.col{flex:1;min-height:0;display:flex;flex-direction:column;width:100%;max-width:780px;margin:0 auto;padding:0 20px 16px}
+.ubub{align-self:flex-end;background:var(--bubble);border-radius:18px;padding:10px 16px;max-width:80%;line-height:1.45;margin:6px 0 10px}
+.field{flex:1;min-height:0;position:relative}
+canvas{display:block;width:100%;height:100%;touch-action:none}
+.overlay{position:absolute;inset:0;display:grid;place-items:center;padding:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px 22px;max-width:420px;width:100%;box-shadow:0 10px 30px rgba(0,0,0,.12)}
+.card h2{margin:0 0 8px;font-family:"Source Serif 4",Georgia,serif;font-weight:500;font-size:22px}
+.card p{margin:0 0 10px;line-height:1.5;color:var(--text)}
+.card .muted{color:var(--muted);font-size:13.5px}
+.card .acts{display:flex;justify-content:flex-end;gap:8px;margin-top:14px}
+.btn{background:var(--accent);color:var(--bg);border-radius:10px;padding:8px 16px;font-weight:600}
+.btn.sec{background:none;color:var(--text);border:1px solid var(--line)}
+
+/* decoy chat */
+.decoy{flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:6px;padding-bottom:10px}
+.amsg{font-family:"Source Serif 4",Georgia,serif;font-size:16.5px;line-height:1.6;max-width:68ch}
+.amsg p{margin:0 0 12px}
+.amsg blockquote{margin:0 0 12px;padding:10px 14px;border-left:3px solid var(--line);background:var(--card);border-radius:0 8px 8px 0;font-size:15.5px}
+.composer{border:1px solid var(--line);background:var(--card);border-radius:18px;padding:12px 12px 10px 16px;display:flex;flex-direction:column;gap:10px;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.composer .ph{color:var(--muted)}
+.composer .row{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:13px}
+.composer .send{margin-left:auto;width:32px;height:32px;border-radius:10px;background:var(--accent);color:var(--bg);display:grid;place-items:center}
+.foot{text-align:center;font-size:12px;color:var(--muted);margin-top:8px}
+body:not(.boss) .decoy,body:not(.boss) .composer{display:none}
+body.boss .field,body.boss .ubub.game{display:none}
+
+@media (max-width:860px){
+  .app{grid-template-columns:minmax(0,1fr)}
+  .side{position:fixed;inset:0 auto 0 0;width:min(280px,82vw);z-index:30;transform:translateX(-105%);transition:transform .2s;padding-top:calc(14px + env(safe-area-inset-top,0px))}
+  .side.open{transform:none}
+  .menu{display:block}
+  .top{padding:10px 12px}
+  .col{padding:0 16px 12px}
+  .top .t{display:none}
+}
+@media (max-width:420px){.chip.lives{display:none}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="app">
+  <aside class="side" id="side">
+    <div class="brand"><span class="mark"><i></i></span>Assistant</div>
+    <button class="newchat" id="newChat"><span>+</span>New chat</button>
+    <div class="recents">
+      <h4>Recents</h4>
+      <div class="on" id="curTitle">One-sentence summary</div>
+      <div>Rewrite this email to sound less passive-aggressive</div>
+      <div>Ideas for a studio Christmas card</div>
+      <div>Explain kerning vs tracking</div>
+      <div>Excel formula for VAT</div>
+      <div>Shot list for product photos</div>
+      <div>Polite way to say "per my last email"</div>
+      <div>Colour palette for a coffee brand</div>
+    </div>
+    <div class="who"><span class="av">F</span><div>Fin<small>Studio Ops</small></div></div>
+  </aside>
+
+  <main class="main">
+    <header class="top">
+      <button class="menu" id="menuBtn" aria-label="Chats"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 5h14M3 10h14M3 15h14"/></svg></button>
+      <span class="t" id="topTitle">One-sentence summary ▾</span>
+      <div class="chips">
+        <span class="chip" id="cTok"><b>0</b> tokens</span>
+        <span class="chip lives" id="cLives"><b>3</b> messages left</span>
+      </div>
+    </header>
+
+    <div class="col">
+      <div class="ubub game" id="prompt">Summarise this in one sentence.</div>
+      <div class="field" id="field">
+        <canvas id="cv"></canvas>
+        <div class="overlay" id="over"></div>
+      </div>
+
+      <div class="decoy" id="decoy">
+        <div class="ubub">Can you tidy up this email to the printer? I want it to sound friendly but make it clear we need the proofs by Thursday.</div>
+        <div class="amsg">
+          <p>Here’s a tidier version that keeps it friendly but firm on the deadline:</p>
+          <blockquote>Hi Dan,<br><br>Hope you’re well! Just checking in on the spring leaflets. Could you send the proofs over by Thursday? We need a day to review them before sign-off on Friday.<br><br>Thanks so much,<br>Fin</blockquote>
+          <p>I moved the deadline into its own sentence so it doesn’t get lost, and gave the reason (sign-off on Friday), which makes it feel less like a demand. Want a shorter version for a quick message instead?</p>
+        </div>
+      </div>
+      <div class="composer" id="composer">
+        <span class="ph">Reply to Assistant…</span>
+        <div class="row"><span>＋</span><span>Tools</span><span class="send">↑</span></div>
+      </div>
+      <div class="foot">Assistant can make mistakes. Please double-check responses.</div>
+    </div>
+  </main>
+</div>
+
+<script>
+(function(){
+const $=id=>document.getElementById(id);
+const cv=$('cv'),ctx=cv.getContext('2d');
+const WAVES=[
+ ['One-sentence summary','Summarise this in one sentence.','Certainly! Here is a comprehensive and nuanced summary that carefully captures every single key point, consideration, caveat and subtlety of the original text, all in one clear sentence.'],
+ ['Logo size question','Should I make the logo bigger?','Great question! Making the logo bigger is a nuanced decision that depends on brand guidelines, visual hierarchy, whitespace, stakeholder expectations and, ultimately, the broader creative vision.'],
+ ['Running late email','Write a short email saying I’m running late.','Absolutely! Here’s a warm, professional, concise yet friendly email that acknowledges the delay, apologises sincerely and reaffirms your deep, lasting commitment to punctuality going forward.'],
+ ['Quick maths','What’s 2 + 2?','What a fascinating question with a long history! While many would say four, it’s worth exploring the philosophical, mathematical and cultural context before committing to any single answer.'],
+ ['Yes or no','Just say yes or no.','I understand you’d like a simple answer. However, it’s important to consider several perspectives, weigh the pros and cons carefully, and acknowledge that it really does depend.'],
+ ['Font recommendation','Which font should I use?','There are so many wonderful options! The perfect typeface depends on tone, audience, legibility, licensing, pairing, medium and the emotional resonance you hope to evoke in every reader.'],
+];
+let col={};
+function readCols(){const s=getComputedStyle(document.documentElement);['text','muted','accent','bubble','danger','gold','card','line','bg'].forEach(k=>col[k]=s.getPropertyValue('--'+k).trim())}
+readCols();setInterval(readCols,700);
+
+/* ---------- sizing ---------- */
+let W=600,H=500,dpr=1;
+function resize(){
+  const r=$('field').getBoundingClientRect();dpr=Math.min(2,window.devicePixelRatio||1);
+  W=Math.max(260,r.width);H=Math.max(260,r.height);cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr);
+  if(pl){pl.y=H-30;pl.x=Math.min(pl.x,W-24)}
+}
+const FS=()=>W<480?15:18;
+
+/* ---------- state ---------- */
+let best=0;try{best=+localStorage.getItem('as-best')||0}catch(e){}
+let state='idle',boss=false,pl,words,shot,eb,shields,ufo,parts,score,lives,wave,dir,fireT,ufoT,msg,held=false;
+function newGame(){score=0;lives=3;wave=0;pl={x:W/2,y:H-30,inv:0};nextWave()}
+function nextWave(){
+  const w=WAVES[wave%WAVES.length];wave++;
+  $('prompt').textContent=w[1];$('curTitle').textContent=w[0];$('topTitle').textContent=w[0]+' ▾';
+  // pack the waffly answer into rows, like text being written
+  ctx.font=`${FS()}px "Source Serif 4",Georgia,serif`;
+  const maxW=W*(W<480?.8:.56),gap=FS()*.55,lh=FS()*1.9;
+  words=[];let row=0,x=0;
+  w[2].split(' ').forEach(t=>{const tw=ctx.measureText(t).width;if(x+tw>maxW&&x>0){row++;x=0}words.push({t,x,row,w:tw,alive:true,hit:0});x+=tw+gap});
+  const rows=row+1;
+  words.forEach(o=>{o.y=24+o.row*lh;o.pts=(rows-o.row)*10});
+  // centre the block
+  let bw=0;words.forEach(o=>bw=Math.max(bw,o.x+o.w));const ox=(W-bw)/2;words.forEach(o=>o.x+=ox);
+  dir=1;shot=null;eb=[];parts=[];ufo=null;ufoT=12+Math.random()*10;fireT=1.2;
+  shields=makeShields();msg={t:1.8,txt:wave>1?'Response '+wave:''};
+  hud();
+}
+function makeShields(){
+  const n=W<480?3:4,cw=W<480?4:5,cols=18,rows=8,out=[];
+  const mask=(c,r)=>{if(r===rows-1)return c>=2&&c<=5; if(r===rows-2)return c>=1&&c<cols-1; if((r===0)&&(c===0||c===cols-1))return false;return r<rows-2};
+  for(let i=0;i<n;i++){const sx=(W/(n))*(i+.5)-cols*cw/2,sy=H-100;const cells=[];
+    for(let r=0;r<rows;r++)for(let c=0;c<cols;c++)if(mask(c,r))cells.push({x:sx+c*cw,y:sy+r*cw,s:cw,on:true});out.push(cells)}
+  return out;
+}
+
+/* ---------- input ---------- */
+const keys={};let pointerX=null;
+addEventListener('keydown',e=>{
+  if(e.key==='Escape'){e.preventDefault();toggleBoss();return}
+  if(boss)return;
+  keys[e.key.toLowerCase()]=true;
+  if([' ','arrowleft','arrowright'].includes(e.key.toLowerCase())&&state==='play'){e.preventDefault();pointerX=null}
+  if(e.key==='Enter'&&state!=='play'&&document.activeElement.tagName!=='BUTTON'){e.preventDefault();start()}
+  if((e.key==='p'||e.key==='P')&&(state==='play'||state==='paused'))togglePause();
+});
+addEventListener('keyup',e=>keys[e.key.toLowerCase()]=false);
+const px=e=>e.clientX-cv.getBoundingClientRect().left;
+cv.addEventListener('pointermove',e=>{if(e.pointerType==='mouse'||held)pointerX=px(e)});
+cv.addEventListener('pointerdown',e=>{held=true;pointerX=px(e);cv.setPointerCapture(e.pointerId)});
+cv.addEventListener('pointerup',()=>held=false);cv.addEventListener('pointercancel',()=>held=false);
+cv.addEventListener('pointerleave',e=>{if(e.pointerType==='mouse')pointerX=null});
+
+/* ---------- update ---------- */
+function update(dt){
+  // player
+  const sp=340;
+  const k=(keys.arrowright||keys.d?1:0)-(keys.arrowleft||keys.a?1:0);
+  if(k)pl.x+=k*sp*dt;else if(pointerX!=null){const d=pointerX-pl.x;pl.x+=Math.sign(d)*Math.min(Math.abs(d),520*dt)}
+  pl.x=Math.max(22,Math.min(W-22,pl.x));if(pl.inv>0)pl.inv-=dt;
+  // fire: one shot on screen at a time, like the original
+  if(!shot&&(keys[' ']||held||(pointerX!=null&&state==='play'&&autoFire))){shot={x:pl.x,y:pl.y-18}}
+  if(shot){shot.y-=620*dt;if(shot.y<-10)shot=null}
+  // words march
+  const alive=words.filter(w=>w.alive);
+  if(!alive.length){score+=100;nextWave();msg={t:1.8,txt:'Response complete · +100 · Response '+wave};return}
+  const speed=(22+wave*6)*(1+(1-alive.length/words.length)*3.2);
+  let minX=1e9,maxX=-1e9,maxY=0;alive.forEach(w=>{minX=Math.min(minX,w.x);maxX=Math.max(maxX,w.x+w.w);maxY=Math.max(maxY,w.y)});
+  let drop=false;
+  if(dir>0&&maxX+speed*dt>W-6)drop=true;if(dir<0&&minX-speed*dt<6)drop=true;
+  if(drop){dir*=-1;words.forEach(w=>w.y+=FS()*.9)}else words.forEach(w=>w.x+=dir*speed*dt);
+  if(maxY+FS()>pl.y-14){lives=0;return end('The reply got too long','It pushed all the way down to the message box.')}
+  // words erase shields they touch
+  alive.forEach(w=>shields.forEach(s=>s.forEach(c=>{if(c.on&&c.x<w.x+w.w&&c.x+c.s>w.x&&c.y<w.y+4&&c.y+c.s>w.y-FS())c.on=false})));
+  // enemy fire from bottom-most words
+  fireT-=dt;
+  if(fireT<=0){fireT=Math.max(.35,1.25-wave*.08)*(0.6+Math.random()*.8);
+    const byCol={};alive.forEach(w=>{const k=Math.round((w.x+w.w/2)/40);if(!byCol[k]||byCol[k].y<w.y)byCol[k]=w});
+    const shooters=Object.values(byCol);const aimed=shooters.filter(w=>Math.abs(w.x+w.w/2-pl.x)<90);
+    const s=(aimed.length&&Math.random()<.5)?aimed[Math.floor(Math.random()*aimed.length)]:shooters[Math.floor(Math.random()*shooters.length)];
+    if(s)eb.push({x:s.x+s.w/2,y:s.y+4,v:170+wave*14,ph:Math.random()*6})}
+  eb.forEach(b=>{b.y+=b.v*dt;b.ph+=dt*18});
+  // shot vs words / ufo / shields
+  if(shot){
+    for(const w of alive){if(shot.x>w.x-2&&shot.x<w.x+w.w+2&&shot.y<w.y+4&&shot.y>w.y-FS()){w.alive=false;w.hit=.25;score+=w.pts;burst(w.x+w.w/2,w.y-FS()/2,col.text,8);shot=null;break}}
+    if(shot&&ufo&&Math.abs(shot.x-ufo.x)<ufo.w/2&&Math.abs(shot.y-ufo.y)<14){const p=[50,100,150,300][Math.floor(Math.random()*4)];score+=p;msg={t:1.4,txt:'Thinking… interrupted · +'+p};burst(ufo.x,ufo.y,col.gold,14);ufo=null;shot=null}
+    if(shot&&hitShield(shot.x,shot.y,true))shot=null;
+  }
+  // enemy bullets vs shields / player
+  for(const b of eb){
+    if(hitShield(b.x,b.y,false)){b.dead=1;continue}
+    if(pl.inv<=0&&Math.abs(b.x-pl.x)<16&&b.y>pl.y-12&&b.y<pl.y+12){b.dead=1;lives--;pl.inv=1.4;burst(pl.x,pl.y,col.danger,16);eb=[];
+      if(lives<=0)return end('You’ve run out of messages','Your limit resets at 17:00. Or, you know, just start a new chat.');break}
+  }
+  eb=eb.filter(b=>!b.dead&&b.y<H);
+  // ufo: the "Thinking…" pill
+  ufoT-=dt;if(ufoT<=0&&!ufo){const r=Math.random()<.5;ufo={x:r?-60:W+60,y:12,v:r?110:-110,w:96};ufoT=18+Math.random()*14}
+  if(ufo){ufo.x+=ufo.v*dt;if(ufo.x<-80||ufo.x>W+80)ufo=null}
+  words.forEach(w=>{if(w.hit>0)w.hit-=dt});
+  parts.forEach(p=>{p.x+=p.vx*dt;p.y+=p.vy*dt;p.l-=dt});parts=parts.filter(p=>p.l>0);
+  if(msg){msg.t-=dt;if(msg.t<=0)msg=null}
+}
+let autoFire=false;
+function hitShield(x,y,up){
+  for(const s of shields)for(const c of s){if(c.on&&x>=c.x-1&&x<=c.x+c.s+1&&y>=c.y&&y<=c.y+c.s){
+    c.on=false;s.forEach(o=>{if(o.on&&Math.hypot(o.x-c.x,o.y-c.y)<c.s*2.2&&Math.random()<.55)o.on=false});return true}}
+  return false;
+}
+function burst(x,y,c,n){for(let i=0;i<n;i++){const a=Math.random()*Math.PI*2,s=40+Math.random()*120;parts.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,l:.35+Math.random()*.25,c})}}
+
+/* ---------- draw ---------- */
+function draw(){
+  ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,W,H);
+  const fs=FS();
+  // words
+  ctx.textBaseline='alphabetic';ctx.textAlign='left';
+  for(const w of words){
+    if(w.alive){ctx.font=`${fs}px "Source Serif 4",Georgia,serif`;ctx.fillStyle=col.text;ctx.fillText(w.t,w.x,w.y)}
+    else if(w.hit>0){ctx.globalAlpha=w.hit*4;ctx.font=`${fs}px "Source Serif 4",Georgia,serif`;ctx.fillStyle=col.muted;ctx.fillText(w.t,w.x,w.y);
+      ctx.strokeStyle=col.danger;ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(w.x,w.y-fs*.32);ctx.lineTo(w.x+w.w,w.y-fs*.32);ctx.stroke();ctx.globalAlpha=1}
+  }
+  // blinking cursor after the last live word, like streaming text
+  const last=[...words].reverse().find(w=>w.alive);
+  if(last&&Math.floor(performance.now()/500)%2){ctx.fillStyle=col.text;ctx.fillRect(last.x+last.w+3,last.y-fs*.8,2,fs*.95)}
+  // ufo
+  if(ufo){ctx.font='500 12.5px Figtree,system-ui';const tw=ctx.measureText('Thinking…').width+30;ufo.w=tw;
+    ctx.fillStyle=col.card;ctx.strokeStyle=col.gold;ctx.lineWidth=1.3;ctx.beginPath();ctx.roundRect(ufo.x-tw/2,ufo.y-11,tw,22,11);ctx.fill();ctx.stroke();
+    ctx.fillStyle=col.gold;ctx.beginPath();ctx.arc(ufo.x-tw/2+12,ufo.y,3.5+Math.sin(performance.now()/150),0,7);ctx.fill();
+    ctx.fillStyle=col.muted;ctx.textBaseline='middle';ctx.fillText('Thinking…',ufo.x-tw/2+21,ufo.y+.5)}
+  // shields: your own chat bubbles
+  ctx.fillStyle=col.bubble;for(const s of shields)for(const c of s)if(c.on)ctx.fillRect(c.x,c.y,c.s+.5,c.s+.5);
+  // enemy bullets: squiggles
+  ctx.strokeStyle=col.danger;ctx.lineWidth=2;
+  for(const b of eb){ctx.beginPath();for(let i=0;i<4;i++){const yy=b.y-12+i*4;const xx=b.x+(i%2?3:-3)*Math.sin(b.ph);i?ctx.lineTo(xx,yy):ctx.moveTo(xx,yy)}ctx.stroke()}
+  // player shot: a text caret
+  if(shot){ctx.fillStyle=col.accent;ctx.fillRect(shot.x-1,shot.y-12,2,14)}
+  // particles
+  for(const p of parts){ctx.globalAlpha=Math.max(0,p.l*2.5);ctx.fillStyle=p.c;ctx.fillRect(p.x-1.5,p.y-1.5,3,3)}ctx.globalAlpha=1;
+  // composer strip + send button (the player)
+  ctx.fillStyle=col.card;ctx.strokeStyle=col.line;ctx.lineWidth=1;ctx.beginPath();ctx.roundRect(2,H-50,W-4,44,16);ctx.fill();ctx.stroke();
+  ctx.fillStyle=col.muted;ctx.font='14px Figtree,system-ui';ctx.textBaseline='middle';ctx.textAlign='left';
+  
+  if(!(pl.inv>0&&Math.floor(pl.inv*10)%2)){
+    ctx.fillStyle=col.accent;ctx.beginPath();ctx.roundRect(pl.x-16,pl.y-16,32,32,10);ctx.fill();
+    ctx.strokeStyle=col.bg;ctx.lineWidth=2.2;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(pl.x,pl.y+7);ctx.lineTo(pl.x,pl.y-7);ctx.moveTo(pl.x-5,pl.y-2);ctx.lineTo(pl.x,pl.y-7);ctx.lineTo(pl.x+5,pl.y-2);ctx.stroke();ctx.lineCap='butt';
+  }
+  if(msg&&msg.txt){ctx.globalAlpha=Math.min(1,msg.t*2);ctx.fillStyle=col.muted;ctx.font='500 13px Figtree,system-ui';ctx.textAlign='center';ctx.fillText(msg.txt,W/2,H-118);ctx.globalAlpha=1}
+}
+
+/* ---------- HUD & flow ---------- */
+function hud(){
+  $('cTok').innerHTML=`<b>${score.toLocaleString('en-GB')}</b> tokens`;
+  $('cLives').innerHTML=`<b>${Math.max(0,lives)}</b> message${lives===1?'':'s'} left`;
+}
+function overlay(html,fn){const o=$('over');o.innerHTML=html;o.hidden=!html;const b=o.querySelector('.btn');if(b)b.onclick=fn||start}
+function start(){resize();newGame();state='play';overlay('');last=performance.now()}
+function end(title,why){
+  state='over';hud();const nb=score>best;if(nb){best=score;try{localStorage.setItem('as-best',best)}catch(e){}}
+  overlay(`<div class="card"><h2>${title}</h2><p>${why}</p><p class="muted">${score.toLocaleString('en-GB')} tokens on response ${wave}.${nb?' A new personal best.':' Best: '+best.toLocaleString('en-GB')+'.'}</p><div class="acts"><button class="btn">Start new chat</button></div></div>`);
+}
+function togglePause(){
+  if(state==='play'){state='paused';overlay(`<div class="card"><h2>Paused</h2><p>The assistant is waiting patiently. Unusually.</p><div class="acts"><button class="btn">Continue</button></div></div>`,()=>{state='play';overlay('');last=performance.now()})}
+  else if(state==='paused'){state='play';overlay('');last=performance.now()}
+}
+function toggleBoss(){
+  boss=!boss;document.body.classList.toggle('boss',boss);
+  $('topTitle').textContent=boss?'Printer email tidy-up ▾':$('curTitle').textContent+' ▾';
+  if(boss){$('curTitle').dataset.t=$('curTitle').textContent;$('curTitle').textContent='Printer email tidy-up';if(state==='play')state='held';$('cTok').hidden=true;$('cLives').hidden=true}
+  else{$('curTitle').textContent=$('curTitle').dataset.t||$('curTitle').textContent;$('topTitle').textContent=$('curTitle').textContent+' ▾';$('cTok').hidden=false;$('cLives').hidden=false;
+    if(state==='held'){state='paused';togglePause()}}
+}
+$('newChat').onclick=()=>{$('side').classList.remove('open');if(boss)toggleBoss();start()};
+$('menuBtn').onclick=()=>$('side').classList.toggle('open');
+
+let last=performance.now();
+function frame(t){
+  const dt=Math.min(.05,(t-last)/1000);last=t;
+  if(state==='play'&&!document.hidden){update(dt);hud()}
+  if(!boss&&words)draw();
+  requestAnimationFrame(frame);
+}
+
+/* ---------- boot ---------- */
+resize();addEventListener('resize',()=>{const was=W;resize();if(state!=='play'&&words&&Math.abs(W-was)>40){newGame()}});
+pl={x:W/2,y:H-30,inv:0};score=0;lives=3;wave=0;
+document.fonts&&document.fonts.ready.then(()=>{if(state==='idle'){nextWave();}});
+nextWave();
+overlay(`<div class="card"><h2>This reply is getting out of hand</h2>
+ <p>The assistant’s answer is waffling its way down the page. Shoot the words before they reach your message box.</p>
+ <p class="muted">Arrow keys or A/D to move, Space to fire. Mouse: hover to steer, click and hold to fire. Phone: touch and drag. Your old chat bubbles are shields. Hit the “Thinking…” pill for bonus tokens. P pauses, Esc hides everything.</p>
+ <div class="acts"><button class="btn">Start chat</button></div></div>`);
+requestAnimationFrame(frame);
+})();
+</script>
+
+</html>

@@ -1,0 +1,838 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Studio Ops – Hubbub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,700;6..12,800&display=swap">
+<style>
+:root{
+  --side:#1c2433; --side2:#232d40; --sideText:#b7c1d3; --sideHi:#ffffff; --sideAct:#d9932b; --sideActText:#1c2433;
+  --bg:#ffffff; --bg2:#f6f7f9; --text:#1d2129; --muted:#646c79; --line:#e4e7ec; --hover:#f3f4f7;
+  --accent:#b76e14; --accentSoft:#fbf0de; --link:#1f6fb2; --good:#2a7d46; --bad:#c0392b; --chip:#ffffff;
+  --narr:#fbfaf6; --mention:#fdf3dd;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --side:#121822; --side2:#18202c; --sideText:#9aa6b8; --sideAct:#e0a449;
+    --bg:#1b1f26; --bg2:#20252d; --text:#e4e8ee; --muted:#9aa3b1; --line:#2d333d; --hover:#232932;
+    --accent:#e8a64f; --accentSoft:#3a2e1c; --link:#74b3e6; --good:#6fcf8f; --bad:#f08a7e; --chip:#232932;
+    --narr:#1f242c; --mention:#3a321f;
+  }
+}
+:root[data-theme="dark"]{
+  --side:#121822; --side2:#18202c; --sideText:#9aa6b8; --sideAct:#e0a449;
+  --bg:#1b1f26; --bg2:#20252d; --text:#e4e8ee; --muted:#9aa3b1; --line:#2d333d; --hover:#232932;
+  --accent:#e8a64f; --accentSoft:#3a2e1c; --link:#74b3e6; --good:#6fcf8f; --bad:#f08a7e; --chip:#232932;
+  --narr:#1f242c; --mention:#3a321f;
+}
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--text);font-family:"Nunito Sans",system-ui,-apple-system,"Segoe UI",sans-serif;font-size:15px;overflow:hidden}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.app{display:grid;grid-template-columns:62px 250px minmax(0,1fr) 300px;height:100%}
+
+.rail{background:var(--side);display:flex;flex-direction:column;align-items:center;gap:10px;padding:12px 0}
+.ws{width:38px;height:38px;border-radius:10px;background:var(--sideAct);color:var(--sideActText);font-weight:800;display:grid;place-items:center;font-size:14px}
+.rail .ri{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;color:var(--sideText)}
+.side{background:var(--side2);color:var(--sideText);display:flex;flex-direction:column;min-height:0}
+.side-h{padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;justify-content:space-between}
+.side-h b{color:var(--sideHi);font-size:16px;font-weight:800}
+.side-h small{display:block;font-size:12px;color:var(--sideText);font-weight:400}
+.sb{overflow-y:auto;padding:10px 8px;display:flex;flex-direction:column;gap:16px}
+.sb h4{margin:0 8px 6px;font-size:12px;font-weight:600;opacity:.75}
+.ch{display:flex;align-items:center;gap:8px;width:100%;padding:5px 8px;border-radius:6px;text-align:left;color:var(--sideText)}
+.ch:hover{background:rgba(255,255,255,.06)}
+.ch.on{background:var(--sideAct);color:var(--sideActText);font-weight:700}
+.ch.near{color:var(--sideHi)}
+.ch.far{opacity:.55}
+.ch .h{width:14px;opacity:.75;text-align:center}
+.ch .tag{margin-left:auto;font-size:11px;opacity:.75}
+.ch .dot{width:8px;height:8px;border-radius:50%;background:#4fb676;flex:none;margin:0 3px}
+
+.main{display:flex;flex-direction:column;min-width:0;min-height:0}
+.top{display:flex;align-items:center;gap:10px;padding:10px 18px;border-bottom:1px solid var(--line);min-height:56px}
+.top h2{margin:0;font-size:17px;font-weight:800;white-space:nowrap}
+.top .topic{color:var(--muted);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.top .tt{min-width:0;display:flex;flex-direction:column}
+.menu{display:none;padding:6px;border-radius:6px}
+.top .right{margin-left:auto;display:flex;gap:6px;flex:none}
+.tb{border:1px solid var(--line);border-radius:6px;padding:4px 10px;font-size:13px;color:var(--muted);background:var(--bg)}
+.tb:hover{color:var(--text)}
+.feed{flex:1;overflow-y:auto;padding:12px 0 6px}
+.day{display:flex;align-items:center;gap:10px;margin:8px 18px;color:var(--muted);font-size:12px;font-weight:700}
+.day::before,.day::after{content:"";flex:1;height:1px;background:var(--line)}
+.msg{display:grid;grid-template-columns:38px minmax(0,1fr);gap:10px;padding:6px 18px}
+.msg:hover{background:var(--hover)}
+.msg.narr{background:var(--narr)}
+.msg.narr:hover{background:var(--hover)}
+.msg.cont{padding-top:0}
+.msg.cont .av{visibility:hidden;height:0}
+.msg.cont .who{display:none}
+.av{width:36px;height:36px;border-radius:8px;color:#fff;font-weight:800;font-size:13px;display:grid;place-items:center}
+.who{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.who b{font-weight:800}
+.who .tag{font-size:10px;font-weight:700;background:var(--line);color:var(--muted);border-radius:3px;padding:1px 4px}
+.who time{color:var(--muted);font-size:12px}
+.txt{line-height:1.5;overflow-wrap:anywhere}
+.txt p{margin:0 0 6px}.txt p:last-child{margin:0}
+.txt em{color:var(--muted)}
+.txt .it{font-weight:700;color:var(--accent)}
+.txt .pp{font-weight:700;color:var(--link)}
+.txt .ex{font-weight:700;color:var(--good)}
+.txt .dmg{font-weight:800;color:var(--bad)}
+.txt code{font-family:ui-monospace,Menlo,monospace;font-size:13px;background:var(--bg2);border:1px solid var(--line);border-radius:4px;padding:0 4px}
+.acts{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.act{border:1px solid var(--line);background:var(--chip);border-radius:6px;padding:4px 10px;font-size:13px;font-weight:600}
+.act:hover:not(:disabled){border-color:var(--accent);color:var(--accent)}
+.act:disabled{opacity:.45;cursor:default}
+.act.pri{background:var(--accent);border-color:var(--accent);color:#fff}
+.hpbar{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);margin-top:6px}
+.hpbar .tr{width:140px;height:7px;border-radius:4px;background:var(--line);overflow:hidden}
+.hpbar .tr i{display:block;height:100%;background:var(--bad);transition:width .25s}
+.card{border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:6px;padding:8px 12px;margin-top:6px;background:var(--bg)}
+
+.chips{display:flex;gap:6px;padding:0 18px 8px;overflow-x:auto;scrollbar-width:thin}
+.chip{flex:none;border:1px solid var(--line);background:var(--chip);border-radius:14px;padding:4px 11px;font-size:13px;font-weight:600;white-space:nowrap}
+.chip:hover{border-color:var(--accent);color:var(--accent)}
+.chip.go{color:var(--good)}.chip.pp{color:var(--link)}.chip.fight{color:var(--bad)}
+.compose{padding:0 18px 14px}
+.box{border:1px solid var(--line);border-radius:10px;background:var(--bg);display:flex;align-items:center;gap:8px;padding:6px 8px 6px 12px}
+.box:focus-within{border-color:var(--muted)}
+.box input{flex:1;border:0;background:none;color:var(--text);font:inherit;padding:6px 0;min-width:0}
+.box input:focus{outline:none}
+.send{background:var(--accent);color:#fff;border-radius:6px;padding:6px 12px;font-weight:700;font-size:13px}
+
+.panel{border-left:1px solid var(--line);overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:18px;background:var(--bg)}
+.panel h3{margin:0 0 8px;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:700;display:flex;justify-content:space-between}
+.me{display:flex;gap:12px;align-items:center}
+.me .av{width:48px;height:48px;border-radius:12px;font-size:18px}
+.me b{display:block;font-size:17px}
+.me span{font-size:13px;color:var(--muted)}
+.stat{display:flex;flex-direction:column;gap:4px;margin-top:10px}
+.stat .l{display:flex;justify-content:space-between;font-size:13px}
+.stat .l span:last-child{color:var(--muted);font-variant-numeric:tabular-nums}
+.meter{height:7px;border-radius:4px;background:var(--line);overflow:hidden}
+.meter i{display:block;height:100%;background:var(--good);transition:width .3s}
+.meter.low i{background:var(--bad)}
+.meter.time i{background:var(--accent)}
+.inv{display:flex;flex-direction:column;gap:6px}
+.item{display:grid;grid-template-columns:30px 1fr;gap:10px;align-items:center;border:1px solid var(--line);border-radius:8px;padding:6px 8px;text-align:left;width:100%}
+.item:hover{border-color:var(--accent)}
+.item .ic{width:30px;height:30px;border-radius:6px;background:var(--accentSoft);display:grid;place-items:center;font-size:15px}
+.item b{font-size:13.5px;display:block}
+.item small{font-size:12px;color:var(--muted)}
+.empty{font-size:13px;color:var(--muted)}
+.q{border:1px solid var(--line);border-radius:8px;padding:8px 10px;margin-bottom:6px}
+.q b{font-size:13.5px;display:flex;justify-content:space-between;gap:6px}
+.q b small{font-weight:600;color:var(--muted);font-size:11px}
+.q.done{opacity:.6}
+.q ul{margin:6px 0 0;padding:0;list-style:none;font-size:12.5px;display:flex;flex-direction:column;gap:3px}
+.q li{display:grid;grid-template-columns:16px 1fr;gap:4px;color:var(--muted)}
+.q li.ok{color:var(--text)}
+.q li::before{content:"○"}
+.q li.ok::before{content:"✓";color:var(--good);font-weight:800}
+
+/* disguise */
+.decoy-only{display:none!important}
+body.boss .decoy-only{display:revert!important}
+body.boss .game-only{display:none!important}
+body.boss #decoy{display:block!important}
+body.boss #feed{display:none!important}
+.dp h3{margin:0 0 8px}
+.dp p{margin:0 0 8px;font-size:14px;line-height:1.5}
+
+@media (max-width:1180px){.app{grid-template-columns:62px 230px minmax(0,1fr)}.panel{position:fixed;right:0;top:0;bottom:0;width:min(320px,90vw);z-index:25;transform:translateX(105%);transition:transform .2s;box-shadow:-8px 0 30px rgba(0,0,0,.2)}.panel.open{transform:none}}
+@media (max-width:780px){
+  .app{grid-template-columns:minmax(0,1fr)}.rail{display:none}
+  .side{position:fixed;inset:0 auto 0 0;width:min(280px,84vw);z-index:26;transform:translateX(-105%);transition:transform .2s;padding-top:env(safe-area-inset-top,0px)}
+  .side.open{transform:none}.menu{display:block}
+  .msg{padding:6px 12px}.chips,.compose{padding-left:12px;padding-right:12px}.day{margin-inline:12px}.top{padding:8px 12px}
+  .top .tb span{display:none}
+}
+.scrim{display:none}
+.scrim.open{display:block;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:24}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="app">
+  <nav class="rail" aria-hidden="true">
+    <span class="ws">SO</span>
+    <span class="ri"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 4h14v10H8l-5 3z"/></svg></span>
+    <span class="ri"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M10 3a5 5 0 0 0-5 5v3l-2 3h14l-2-3V8a5 5 0 0 0-5-5z"/></svg></span>
+  </nav>
+
+  <aside class="side" id="side">
+    <div class="side-h"><div><b>Studio Ops</b><small id="sideClock">Tuesday · 09:00</small></div><span>⌄</span></div>
+    <div class="sb">
+      <div><h4>Channels</h4><div id="chans"></div></div>
+      <div><h4>Direct messages</h4><div id="dms"></div></div>
+      <div class="game-only"><h4>Apps</h4>
+        <button class="ch" id="appInv"><span class="h">▤</span>Inventory</button>
+        <button class="ch" id="appQuest"><span class="h">✓</span>Quest log</button>
+        <button class="ch" id="appHelp"><span class="h">?</span>Help</button>
+      </div>
+    </div>
+  </aside>
+  <div class="scrim" id="scrim"></div>
+
+  <main class="main">
+    <header class="top">
+      <button class="menu" id="menuBtn" aria-label="Channels"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 5h14M3 10h14M3 15h14"/></svg></button>
+      <div class="tt"><h2 id="chName"># reception</h2><div class="topic" id="chTopic"></div></div>
+      <div class="right">
+        <button class="tb game-only" id="panelBtn" title="Details">ⓘ <span>Details</span></button>
+        <button class="tb" id="hideBtn" title="Huddle (Esc)">🎧 <span>Huddle</span></button>
+      </div>
+    </header>
+    <div class="feed" id="feed" aria-live="polite"></div>
+    <div class="feed" id="decoy" style="display:none"></div>
+    <div class="chips game-only" id="chips"></div>
+    <div class="compose">
+      <form class="box" id="form" autocomplete="off">
+        <input id="input" aria-label="Message" placeholder="Message #reception">
+        <button class="send" type="submit">Send</button>
+      </form>
+    </div>
+  </main>
+
+  <aside class="panel" id="panel">
+    <div class="game-only">
+      <h3>You</h3>
+      <div class="me"><span class="av" style="background:#c77d3a">F</span><div><b>Fin</b><span id="meTitle">Designer · on a deadline</span></div></div>
+      <div class="stat"><div class="l"><span>Energy</span><span id="sEnergy">30 / 30</span></div><div class="meter" id="mEnergy"><i style="width:100%"></i></div></div>
+      <div class="stat"><div class="l"><span>Time until 17:30</span><span id="sTime">8h 30m</span></div><div class="meter time" id="mTime"><i style="width:100%"></i></div></div>
+      <div class="stat"><div class="l"><span>Reputation</span><span id="sRep">0</span></div></div>
+    </div>
+    <div class="game-only"><h3>Inventory <span id="invCount">0</span></h3><div class="inv" id="inv"></div></div>
+    <div class="game-only"><h3>Quests</h3><div id="quests"></div></div>
+    <div class="decoy-only dp"><h3>About #general</h3><p>Company-wide announcements and work-based matters.</p><p style="color:var(--muted)">14 members · Created March 2021</p></div>
+  </aside>
+</div>
+
+<script>
+(function(){
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const norm=s=>s.toLowerCase().replace(/[^a-z0-9#' ]+/g,' ').replace(/\s+/g,' ').trim();
+const DEADLINE=510; // minutes after 09:00 = 17:30
+
+/* =========================================================
+   WORLD
+   ========================================================= */
+const I=n=>`<span class="it">${n}</span>`, P=n=>`<span class="pp">${n}</span>`, X=n=>`<span class="ex">#${n}</span>`;
+const ITEMS={
+ biscuit:{n:'digestive biscuit',ic:'🍪',al:['biscuit','digestive'],x:'A slightly soft digestive. Somebody, somewhere, would be very grateful for this.'},
+ tupperware:{n:'tupperware',ic:'🥡',al:['tupperware','box','lunch'],x:'Masking tape on the lid: “PROPERTY OF JANET. DO NOT EAT. I MEAN IT.” There’s a lasagne inside with one bite missing.'},
+ key:{n:'cupboard key',ic:'🗝️',al:['key','cupboard key'],x:'A small brass key on a keyring shaped like a stapler.'},
+ descaler:{n:'descaler',ic:'🧴',al:['descaler','descaling'],x:'Coffee machine descaler. “Use every 3 months.” Last used: 2019.'},
+ toner:{n:'toner cartridge',ic:'🖨️',al:['toner','cartridge'],x:'A black toner cartridge. Heavier than it has any right to be.'},
+ stapler:{n:'red stapler',ic:'📎',al:['stapler','red stapler'],weapon:2,x:'A heavy red stapler with “TOM” scratched into the base. Surprisingly good in a fight (+2 damage).'},
+ umbrella:{n:'golf umbrella',ic:'☂️',al:['umbrella','brolly'],x:'Enormous. Branded with a company that went bust in 2011. Keeps the rain off.'},
+ badge:{n:'facilities badge',ic:'🪪',al:['badge','facilities badge','lanyard'],x:'“M. PRYCE — FACILITIES — ALL AREAS”. The photo is of a man who has seen things.'},
+ usb:{n:'USB stick',ic:'💾',al:['usb','stick','usb stick','memory stick'],x:'A chunky USB stick with “DAN — IT — DO NOT WIPE” on it. Slightly chewed.'},
+ usbfile:{n:'USB stick (with final file)',ic:'💾',al:['usb','stick','usb stick','file','final file','artwork'],x:'Dan’s USB stick, now holding <code>final_FINAL_v7_USE-THIS.psd</code>. 2.4 GB of hope.'},
+ keycard:{n:'server room keycard',ic:'💳',al:['keycard','card','key card'],x:'A white keycard. Opens the server room. Dan made you promise not to touch “the blinky one”.'},
+ flatwhite:{n:'flat white',ic:'☕',al:['coffee','flat white','flatwhite'],food:14,x:'A proper flat white from the newly descaled machine. Drink it for energy, or give it to someone who deserves it.'},
+ proofs:{n:'printed proofs',ic:'📄',al:['proofs','proof','prints','printouts'],x:'Crisp colour proofs of the spring campaign. Still warm. The logo is, in fact, big enough.'},
+ signed:{n:'signed-off proofs',ic:'✅',al:['proofs','signed proofs','signed','sign off'],x:'The proofs, with “APPROVED — HW” scrawled across the top in green pen. The holy grail.'},
+ laser:{n:'laser pointer',ic:'🔴',al:['laser','pointer','laser pointer'],weapon:1,x:'A laser pointer from Meeting Room B. Surprisingly effective at distracting things (+1 damage).'},
+ headphones:{n:'noise-cancelling headphones',ic:'🎧',al:['headphones','cans'],def:2,x:'Tom’s spare noise-cancelling headphones. Everything hurts a bit less (take 2 less damage).'},
+ golden:{n:'golden stapler',ic:'🏆',al:['golden stapler','gold stapler','golden','gold'],weapon:4,x:'A stapler cast in gold, awarded for “Services to Stationery, 1998”. Devastating (+4 damage).'},
+ mute:{n:'mute button',ic:'🔇',al:['mute','mute button'],x:'A big red button labelled MUTE. In a fight, it silences an enemy for a turn. Works once per fight.'},
+ award:{n:'dusty award',ic:'🏅',al:['award','trophy'],x:'“BEST USE OF CLIP ART — 2004”. Priya would find this hilarious.'},
+};
+const LOCS={
+ reception:{n:'reception',topic:'Front desk, visitors, and a sofa nobody sits on',exits:['kitchen','studio','lift','carpark'],
+  d:s=>`The reception of Studio Ops. A sad pot plant, a sofa nobody sits on, and a ${I('lost & found box')} under the desk. ${s.npcHere('janet')?P('Janet')+' is behind the front desk, glaring at the fridge through the kitchen door.':''}`,
+  things:{lostfound:{n:'lost & found box',al:['lost','found','box','lost and found','lost & found'],x:s=>s.f.lfOpened?'Empty now, apart from a single odd sock.':'A cardboard box full of other people’s things. You could open it.'},
+   plant:{n:'pot plant',al:['plant','pot plant'],x:'A peace lily in its final act. Someone has watered it with cold brew.'},
+   sofa:{n:'sofa',al:['sofa','couch'],x:'Grey, firm, slightly damp. Perfect for a lie down if you run out of energy.'}}},
+ kitchen:{n:'kitchen',topic:'Please wash your own mugs (this means YOU)',exits:['reception','cupboard'],
+  d:s=>`The office kitchen. A ${I('coffee machine')} ${s.f.descaled?'hums happily, freshly descaled':'blinks a red DESCALE light at you'}. There’s a ${I('fridge')}, a ${I('biscuit tin')}, and the door to the ${X('stationery-cupboard')}${s.f.cupboard?'':' (locked)'}.`,
+  things:{machine:{n:'coffee machine',al:['coffee machine','machine','coffee'],x:s=>{s.startQ('coffee');return s.f.descaled?'Clean, shiny and ready. You could make coffee.':'The DESCALE light is flashing. It dispenses one sad drip of brown water and gives up. It needs descaler.'}},
+   fridge:{n:'fridge',al:['fridge'],x:s=>s.f.tupTaken?'Six half-empty milks and a yoghurt from last March.':'Six half-empty milks, a yoghurt from last March, and a '+I('tupperware')+' with someone’s name on it.'},
+   tin:{n:'biscuit tin',al:['tin','biscuit tin','biscuits'],x:'A Christmas biscuit tin. It is September. There are still digestives in it. You could take a biscuit.'}}},
+ cupboard:{n:'stationery-cupboard',topic:'Authorised personnel only (Janet)',exits:['kitchen'],lock:s=>(s.f.cupboard||s.has('key'))?null:'The stationery cupboard is locked. Janet has the key, and Janet doesn’t give the key to just anyone.',
+  d:s=>`A cupboard that smells of toner and ambition. Shelves of envelopes, a pallet of A4, ${s.f.descTaken?'':'a bottle of '+I('descaler')+', '}${s.f.tonerTaken?'':'a boxed '+I('toner cartridge')+', '}${s.f.stapTaken?'':'and, on the top shelf, a '+I('red stapler')+' with a name scratched on it'}.`,
+  things:{shelves:{n:'shelves',al:['shelves','shelf','paper','envelopes'],x:'Enough envelopes to last until the heat death of the universe.'}}},
+ studio:{n:'studio',topic:'Where the magic happens (and the deadlines)',exits:['reception','print','meeting'],
+  d:s=>`The studio floor. Big monitors, bigger plants, and your ${I('desk')}. ${s.npcHere('priya')?P('Priya')+' is pacing by the window with a phone to her ear. ':''}${s.npcHere('tom')?P('Tom')+' is staring at his desk, where a stapler used to be.':''} Doors lead to the ${X('print-room')} and ${X('meeting-room-b')}.`,
+  things:{desk:{n:'your desk',al:['desk','my desk','computer','monitor'],x:s=>s.f.won?'Tidy, for once.':'Your monitor shows a missing-file icon where the spring campaign should be. The final file lives on the server.'}}},
+ print:{n:'print-room',topic:'Printer status: angry',exits:['studio'],
+  d:s=>`A windowless room humming with menace. The big colour ${I('printer')} ${s.f.toner?'has fresh toner and a look in its eye':'flashes TONER EMPTY'}. ${s.f.gremlin?'':'Something rustles inside the paper tray.'}`,
+  things:{printer:{n:'printer',al:['printer','copier'],x:s=>s.f.toner?(s.f.gremlin?'Purring. You could print.':'Toner loaded. Something is living in tray 3. You could try to print.'):'TONER EMPTY. It was replaced yesterday, apparently. It needs a toner cartridge.'}}},
+ meeting:{n:'meeting-room-b',topic:'Booked all day: “Alignment on alignment”',exits:['studio'],
+  d:s=>s.f.meetingDone?`Meeting Room B, finally empty. A whiteboard covered in the word SYNERGY${s.f.laserTaken?'':', and a '+I('laser pointer')+' left on the table'}.`:`Meeting Room B. ${P('Mark')} is at the whiteboard mid-sentence. Six people stare into the middle distance. The door clicks shut behind you.`,
+  things:{whiteboard:{n:'whiteboard',al:['whiteboard','board'],x:'SYNERGY, circled four times. A drawing of a funnel. Nobody knows what the funnel means.'}}},
+ lift:{n:'lift',topic:'Please do not jump in the lift',exits:['reception','it','roof','archive'],
+  d:s=>`The lift. Mirrored walls, a faint smell of someone’s lunch, and buttons for ${X('it-helpdesk')} (2nd floor), ${X('roof-terrace')}, ${X('basement-archive')}${s.has('badge')?'':' (needs a facilities badge)'} and back down to ${X('reception')}.`,
+  things:{buttons:{n:'buttons',al:['buttons','button'],x:'The basement button has a little card reader next to it.'}}},
+ it:{n:'it-helpdesk',topic:'Have you tried turning it off and on again?',exits:['lift','server'],
+  d:s=>`The IT helpdesk: three monitors, forty cables, one fern. ${P('Dan')} is here, eating crisps over a keyboard. A heavy door leads to the ${X('server-room')}${s.has('keycard')||s.f.serverOpen?'':' (keycard required)'}.`,
+  things:{cables:{n:'cables',al:['cables','cable'],x:'You pull one. Somewhere, a printer on the 4th floor goes offline. You put it back.'}}},
+ server:{n:'server-room',topic:'DO NOT TOUCH THE BLINKY ONE',exits:['it'],lock:s=>s.has('keycard')?null:'The door beeps red. You need a keycard.',
+  d:s=>`It’s very warm and very loud. Racks of blinking lights. The studio’s file server, a ${I('NAS')}, sits on the bottom shelf. The blinky one blinks at you.`,
+  things:{nas:{n:'NAS',al:['nas','server','file server','drive'],x:s=>s.f.copied?'You’ve already copied the file.':'The studio file server. <code>final_FINAL_v7_USE-THIS.psd</code> is on here. You need something to copy it onto.'},
+   blinky:{n:'the blinky one',al:['blinky','blinky one','light','lights'],x:'It blinks. You feel it blinking back into your soul. Best leave it.'}}},
+ carpark:{n:'car-park',topic:'It is raining (it is always raining)',exits:['reception'],
+  d:s=>`The car park. It’s raining sideways. ${s.f.usbDog?P('Biscuit')+', the office dog, is chewing a stick happily.':P('Biscuit')+', the office dog, is sitting under a Vauxhall, guarding something small and shiny.'}`,
+  things:{car:{n:'Vauxhall',al:['car','vauxhall'],x:'A silver Vauxhall with a “My other car is also a Vauxhall” sticker.'}}},
+ roof:{n:'roof-terrace',topic:'Phone calls, fresh air, questionable decking',exits:['lift'],
+  d:s=>`The roof terrace. Gulls, wind, and a view of the retail park. ${s.npcHere('helen')?P('Helen')+', the Director, is on a call, pacing by the railings.':''}`,
+  things:{gulls:{n:'gulls',al:['gulls','gull','seagull','seagulls'],x:'A gull looks at your biscuit. You look at the gull. It’s a standoff.'}}},
+ archive:{n:'basement-archive',topic:'Old awards, older hard drives',exits:['lift'],lock:s=>s.has('badge')?null:'The basement button won’t light. The card reader wants a facilities badge.',
+  d:s=>`The basement archive. Boxes labelled 1998 to 2014, a flickering strip light, and a cold spot by the filing cabinets. ${s.f.ghost?'The cold spot has gone.':P('A translucent intern')+' is sorting paperclips that aren’t there.'}${s.f.awardTaken?'':' A '+I('dusty award')+' sits on a box.'}`,
+  things:{boxes:{n:'boxes',al:['boxes','box','cabinet','cabinets'],x:'Invoices, old brand guidelines, and a floppy disk labelled FONTS DO NOT LOSE.'}}},
+ general:{n:'general',topic:'Company-wide announcements (47 unread)',exits:[],special:1,
+  d:s=>s.f.wraith?'#general is calm. Someone has posted a photo of cake. Order is restored.':'#general. The air is thick with “+1”s. Something is gathering in the replies…'},
+};
+const NPCS={
+ janet:{n:'Janet',title:'Office Manager',col:'#b4552d',at:'reception'},
+ priya:{n:'Priya',title:'Account Director',col:'#a0376a',at:'studio'},
+ tom:{n:'Tom',title:'Motion Designer',col:'#5a5fb0',at:'studio'},
+ dan:{n:'Dan',title:'IT',col:'#4f7d3a',at:'it'},
+ helen:{n:'Helen',title:'Director',col:'#0f7c86',at:'roof'},
+ mark:{n:'Mark',title:'Account Manager',col:'#8a6d1f',at:'meeting'},
+ dog:{n:'Biscuit',title:'Office dog',col:'#9a6b3f',at:'carpark',al:['dog','biscuit the dog','good boy']},
+ ghost:{n:'The Intern',title:'Deceased, 2004',col:'#7d8a99',at:'archive',al:['ghost','intern']},
+};
+const QUESTS={
+ main:{n:'Ship the spring campaign',giver:'Priya',steps:[['Copy the final file from the server room',s=>s.f.copied],['Print the proofs',s=>s.f.printed],['Get Helen’s sign-off on the roof',s=>s.f.signed],['Hand the signed proofs to Priya',s=>s.f.won]]},
+ tup:{n:'The Tupperware Incident',giver:'Janet',steps:[['Find Janet’s tupperware',s=>s.has('tupperware')||s.f.tupDone],['Give it back to Janet',s=>s.f.tupDone]]},
+ usb:{n:'Dan’s lost USB stick',giver:'Dan',steps:[['Get the USB stick from the car park',s=>s.f.usbDog],['Return it to Dan',s=>s.f.keycardGiven]]},
+ coffee:{n:'Fix the coffee machine',giver:'the kitchen',steps:[['Find some descaler',s=>s.has('descaler')||s.f.descaled],['Descale the machine',s=>s.f.descaled]]},
+ stapler:{n:'Tom’s stapler',giver:'Tom',steps:[['Find Tom’s red stapler',s=>s.has('stapler')||s.f.stapDone],['Give it back',s=>s.f.stapDone]]},
+ meeting:{n:'Escape the meeting',giver:'Mark',steps:[['Get out of Meeting Room B',s=>s.f.meetingDone]]},
+ wraith:{n:'The Reply-All Wraith',giver:'#general',steps:[['Defeat the Reply-All Wraith',s=>s.f.wraith]]},
+ ghost:{n:'The Archive Ghost',giver:'The Intern',steps:[['Answer the intern’s riddle',s=>s.f.ghost]]},
+};
+
+/* =========================================================
+   STATE
+   ========================================================= */
+function fresh(){return {loc:'reception',prev:'reception',view:'reception',time:0,energy:30,max:30,rep:0,inv:[],f:{},q:{},feeds:{},known:['reception','kitchen','studio','lift','carpark','general'],met:[],combat:null,over:false,uid:1}}
+let S;
+const api={
+ has:id=>S.inv.includes(id),
+ get f(){return S.f},
+ npcHere:id=>npcsAt(S.loc).includes(id),
+ startQ:id=>startQ(id),
+};
+function npcsAt(loc){
+  return Object.keys(NPCS).filter(k=>{const n=NPCS[k];if(n.at!==loc)return false;
+    if(k==='ghost'&&S.f.ghost)return false;if(k==='mark'&&S.f.meetingDone)return false;return true});
+}
+function save(){try{localStorage.setItem('hb-save',JSON.stringify(S))}catch(e){}}
+function load(){try{const s=JSON.parse(localStorage.getItem('hb-save')||'null');if(s&&s.loc&&LOCS[s.loc])return s}catch(e){}return null}
+
+/* =========================================================
+   OUTPUT
+   ========================================================= */
+const hhmm=m=>{const t=9*60+m;return String(Math.floor(t/60)).padStart(2,'0')+':'+String(t%60).padStart(2,'0')};
+function post(ch,who,html,actions){
+  const f=S.feeds[ch]||(S.feeds[ch]=[]);
+  const last=f[f.length-1];const cont=last&&last.who===who&&!actions&&!last.actions;
+  const m={id:S.uid++,who,html,actions,t:hhmm(S.time),cont};if(who==='enemy')m.en=S.combat?S.combat.name:(last&&last.en)||'Enemy';f.push(m);if(f.length>160)f.splice(0,f.length-160);
+  if(ch===S.view&&!boss){$('feed').appendChild(msgEl(m));scrollDown()}
+  return m;
+}
+const say=(html,actions)=>post(S.view,'narr',html,actions);
+const npcSay=(npc,html,actions)=>post(S.view,npc,html,actions);
+function whoInfo(w,m){
+  if(w==='narr')return {n:'Hubbub',ini:'H',col:'#3b4a63',bot:1};
+  if(w==='you')return {n:'Fin',ini:'F',col:'#c77d3a'};
+  if(w==='sys')return {n:'Slackbot-ish',ini:'★',col:'#6a7486',bot:1};
+  if(w==='enemy')return {n:(m&&m.en)||'Enemy',ini:'☠',col:'#8e2d2d'};
+  const n=NPCS[w];return {n:n.n,ini:n.n[0],col:n.col,title:n.title};
+}
+function msgEl(m){
+  const d=document.createElement('div');
+  if(m.who==='day'){d.className='day';d.textContent=m.html;return d}
+  const w=whoInfo(m.who,m);
+  d.className='msg'+(m.who==='narr'?' narr':'')+(m.cont?' cont':'');
+  d.innerHTML=`<div class="av" style="background:${w.col}">${w.ini}</div><div><div class="who"><b>${w.n}</b>${w.bot?'<span class="tag">APP</span>':''}${w.title?`<span class="tag">${w.title}</span>`:''}<time>${m.t}</time></div><div class="txt">${m.html}</div>${m.actions?`<div class="acts">${m.actions.map(a=>`<button class="act${a[2]?' pri':''}" data-cmd="${esc(a[1])}">${a[0]}</button>`).join('')}</div>`:''}</div>`;
+  return d;
+}
+function renderFeed(){
+  const f=$('feed');f.innerHTML='';(S.feeds[S.view]||[]).forEach(m=>f.appendChild(msgEl(m)));scrollDown();
+}
+function scrollDown(){const f=$('feed');f.scrollTop=f.scrollHeight}
+
+/* =========================================================
+   PARSER
+   ========================================================= */
+function matchIn(list,q){ // list: [{id,names}]
+  q=norm(q);if(!q)return null;
+  let best=null,bs=0;
+  for(const o of list)for(const n of o.names){const nn=norm(n);let sc=0;
+    if(q===nn)sc=1000+nn.length;else if(q.includes(nn))sc=500+nn.length;else if(nn.includes(q)&&q.length>2)sc=q.length;
+    if(sc>bs){best=o;bs=sc}}
+  return best;
+}
+const invList=()=>S.inv.map(id=>({id,names:[ITEMS[id].n,...ITEMS[id].al]}));
+const thingList=()=>Object.entries(LOCS[S.loc].things||{}).map(([id,t])=>({id,names:[t.n,...t.al]}));
+const npcList=()=>npcsAt(S.loc).map(id=>({id,names:[NPCS[id].n,...(NPCS[id].al||[])]}));
+const exitList=()=>(S.combat?[]:LOCS[S.loc].exits).map(id=>({id,names:[LOCS[id].n,LOCS[id].n.replace(/-/g,' '),id,'#'+LOCS[id].n]}));
+
+function run(raw,echo=true){
+  if(S.over&&!/^(restart|new game)/.test(norm(raw))){say('The day is over. Type <code>restart</code> or use the button to start again.');return}
+  const c=norm(raw);if(!c)return;
+  if(echo)post(S.view,'you',esc(raw));
+  const [v,...rest]=c.split(' ');const r=rest.join(' ');
+  if(S.combat&&!['i','inventory','q','quests','help','look','l','examine','x'].includes(v))return combatCmd(v,r);
+  switch(v){
+   case 'l':case 'look':return r?examine(r):look();
+   case 'x':case 'examine':case 'inspect':case 'check':case 'read':return examine(r);
+   case 'go':case 'walk':case 'enter':case 'visit':return go(r.replace(/^to /,''));
+   case 'back':return go(S.prev);
+   case 'take':case 'get':case 'grab':case 'pick':return take(r.replace(/^up /,''));
+   case 'drop':return drop(r);
+   case 'open':return open(r);
+   case 'use':case 'put':case 'insert':case 'load':return use(r);
+   case 'give':case 'hand':case 'offer':case 'show':return give(r);
+   case 'talk':case 'speak':case 'chat':case 'ask':return talk(r.replace(/^(to|with) /,''));
+   case 'say':case 'shout':case 'post':case 'reply':return sayCmd(r);
+   case 'drink':case 'eat':return use(r);
+   case 'make':case 'brew':return /coffee|flat/.test(r)?makeCoffee():say('You can’t make that here.');
+   case 'print':return printCmd();
+   case 'i':case 'inv':case 'inventory':return inventory();
+   case 'q':case 'quests':case 'quest':case 'journal':return questsCmd();
+   case 'wait':case 'rest':case 'sleep':return wait();
+   case 'help':case 'h':case '?':return help();
+   case 'restart':return restart();
+   case 'attack':case 'hit':case 'fight':return say('There’s nothing to fight here. Probably for the best.');
+   case 'hug':case 'pet':case 'stroke':return npcsAt(S.loc).includes('dog')?(say(`${P('Biscuit')} leans into it. He does not, however, move off the shiny thing.`),tick(5)):say('Best not.');
+  }
+  // bare exit / channel name
+  const ex=matchIn(exitList(),c);if(ex)return go(ex.id);
+  const th=matchIn(thingList(),c)||matchIn(invList(),c);if(th)return examine(c);
+  say(`Hubbub didn’t understand <code>${esc(raw)}</code>. Try <code>look</code>, <code>go studio</code>, <code>take biscuit</code>, <code>use toner on printer</code>, <code>give tupperware to janet</code> or <code>talk to priya</code>. <code>help</code> lists everything.`);
+}
+
+/* =========================================================
+   VERBS
+   ========================================================= */
+function tick(m){
+  S.time+=m;
+  if(!S.f.won&&S.time>=DEADLINE&&!S.over){S.time=DEADLINE;endGame(false)}
+}
+function look(){
+  const L=LOCS[S.loc];
+  const ppl=npcsAt(S.loc).filter(n=>n!=='mark'||S.f.meetingDone);
+  const acts=[];
+  L.exits.forEach(e=>acts.push(['→ #'+LOCS[e].n,'go '+LOCS[e].n]));
+  say(`<p>${L.d(api)}</p>`+(S.dropped&&S.dropped[S.loc]&&S.dropped[S.loc].length?`<p>On the floor: ${S.dropped[S.loc].map(i=>I(ITEMS[i].n)).join(', ')}.</p>`:''),acts.length?acts:null);
+}
+function go(q){
+  if(S.combat)return say('You can’t just leave in the middle of this. Try <code>flee</code>.');
+  let id=typeof q==='string'&&LOCS[q]?q:null;
+  if(!id){const m=matchIn(Object.keys(LOCS).map(k=>({id:k,names:[LOCS[k].n,LOCS[k].n.replace(/-/g,' '),k,'#'+LOCS[k].n]})),q);id=m&&m.id}
+  if(!id)return say(`Go where? Exits: ${LOCS[S.loc].exits.map(e=>X(LOCS[e].n)).join(', ')}.`);
+  if(id===S.loc){say('You’re already here.');return}
+  if(S.loc==='meeting'&&!S.f.meetingDone)return meetingBlock();
+  if(id!=='general'&&S.loc!=='general'&&!LOCS[S.loc].exits.includes(id)){return say(`You can’t get to ${X(LOCS[id].n)} from here. Exits: ${LOCS[S.loc].exits.map(e=>X(LOCS[e].n)).join(', ')}.`)}
+  if(S.loc==='general'&&id!=='general'&&id!==S.prev&&!LOCS[S.prev].exits.includes(id)&&id!==S.prev){return say(`You close #general and head back to ${X(LOCS[S.prev].n)} first.`),travel(S.prev)}
+  const lock=LOCS[id].lock&&LOCS[id].lock(api);if(lock)return say(lock);
+  travel(id);
+}
+function travel(id){
+  const was=S.loc;S.prev=S.loc===('general')?S.prev:S.loc;S.loc=id;S.view=id;
+  if(!S.known.includes(id))S.known.push(id);
+  LOCS[id].exits.forEach(e=>{if(!S.known.includes(e))S.known.push(e)});
+  tick(5);renderAll();
+  const first=!(S.feeds[id]&&S.feeds[id].length);
+  if(first)post(id,'day','Today');
+  arrive(id,first);
+  save();
+}
+function arrive(id,first){
+  look();
+  if(id==='carpark'&&api.has('umbrella'))say('<em>You shelter under the golf umbrella. Smug and dry.</em>');
+  if(id==='carpark'){ if(!api.has('umbrella')){S.energy-=5;say('<span class="dmg">−5 energy.</span> You’re soaked to the bone. An umbrella would help.');checkEnergy()} }
+  if(id==='server'){S.energy-=2;say('It’s roasting in here. <span class="dmg">−2 energy.</span>');checkEnergy()}
+  if(id==='meeting'&&!S.f.meetingDone){startQ('meeting');npcSay('mark','Fin! Perfect timing. Grab a seat, we’re aligning on alignment. Shouldn’t be more than… a couple of hours?',[['Nod along','say nod along'],['“Let’s take this offline”','say let’s take this offline',1],['Try to leave','go studio']])}
+  if(id==='general'&&!S.f.wraith)startWraith();
+  if(id==='archive'&&!S.f.ghost&&first){startQ('ghost');ghostRiddle()}
+  if(id==='print'&&first&&!S.f.toner)say('<em>Hint: the printer needs toner. The stationery cupboard off the kitchen probably has some.</em>');
+}
+function examine(q){
+  if(!q)return look();
+  const it=matchIn(invList(),q);
+  if(it)return say(`${ITEMS[it.id].ic} <b>${ITEMS[it.id].n}</b>: ${ITEMS[it.id].x}`);
+  const th=matchIn(thingList(),q);
+  if(th){const t=LOCS[S.loc].things[th.id];tick(0);return say(typeof t.x==='function'?t.x(api):t.x)}
+  const np=matchIn(npcList(),q);if(np)return say(`${P(NPCS[np.id].n)}, ${NPCS[np.id].title}. Try <code>talk to ${NPCS[np.id].n.toLowerCase()}</code>.`);
+  const fl=S.dropped&&S.dropped[S.loc]&&matchIn(S.dropped[S.loc].map(id=>({id,names:[ITEMS[id].n,...ITEMS[id].al]})),q);
+  if(fl)return say(ITEMS[fl.id].x);
+  say('You don’t see that here.');
+}
+function giveItem(id,silent){if(!S.inv.includes(id))S.inv.push(id);if(!silent)say(`${ITEMS[id].ic} You got the ${I(ITEMS[id].n)}.`);renderPanel()}
+const lose=id=>{S.inv=S.inv.filter(x=>x!==id);renderPanel()};
+function take(q){
+  const L=S.loc,c=norm(q);
+  const fl=S.dropped&&S.dropped[L]&&matchIn(S.dropped[L].map(id=>({id,names:[ITEMS[id].n,...ITEMS[id].al]})),c);
+  if(fl){S.dropped[L]=S.dropped[L].filter(x=>x!==fl.id);giveItem(fl.id);return tick(5)}
+  const T=[
+   [L==='kitchen'&&/biscuit|digestive/.test(c),()=>{if(api.has('biscuit'))return say('You’ve already got a biscuit. Don’t be greedy.');giveItem('biscuit')}],
+   [L==='kitchen'&&/tupperware|lasagne|box/.test(c),()=>{if(S.f.tupTaken)return say('It’s gone.');S.f.tupTaken=1;giveItem('tupperware');if(!S.q.tup)say('<em>Somebody is going to want this back.</em>')}],
+   [L==='cupboard'&&/descal/.test(c),()=>{if(S.f.descTaken)return say('Already taken.');S.f.descTaken=1;giveItem('descaler');startQ('coffee')}],
+   [L==='cupboard'&&/toner|cartridge/.test(c),()=>{if(S.f.tonerTaken)return say('Already taken.');S.f.tonerTaken=1;giveItem('toner')}],
+   [L==='cupboard'&&/stapler/.test(c),()=>{if(S.f.stapTaken)return say('Already taken.');S.f.stapTaken=1;giveItem('stapler')}],
+   [L==='meeting'&&/laser|pointer/.test(c),()=>{if(!S.f.meetingDone)return npcSay('mark','Ah-ah, I’m using that. Sit down, we’re nearly on slide 4.');if(S.f.laserTaken)return say('Already taken.');S.f.laserTaken=1;giveItem('laser')}],
+   [L==='archive'&&/award|trophy/.test(c),()=>{if(S.f.awardTaken)return say('Already taken.');S.f.awardTaken=1;giveItem('award')}],
+   [L==='reception'&&/umbrella|badge/.test(c),()=>say('It’s in the lost & found box. Try <code>open box</code>.')],
+  ];
+  const h=T.find(t=>t[0]);if(h){h[1]();tick(5);save();return}
+  const th=matchIn(thingList(),c);if(th)return say(`You can’t take the ${LOCS[L].things[th.id].n}. People would notice.`);
+  if(matchIn(npcList(),c))return say('You can’t take people. HR has been very clear about this.');
+  say('You can’t see that here.');
+}
+function drop(q){
+  const it=matchIn(invList(),q);if(!it)return say('You don’t have that.');
+  if(['signed','usbfile','keycard','key'].includes(it.id))return say('You’d better hang on to that.');
+  lose(it.id);S.dropped=S.dropped||{};(S.dropped[S.loc]=S.dropped[S.loc]||[]).push(it.id);say(`You put down the ${I(ITEMS[it.id].n)}.`);tick(0);save();
+}
+function open(q){
+  const c=norm(q);
+  if(S.loc==='reception'&&/box|lost|found/.test(c)){
+    if(S.f.lfOpened)return say('Just a sock left in there.');
+    S.f.lfOpened=1;say('You rummage through the lost & found. Among the single gloves and a Nokia charger:');giveItem('umbrella');giveItem('badge');tick(5);save();return;
+  }
+  if(S.loc==='kitchen'&&/fridge/.test(c))return examine('fridge');
+  if(S.loc==='kitchen'&&/cupboard|door/.test(c))return go('cupboard');
+  if(S.loc==='kitchen'&&/tin/.test(c))return examine('tin');
+  say('You can’t open that.');
+}
+function use(q){
+  const c=norm(q);const [a,b]=c.split(/ (?:on|in|into|with|at) /);
+  const it=matchIn(invList(),a||c);
+  if(!it)return say('You don’t have that. Check your <code>inventory</code>.');
+  const id=it.id,tgt=b||'';
+  const L=S.loc;
+  if(ITEMS[id].food&&!tgt){lose(id);S.energy=Math.min(S.max,S.energy+ITEMS[id].food);say(`You drink the flat white. Pure life. <span class="ex">+${ITEMS[id].food} energy.</span>`);tick(5);renderPanel();save();return}
+  if(id==='biscuit'&&!tgt){lose(id);S.energy=Math.min(S.max,S.energy+3);say('You eat the biscuit. It was fine. <span class="ex">+3 energy.</span>');tick(0);save();return}
+  if(id==='descaler'&&L==='kitchen'&&(!tgt||/machine|coffee/.test(tgt))){lose(id);S.f.descaled=1;say('You pour in the descaler. The machine gurgles, wheezes, then sighs with relief. The red light turns green. You can <code>make coffee</code> now.',[['Make coffee','make coffee',1]]);tick(10);renderPanel();save();return}
+  if(id==='toner'&&L==='print'&&(!tgt||/printer/.test(tgt))){lose(id);S.f.toner=1;say('You wrestle the toner in. The printer goes quiet, then makes a noise like a cat seeing a cucumber. Something in tray 3 is <em>awake</em>.',[['Print the proofs','print',1]]);tick(5);renderPanel();save();return}
+  if((id==='usb')&&L==='server'&&(!tgt||/nas|server|drive/.test(tgt))){lose('usb');S.f.copied=1;giveItem('usbfile',true);say(`You plug in Dan’s USB stick. <code>final_FINAL_v7_USE-THIS.psd</code>… copying… 2.4 GB… done. ${I('USB stick (with final file)')} is in your inventory.`);tick(10);renderPanel();save();return}
+  if((id==='usbfile')&&L==='print'&&(!tgt||/printer/.test(tgt)))return printCmd();
+  if(id==='key'&&L==='kitchen'&&(!tgt||/cupboard|door/.test(tgt))){S.f.cupboard=1;say(`The key turns. The ${X('stationery-cupboard')} is open.`,[['→ #stationery-cupboard','go stationery-cupboard']]);tick(0);save();return}
+  if(id==='keycard'&&L==='it'){return go('server')}
+  if(id==='badge'&&L==='lift'){return go('archive')}
+  if(id==='umbrella')return say(S.loc==='carpark'?'You’re already under it. Mostly.':'Opening an umbrella indoors is bad luck. Everyone knows that.');
+  if(id==='mute')return say('Save that for a fight.');
+  if(id==='award'||id==='proofs'||id==='signed'||id==='tupperware'||id==='stapler'&&S.q.stapler&&!S.f.stapDone)return say(`Try giving the ${I(ITEMS[id].n)} to someone.`);
+  say(`You can’t use the ${I(ITEMS[id].n)} like that here.`);
+}
+function makeCoffee(){
+  if(S.loc!=='kitchen')return say('The coffee machine is in the kitchen.');
+  if(!S.f.descaled)return say('The machine blinks DESCALE and gives you one sad drip. It needs descaler.');
+  if(api.has('flatwhite'))return say('You’ve already got a flat white on the go. One at a time.');
+  giveItem('flatwhite',true);S.f.coffees=(S.f.coffees||0)+1;say('The machine hisses and produces a genuinely excellent flat white. ☕ Added to your inventory. Drink it, or give it to someone.');tick(10);save();
+}
+function printCmd(){
+  if(S.loc!=='print')return say('You need to be in the print room.');
+  if(!S.f.toner)return say('TONER EMPTY. Toner was replaced yesterday. The printer is lying, but it still needs a toner cartridge.');
+  if(!api.has('usbfile'))return say('Print what? The final file is on the server. Copy it onto something first.');
+  if(!S.f.gremlin)return startFight('gremlin');
+  if(S.f.printed)return say('You’ve already got the proofs. The printer looks relieved.');
+  S.f.printed=1;giveItem('proofs',true);say('The printer whirrs, clunks and produces immaculate colour proofs. 📄 Added to your inventory. Now for Helen’s sign-off.');tick(10);renderPanel();save();
+}
+function wait(){say('You stare out of the window for half an hour. Nothing happens. <span class="ex">+4 energy.</span>');S.energy=Math.min(S.max,S.energy+4);tick(30);renderPanel();save()}
+function inventory(){
+  if(!S.inv.length)return say('Your pockets are empty. Apart from lint.');
+  say('<b>Inventory</b><br>'+S.inv.map(id=>`${ITEMS[id].ic} ${I(ITEMS[id].n)}`).join('<br>'),S.inv.slice(0,6).map(id=>['Examine '+ITEMS[id].n,'examine '+ITEMS[id].n]));
+}
+function questsCmd(){
+  const ids=Object.keys(S.q);if(!ids.length)return say('No quests yet. Talk to people. Try '+P('Priya')+' in the studio.');
+  say(ids.map(id=>{const Q=QUESTS[id];const done=Q.steps.every(s=>s[1](api));const next=Q.steps.find(s=>!s[1](api));return `${done?'✅':'🟠'} <b>${Q.n}</b>${done?'':` · next: ${next[0]}`}`}).join('<br>'));
+}
+function help(){
+  say(`<b>How to play</b><br>Type commands like a text adventure, or click the buttons.<br>
+  <code>look</code> · <code>go kitchen</code> (or just <code>kitchen</code>) · <code>examine fridge</code> · <code>take biscuit</code> · <code>open box</code><br>
+  <code>use toner on printer</code> · <code>give tupperware to janet</code> · <code>talk to priya</code> · <code>say hello</code><br>
+  <code>make coffee</code> · <code>print</code> · <code>drink coffee</code> · <code>inventory</code> · <code>quests</code> · <code>wait</code><br>
+  In a fight: <code>attack</code> · <code>defend</code> · <code>use mute</code> · <code>flee</code><br>
+  You’ve got until <b>17:30</b>. Most actions take 5 minutes. Run out of energy and you’ll need a lie down. Your progress saves automatically. <code>restart</code> starts again. <b>Esc</b> hides everything.`);
+}
+
+/* =========================================================
+   DIALOGUE
+   ========================================================= */
+function startQ(id){if(!S.q[id]){S.q[id]=1;post(S.view,'sys',`📌 New quest: <b>${QUESTS[id].n}</b>`);renderPanel()}}
+function talk(q,topic){
+  const np=matchIn(npcList(),q);
+  if(!np){const any=matchIn(Object.keys(NPCS).map(k=>({id:k,names:[NPCS[k].n,...(NPCS[k].al||[])]})),q);
+    return say(any?`${P(NPCS[any.id].n)} isn’t here. ${NPCS[any.id].n} is usually in ${X(LOCS[NPCS[any.id].at].n)}.`:'There’s nobody by that name here.')}
+  const id=np.id;const again=S.met.includes(id);if(!again){S.met.push(id);renderSide()}
+  // typing "talk to X" a second time (or "ask X about ...") moves the conversation on, same as clicking the main option
+  const MAIN={janet:'fridge',priya:'brief',tom:'stapler',dan:'usb',helen:'signoff'};
+  if(!topic){const ab=norm(q).split(' about ')[1];if(ab||again)topic=MAIN[id]||''}
+  if(id==='priya'&&topic==='brief'&&S.q.main)topic='';
+  tick(5);DIALOGUE[id](topic||'');save();
+}
+const T_=(npc,txt,opts)=>npcSay(npc,txt,opts);
+const DIALOGUE={
+ janet(t){
+  if(t==='fridge'){startQ('tup');return T_('janet','Someone has taken my lasagne from the fridge. In tupperware. With my NAME on it. If you find it, bring it back and I’ll owe you one. I have keys to everything, you know.',[['Leave','look']])}
+  if(t==='lost')return T_('janet','Lost & found is the box under my desk. Help yourself, most of it’s been there since 2016.',[['Open the box','open box',1]]);
+  if(t==='coffee')return T_('janet','The machine’s been broken for a week. Nobody descales it. There’s descaler in the stationery cupboard, if anyone ever bothered to look.',[['Ask about the cupboard','talk janet:cupboard']]);
+  if(t==='cupboard')return T_('janet',S.f.tupDone?'You’ve got the key. Don’t take the good pens.':'Stationery cupboard’s locked. For a reason. Find my tupperware and we’ll talk.',[['Leave','look']]);
+  const o=[['“What’s wrong?”','talk janet:fridge'],['Ask about lost & found','talk janet:lost'],['Ask about the coffee','talk janet:coffee']];
+  T_('janet',S.f.tupDone?'Morning, lovely. Key working all right?':'Morning. Don’t talk to me about the fridge.',o);
+ },
+ priya(t){
+  if(S.f.won)return T_('priya','You absolute legend. Go home. Actually, don’t, there’s cake.');
+  if(t==='brief'){startQ('main');return T_('priya',`Right. Brightwave need the spring campaign signed off <b>today</b>, 17:30 latest. Steps:<br>1. The final artwork is on the server. Dan in IT has the keycard.<br>2. Print colour proofs. The printer is… temperamental.<br>3. Get Helen to sign them off. She’s on the roof on calls all day.<br>4. Bring them back to me. Go, go, go.`,[['“On it.”','look',1],['“Where’s IT?”','talk priya:it']])}
+  if(t==='it')return T_('priya','Second floor. Take the lift from reception. Bring Dan a biscuit, he responds well to biscuits.');
+  if(t==='award'){lose('award');S.rep+=2;S.f.award=1;renderPanel();return T_('priya','“Best Use of Clip Art 2004”?! I’m putting this on my desk. Forever. <span class="ex">+2 reputation.</span>')}
+  const o=S.q.main?[['“Where are we at?”','quests']]:[['“What do you need?”','talk priya:brief',1]];
+  T_('priya',S.q.main?'How’s it going? Clock’s ticking.':'Fin! Thank god. Have you got five minutes? It’s urgent. It’s always urgent, but this is URGENT urgent.',o);
+ },
+ tom(t){
+  if(S.f.stapDone)return T_('tom','Stapler’s back where it belongs. All is right with the world.');
+  if(t==='stapler'){startQ('stapler');return T_('tom','My red stapler. Gone. I think Janet “tidied” it into the stationery cupboard. If you find it, I’ll give you my spare noise-cancelling headphones.')}
+  T_('tom','Have you seen my stapler?',[['“What stapler?”','talk tom:stapler',1]]);
+ },
+ dan(t){
+  if(S.f.keycardGiven)return T_('dan','Server room’s all yours. Don’t touch the blinky one. I mean it.');
+  if(t==='usb'){startQ('usb');return T_('dan','I dropped my USB stick in the car park and the dog’s sat on it. Won’t move. I’m not fighting a dog. Get it back and you can have the server room keycard. And keep the stick, I’ve got loads.')}
+  if(t==='server')return T_('dan','Server room needs a keycard. I’ll give you mine if you help me out first.',[['“Help with what?”','talk dan:usb',1]]);
+  T_('dan','*crunch* Yeah? Have you tried turning it off and on again?',[['“I need the server room.”','talk dan:server',1],['“You all right?”','talk dan:usb']]);
+ },
+ helen(t){
+  if(S.f.signed)return T_('helen','Signed, sealed, delivered. Go on, off you go.');
+  const need=[];if(!S.f.hProofs)need.push('the proofs');if(!S.f.hCoffee)need.push('a <i>proper</i> coffee');
+  if(t==='signoff')return T_('helen',`I’m not signing anything until I see ${need.join(' and ')}. I’ve been on calls since seven.`);
+  T_('helen','*hand over the phone* Two minutes. What is it?',[['“I need your sign-off.”','talk helen:signoff',1]]);
+ },
+ mark(){T_('mark','Fin, quick one while we’re here: could we circle back on the synergy funnel? Actually, let’s park that.',[['“Let’s take this offline”','say let’s take this offline',1],['Nod along','say nod along']])},
+ dog(){T_('dog',S.f.usbDog?'*happy panting* 🐶':'*low, polite growl. Eyes on your pockets.* 🐶',S.f.usbDog?null:[api.has('biscuit')?['Give him the biscuit','give biscuit to dog',1]:['Pat him','pet dog']])},
+ ghost(){ghostRiddle()},
+};
+function ghostRiddle(){
+  npcSay('ghost','I was an intern. I made the 2004 awards night slides and never left. Tell me… which typeface did I use for <i>everything</i>?',[['“Helvetica”','say helvetica'],['“Comic Sans”','say comic sans'],['“Papyrus”','say papyrus'],['“Garamond”','say garamond']]);
+}
+function give(q){
+  const m=norm(q).match(/^(.+?) (?:to) (.+)$/);
+  if(!m)return say('Give what to whom? e.g. <code>give tupperware to janet</code>');
+  const it=matchIn(invList(),m[1]);if(!it)return say('You don’t have that.');
+  const np=matchIn(npcList(),m[2]);if(!np)return say('They’re not here.');
+  const id=it.id,to=np.id;tick(5);
+  const G={
+   'tupperware>janet':()=>{lose(id);S.f.tupDone=1;S.rep+=1;giveItem('key',true);npcSay('janet','My LASAGNE. One bite missing. I know who did this. Here, take the cupboard key. You’ve earned it. <span class="ex">+1 reputation.</span>');say(`🗝️ You got the ${I('cupboard key')}. The ${X('stationery-cupboard')} is off the kitchen.`)},
+   'flatwhite>janet':()=>{lose(id);S.rep+=1;npcSay('janet','For me? From the machine? It WORKS? I could cry. <span class="ex">+1 reputation.</span>')},
+   'flatwhite>helen':()=>{lose(id);S.f.hCoffee=1;npcSay('helen','Oh, that’s the good stuff.'+(S.f.hProofs?'':' Now where are those proofs?'));helenCheck()},
+   'proofs>helen':()=>{lose(id);S.f.hProofs=1;npcSay('helen','Let’s see… logo’s big enough, colours are right.'+(S.f.hCoffee?'':' I’d sign these, but I can’t think without a proper coffee.'));helenCheck()},
+   'signed>priya':()=>{lose(id);S.f.won=1;renderPanel();npcSay('priya','Signed off?! With TIME TO SPARE? Fin, you legend. Sending to Brightwave now. 🎉');endGame(true)},
+   'proofs>priya':()=>npcSay('priya','These need Helen’s sign-off first. She’s on the roof.'),
+   'stapler>tom':()=>{lose(id);S.f.stapDone=1;S.rep+=1;giveItem('headphones',true);npcSay('tom','MY STAPLER. You beautiful human. Have these, as promised. <span class="ex">+1 reputation.</span>');say(`🎧 You got ${I('noise-cancelling headphones')}. You’ll take less damage in fights.`)},
+   'golden>tom':()=>npcSay('tom','That is not my stapler. That is a much better stapler. Keep it.'),
+   'biscuit>dog':()=>{lose(id);if(S.f.usbDog){S.rep+=1;return npcSay('dog','*CRUNCH. Tail goes like a propeller.* 🐶 <span class="ex">+1 reputation.</span>')}S.f.usbDog=1;giveItem('usb',true);npcSay('dog','*CRUNCH.* 🐶');say(`${P('Biscuit')} trots off with the digestive, leaving behind a slightly chewed ${I('USB stick')}. You picked it up.`)},
+   'biscuit>dan':()=>{lose(id);S.rep+=1;npcSay('dan','Oh, you know me too well. <span class="ex">+1 reputation.</span>')},
+   'usb>dan':()=>{S.f.keycardGiven=1;giveItem('keycard',true);npcSay('dan','My stick! Slightly chewed. Keep it, honestly, I’ve got forty. Here’s the server room keycard. Do NOT touch the blinky one.');say(`💳 You got the ${I('server room keycard')}.`)},
+   'usbfile>dan':()=>npcSay('dan','Nah, keep it. You’ve got work to do.'),
+   'award>priya':()=>DIALOGUE.priya('award'),
+  };
+  const k=id+'>'+to;
+  if(G[k]){G[k]();renderPanel();save();return}
+  if(to==='dog')return npcSay('dog','*sniffs the '+ITEMS[id].n+'. Unimpressed.* 🐶');
+  npcSay(to,`Why would I want your ${ITEMS[id].n}?`);
+}
+function helenCheck(){
+  if(S.f.hCoffee&&S.f.hProofs&&!S.f.signed){S.f.signed=1;giveItem('signed',true);npcSay('helen','Approved. <i>*scribbles “APPROVED — HW” in green pen*</i> Get these to Priya. Good work, Fin. <span class="ex">+2 reputation.</span>');S.rep+=2;say(`✅ You got the ${I('signed-off proofs')}. Back to ${P('Priya')} in ${X('studio')}!`)}
+}
+function sayCmd(r){
+  const c=norm(r);tick(5);
+  if(S.loc==='meeting'&&!S.f.meetingDone){
+    if(/offline|park this|park that|take this|circle back later/.test(c)){S.f.meetingDone=1;S.rep+=1;npcSay('mark','Great shout. Let’s take it offline. Good meeting, everyone!');say(`The room empties in seconds. You’re free. There’s a ${I('laser pointer')} left on the table. <span class="ex">+1 reputation.</span>`,[['Take the laser pointer','take laser pointer'],['→ #studio','go studio']]);renderPanel();save();return}
+    if(/nod/.test(c)){tick(25);S.energy-=api.has('headphones')?1:4;npcSay('mark','…and that’s why the funnel is actually a flywheel. Questions? No? Great, slide 5.');say(`Half an hour passes. <span class="dmg">−${api.has('headphones')?1:4} energy.</span>`,[['“Let’s take this offline”','say let’s take this offline',1],['Nod along','say nod along']]);checkEnergy();renderPanel();save();return}
+    npcSay('mark','Love that energy. Let’s capture it in the parking lot and keep going.');return;
+  }
+  if(S.loc==='archive'&&!S.f.ghost){
+    if(/comic/.test(c)){S.f.ghost=1;S.rep+=1;giveItem('golden',true);npcSay('ghost','Comic Sans. Every slide. Every award. I was so happy. Thank you… I can rest now. Take this. <span class="ex">+1 reputation.</span>');say(`The cold spot fades. Where the intern stood lies a ${I('golden stapler')} (+4 damage). 🏆`);renderPanel();save();return}
+    if(/helvetica|papyrus|garamond|arial|times|futura|gill/.test(c)){S.energy-=3;npcSay('ghost','No… NO… <i>*the temperature drops*</i>');say('<span class="dmg">−3 energy.</span> A chill runs down your spine.',[['“Comic Sans”','say comic sans'],['Try again','talk ghost']]);checkEnergy();renderPanel();save();return}
+  }
+  if(S.loc==='general'&&!S.f.wraith)return startWraith();
+  say(`You say “${esc(r)}”. ${npcsAt(S.loc).length?'Nobody seems to have heard.':'Nobody’s around to hear it.'}`);
+}
+function meetingBlock(){npcSay('mark','Ah-ah, we’re nearly done! Five more minutes. Sit down, sit down.',[['“Let’s take this offline”','say let’s take this offline',1],['Nod along','say nod along']])}
+
+/* =========================================================
+   COMBAT
+   ========================================================= */
+const FOES={
+ gremlin:{name:'Paper Jam Gremlin',hp:20,atk:[2,5],lines:['*shreds an A4 sheet at you*','*PC LOAD LETTER*','*jams your sleeve in tray 3*','*prints 400 copies of someone’s payslip at you*'],win:()=>{S.f.gremlin=1;say('The gremlin dissolves into a puff of toner. The printer purrs.',[['Print the proofs','print',1]])}},
+ wraith:{name:'Reply-All Wraith',hp:34,atk:[3,7],lines:['“+1”','“Please remove me from this list”','“Replying all to say stop replying all”','“Thanks!”','“Sent from my phone”'],win:()=>{S.f.wraith=1;S.rep+=2;giveItem('mute',true);say(`The Wraith collapses into a single “Thanks all!” and is gone. #general falls silent. You find a ${I('mute button')} in the wreckage. <span class="ex">+2 reputation.</span>`)}},
+};
+function weapon(){let b=0,n='fists';for(const id of S.inv){if(ITEMS[id].weapon&&ITEMS[id].weapon>b){b=ITEMS[id].weapon;n=ITEMS[id].n}}return {b,n}}
+function startFight(k){
+  const F=FOES[k];S.combat={k,name:F.name,hp:F.hp,max:F.hp,def:false,stun:0,muteUsed:false};
+  post(S.view,'enemy',`<b>${F.name}</b> appears! ${pick(F.lines)}`+hpHtml());
+  combatPrompt();renderChips();save();
+}
+function startWraith(){startQ('wraith');say('Your notification sound plays forty-seven times in a row. The replies knit themselves into a shape…');startFight('wraith')}
+const hpHtml=()=>`<div class="hpbar"><span>HP ${Math.max(0,S.combat.hp)}/${S.combat.max}</span><span class="tr"><i style="width:${Math.max(0,S.combat.hp)/S.combat.max*100}%"></i></span></div>`;
+function combatPrompt(){
+  const acts=[['⚔️ Attack','attack',1],['🛡️ Defend','defend']];
+  if(api.has('mute')&&!S.combat.muteUsed)acts.push(['🔇 Use mute button','use mute']);
+  if(api.has('flatwhite'))acts.push(['☕ Drink flat white','use coffee']);
+  if(api.has('biscuit'))acts.push(['🍪 Eat biscuit','use biscuit']);
+  acts.push(['🏃 Flee','flee']);
+  say(`Your move. Energy ${S.energy}/${S.max}. Weapon: ${weapon().n}.`,acts);
+}
+function combatCmd(v,r){
+  const C=S.combat,F=FOES[C.k];let acted=true;
+  if(v==='attack'||v==='hit'||v==='fight'){const w=weapon(),d=rnd(3,6)+w.b;C.hp-=d;say(`You hit it with your ${w.n}. <span class="dmg">−${d} HP.</span>`)}
+  else if(v==='defend'||v==='block'){C.def=true;say('You brace yourself behind a laptop.')}
+  else if(v==='use'||v==='drink'||v==='eat'){
+    const it=matchIn(invList(),r);
+    if(!it){say('Use what?');acted=false}
+    else if(it.id==='mute'){if(C.muteUsed){say('You’ve already used it this fight.');acted=false}else{C.muteUsed=true;C.stun=1;say(`You slam the ${I('mute button')}. The ${F.name} is silenced for a turn!`)}}
+    else if(it.id==='flatwhite'||it.id==='biscuit'){const g=it.id==='flatwhite'?14:3;lose(it.id);S.energy=Math.min(S.max,S.energy+g);say(`Quick refuel. <span class="ex">+${g} energy.</span>`)}
+    else {say('That won’t help here.');acted=false}
+  }
+  else if(v==='flee'||v==='run'||v==='escape'){S.combat=null;say('You run for it. It’ll still be there later.');const back=S.loc==='general'?S.prev:S.loc==='print'?'studio':S.prev;renderChips();travel(back);return}
+  else {say('In a fight you can <code>attack</code>, <code>defend</code>, <code>use</code> an item, or <code>flee</code>.');acted=false}
+  if(!acted){combatPrompt();return}
+  tick(0);
+  if(C.hp<=0){S.combat=null;post(S.view,'enemy',`<b>${F.name}</b> is defeated!`);S.feeds[S.view][S.feeds[S.view].length-1].en=F.name;F.win();renderAll();save();return}
+  if(C.stun>0){C.stun--;post(S.view,'enemy','<em>*muted. Furious, but muted.*</em>'+hpHtml())}
+  else{let d=rnd(...F.atk);if(C.def)d=Math.ceil(d/2);if(api.has('headphones'))d=Math.max(0,d-2);S.energy-=d;C.def=false;
+    post(S.view,'enemy',`${pick(F.lines)} <span class="dmg">−${d} energy.</span>`+hpHtml())}
+  renderPanel();
+  if(S.energy<=0){S.combat=null;renderChips();return checkEnergy()}
+  combatPrompt();save();
+}
+function checkEnergy(){
+  if(S.energy>0)return renderPanel();
+  S.combat=null;S.energy=16;tick(60);
+  const f=S.loc;S.loc='reception';S.view='reception';
+  renderAll();post('reception','sys','💤 You ran out of energy and passed out.');
+  say('You wake up on the reception sofa an hour later. Janet has put a blanket over you and a Post-it on your forehead that says “drink water”. <span class="ex">Energy back to 16.</span>');
+  save();
+}
+
+/* =========================================================
+   ENDINGS
+   ========================================================= */
+function endGame(win){
+  S.over=true;const side=['tup','usb','coffee','stapler','meeting','wraith','ghost'].filter(k=>QUESTS[k].steps.every(s=>s[1](api))).length;
+  const left=DEADLINE-S.time,score=win?Math.round(left/5)*10+S.rep*50+side*60:S.rep*20+side*30;
+  let best=0;try{best=+localStorage.getItem('hb-best')||0;if(score>best){best=score;localStorage.setItem('hb-best',best)}}catch(e){}
+  const grade=!win?'—':score>1400?'S':score>1000?'A':score>700?'B':'C';
+  post(S.view,'sys',win?`🎉 <b>Campaign shipped at ${hhmm(S.time)}</b><div class="card">Time to spare: ${Math.floor(left/60)}h ${left%60}m<br>Reputation: ${S.rep}<br>Side quests done: ${side} of 7<br>Score: <b>${score}</b> · Grade <b>${grade}</b> · Best ${best}</div>`
+    :`🕠 <b>17:30. The campaign has slipped to Monday.</b><div class="card">Priya has gone quiet in a way that’s worse than shouting.<br>Reputation: ${S.rep} · Side quests: ${side} of 7 · Score ${score}</div>`,[['Play again','restart',1]]);
+  renderPanel();save();
+}
+function restart(){try{localStorage.removeItem('hb-save')}catch(e){}S=fresh();boot(true)}
+
+/* =========================================================
+   UI
+   ========================================================= */
+function renderSide(){
+  const near=S.combat?[]:LOCS[S.loc].exits;
+  const order=['general','reception','kitchen','cupboard','studio','print','meeting','lift','it','server','carpark','roof','archive'];
+  $('chans').innerHTML=order.filter(id=>S.known.includes(id)).map(id=>{
+    const on=id===S.view,nr=near.includes(id)||id==='general';const lock=LOCS[id].lock&&LOCS[id].lock(api);
+    return `<button class="ch${on?' on':nr?' near':' far'}" data-go="${id}"><span class="h">#</span>${LOCS[id].n}${lock&&!on?'<span class="tag">🔒</span>':id===S.loc&&!on?'<span class="tag">you</span>':''}</button>`}).join('');
+  $('dms').innerHTML=(S.met.length?S.met:[]).map(id=>`<button class="ch" data-dm="${id}"><span class="dot" style="background:${NPCS[id].at===S.loc?'#4fb676':'transparent'};border:1.5px solid #4fb676"></span>${NPCS[id].n}<span class="tag">${LOCS[NPCS[id].at].n}</span></button>`).join('')||'<div style="padding:4px 8px;font-size:13px;opacity:.7">Talk to people to add them here.</div>';
+  $('sideClock').textContent='Tuesday · '+hhmm(S.time);
+}
+function renderPanel(){
+  $('sEnergy').textContent=`${Math.max(0,S.energy)} / ${S.max}`;$('mEnergy').firstElementChild.style.width=Math.max(0,S.energy)/S.max*100+'%';$('mEnergy').classList.toggle('low',S.energy<10);
+  const left=Math.max(0,DEADLINE-S.time);$('sTime').textContent=`${hhmm(S.time)} · ${Math.floor(left/60)}h ${left%60}m left`;$('mTime').firstElementChild.style.width=left/DEADLINE*100+'%';
+  $('sRep').textContent=S.rep;
+  $('invCount').textContent=S.inv.length;
+  $('inv').innerHTML=S.inv.map(id=>`<button class="item" data-x="${id}"><span class="ic">${ITEMS[id].ic}</span><span><b>${ITEMS[id].n}</b><small>${ITEMS[id].weapon?'+'+ITEMS[id].weapon+' damage':ITEMS[id].def?'−'+ITEMS[id].def+' damage taken':ITEMS[id].food?'+'+ITEMS[id].food+' energy':'Click to examine'}</small></span></button>`).join('')||'<div class="empty">Empty. Try the lost & found in reception.</div>';
+  const qs=Object.keys(S.q).sort((a,b)=>(a==='main'?-1:b==='main'?1:0));
+  $('quests').innerHTML=qs.map(id=>{const Q=QUESTS[id],done=Q.steps.every(s=>s[1](api));return `<div class="q${done?' done':''}"><b>${Q.n}<small>${done?'Done':'from '+Q.giver}</small></b><ul>${Q.steps.map(s=>`<li class="${s[1](api)?'ok':''}">${s[0]}</li>`).join('')}</ul></div>`}).join('')||'<div class="empty">No quests yet. Talk to Priya in #studio.</div>';
+  $('meTitle').textContent=S.f.won?'Designer · campaign shipped':'Designer · on a deadline';
+  renderSide();
+}
+function renderChips(){
+  const c=[];
+  if(S.over)c.push(['Play again','restart','go']);
+  else if(S.combat){c.push(['⚔️ Attack','attack','fight'],['🛡️ Defend','defend','fight']);if(api.has('mute')&&!S.combat.muteUsed)c.push(['🔇 Mute','use mute','fight']);c.push(['🏃 Flee','flee',''])}
+  else{
+    c.push(['👀 Look','look','']);
+    npcsAt(S.loc).forEach(n=>c.push(['💬 '+NPCS[n].n,'talk '+NPCS[n].n.toLowerCase(),'pp']));
+    Object.values(LOCS[S.loc].things||{}).slice(0,3).forEach(t=>c.push(['🔍 '+t.n,'examine '+t.n,'']));
+    LOCS[S.loc].exits.forEach(e=>c.push(['→ #'+LOCS[e].n,'go '+LOCS[e].n,'go']));
+    c.push(['🎒 Inventory','inventory',''],['📌 Quests','quests','']);
+  }
+  $('chips').innerHTML=c.map(x=>`<button class="chip ${x[2]}" data-cmd="${esc(x[1])}">${x[0]}</button>`).join('');
+}
+function renderHead(){
+  if(boss){$('chName').textContent='# general';$('chTopic').textContent='Company-wide announcements and work-based matters';$('input').placeholder='Message #general';return}
+  const L=LOCS[S.view];$('chName').textContent='# '+L.n;$('chTopic').textContent=L.topic;$('input').placeholder=`Message #${L.n} — try “look”, “help”`;
+}
+function renderAll(){renderHead();renderFeed();renderPanel();renderChips()}
+
+/* =========================================================
+   INPUT
+   ========================================================= */
+document.addEventListener('click',e=>{
+  const c=e.target.closest('[data-cmd]');if(c&&!boss){const cmd=c.getAttribute('data-cmd');
+    // talk topics use "talk npc:topic"
+    if(/^talk \w+:\w+$/.test(cmd)){const [n,t]=cmd.slice(5).split(':');post(S.view,'you',esc(c.textContent));talk(n,t);renderAll();return}
+    run(cmd.replace(/’/g,"'"));renderAll();$('input').focus({preventScroll:true});return}
+  const g=e.target.closest('[data-go]');if(g&&!boss){closeSide();const id=g.dataset.go;if(id===S.loc&&S.view!==S.loc){S.view=S.loc;renderAll();return}run('go '+LOCS[id].n);renderAll();return}
+  const d=e.target.closest('[data-dm]');if(d&&!boss){closeSide();const id=d.dataset.dm;if(NPCS[id].at!==S.loc||(id==='ghost'&&S.f.ghost)){say(`${P(NPCS[id].n)} isn’t here. They’re in ${X(LOCS[NPCS[id].at].n)}.`);return}run('talk '+NPCS[id].n);renderAll();return}
+  const x=e.target.closest('[data-x]');if(x&&!boss){run('examine '+ITEMS[x.dataset.x].n);return}
+});
+$('form').addEventListener('submit',e=>{e.preventDefault();const v=$('input').value.trim();$('input').value='';if(!v)return;
+  if(boss){DECOY.push(['you',v]);renderDecoy();return}
+  run(v);renderAll()});
+$('appInv').onclick=()=>{closeSide();run('inventory');renderAll()};
+$('appQuest').onclick=()=>{closeSide();run('quests');renderAll()};
+$('appHelp').onclick=()=>{closeSide();run('help');renderAll()};
+$('panelBtn').onclick=()=>$('panel').classList.toggle('open');
+$('menuBtn').onclick=()=>{$('side').classList.add('open');$('scrim').classList.add('open')};
+$('scrim').onclick=closeSide;
+function closeSide(){$('side').classList.remove('open');$('scrim').classList.remove('open')}
+
+/* =========================================================
+   DISGUISE
+   ========================================================= */
+const DECOY=[['priya','Morning all. Brightwave proofs due today, I’ll chase sign-off this afternoon.'],['janet','Reminder: the kitchen fridge gets cleared on Friday. Label your food, please.'],['dan','Server maintenance Saturday 8–12. Nothing needed from you.'],['tom','Has anyone seen a red stapler?'],['you','Working on the spring cut-downs, should have them over by 3.']];
+let boss=false;
+function renderDecoy(){
+  const d=$('decoy');d.innerHTML='';d.appendChild(msgEl({who:'day',html:'Today'}));
+  DECOY.forEach(([w,t],i)=>d.appendChild(msgEl({who:w,html:esc(t),t:['09:12','09:31','10:04','10:48','11:02'][i]||'11:10'})));
+}
+function toggleBoss(){
+  boss=!boss;document.body.classList.toggle('boss',boss);
+  if(boss){renderDecoy();$('panel').classList.remove('open')}
+  renderHead();if(!boss)renderAll();
+  $('chans').querySelectorAll('.ch').forEach(b=>b.classList.toggle('on',boss?b.dataset.go==='general':b.dataset.go===S.view));
+  window.LookBusy&&queueMicrotask(()=>window.LookBusy.sync());
+}
+$('hideBtn').onclick=toggleBoss;
+addEventListener('keydown',e=>{if(e.key==='Escape'){e.preventDefault();toggleBoss()}});
+
+/* =========================================================
+   BOOT
+   ========================================================= */
+function boot(isNew){
+  if(!S){S=load();if(!S){S=fresh();isNew=true}}
+  if(isNew){
+    S.feeds={};post('reception','day','Today');
+    post('reception','sys','👋 Welcome to <b>Studio Ops</b>. This whole workspace is a text adventure. Channels are places, DMs are people.<br>Type commands (<code>look</code>, <code>go kitchen</code>, <code>take biscuit</code>, <code>talk to janet</code>) or click the buttons. <code>help</code> lists everything. You’ve got until <b>17:30</b>.');
+    say(`<p>It’s 09:00 on a Tuesday. You’ve just badged in. Your phone buzzes: a message from ${P('Priya')} in ${X('studio')}.</p><p><b>Priya:</b> “Where are you?? Come to the studio ASAP. Brightwave. Today. 😬”</p>`);
+    look();
+  }
+  renderAll();save();
+}
+S=null;boot(false);
+window.LookBusy&&window.LookBusy.register({name:'Hubbub',goal:'A text adventure hiding in a team chat. Ship the spring campaign by 17:30: explore channels, talk to people, collect items and finish quests.',controls:[['Type commands','look, go kitchen, take biscuit, use toner on printer, give tupperware to janet, talk to priya'],['Click','Buttons, chips, channels and DMs all work too'],['help','List every command'],['restart','Start a new day']],file:'hubbub-rpg.html',toggle:toggleBoss,isHidden:()=>boss});
+})();
+</script>
+
+</html>

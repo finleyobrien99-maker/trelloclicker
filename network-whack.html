@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>My Network | Networkd</title>
+<style>
+/* Deliberately single-theme: a light professional-network page. */
+:root{
+  --bg:#f3f2ef; --card:#ffffff; --text:#1d1d1d; --muted:#666666; --line:#e0dfdc; --blue:#0b63b5; --blueDk:#08498a; --blueSoft:#e3effa;
+  --red:#b42318; --redSoft:#fdecea; --green:#1f7a3d; --greenSoft:#e6f4ea; --gold:#a8750d;
+}
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,system-ui,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;font-size:14px;color-scheme:light;overflow-y:auto}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+button:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+
+.nav{background:#fff;border-bottom:1px solid var(--line);position:sticky;top:env(safe-area-inset-top,0px);z-index:10}
+.navin{max-width:1128px;margin:0 auto;padding:0 16px;display:flex;align-items:center;gap:10px;height:54px}
+.logo{width:34px;height:34px;border-radius:5px;background:var(--blue);color:#fff;display:grid;place-items:center;font-weight:800;font-size:17px;letter-spacing:-.04em;flex:none}
+.search{background:#edf3f8;border-radius:4px;padding:8px 12px;color:var(--muted);width:260px;white-space:nowrap;overflow:hidden}
+.icons{margin-left:auto;display:flex;height:100%}
+.ni{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:0 12px;color:var(--muted);font-size:12px;min-width:72px;border-bottom:2px solid transparent;position:relative}
+.ni.on{color:var(--text);border-bottom-color:var(--text)}
+.ni svg{width:22px;height:22px}
+.ni .bd{position:absolute;top:4px;right:18px;background:#cc1016;color:#fff;border-radius:10px;font-size:11px;font-weight:700;padding:0 5px;font-variant-numeric:tabular-nums}
+.me{width:24px;height:24px;border-radius:50%;background:#c77d3a;color:#fff;display:grid;place-items:center;font-size:11px;font-weight:700}
+
+.wrap{max-width:1128px;margin:0 auto;padding:24px 16px 40px;display:grid;grid-template-columns:225px minmax(0,1fr);gap:24px}
+.box{background:var(--card);border:1px solid var(--line);border-radius:8px}
+.side .box{padding:12px 0}
+.side h3{margin:0 16px 8px;font-size:16px;font-weight:600}
+.side .row{display:flex;justify-content:space-between;padding:8px 16px;color:var(--muted);font-variant-numeric:tabular-nums}
+.side .row b{color:var(--text);font-weight:600}
+.side .row b.blue{color:var(--blue)}
+.side .foot{border-top:1px solid var(--line);margin-top:8px;padding:10px 16px 0;font-size:12px;color:var(--muted);line-height:1.5}
+
+.main .box{padding:14px 16px 16px}
+.mh{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.mh h2{margin:0;font-size:16px;font-weight:600}
+.mh .tm{color:var(--muted);font-variant-numeric:tabular-nums;font-size:13px}
+.bar{height:4px;background:var(--line);border-radius:2px;overflow:hidden;margin-bottom:14px}
+.bar i{display:block;height:100%;background:var(--blue);transition:width .25s linear}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;max-width:max(300px,calc((100vh - 230px) * 1.05));margin:0 auto}
+.cell{position:relative;aspect-ratio:1/1.05;min-height:0}
+.pc{position:absolute;inset:0;border:1px solid var(--line);border-radius:10px;background:#fff;overflow:hidden;display:flex;flex-direction:column;align-items:center;text-align:center;transition:transform .15s,opacity .15s}
+.pc .cov{height:22%;width:100%;flex:none}
+.pc .av{width:30%;aspect-ratio:1;border-radius:50%;border:3px solid #fff;margin-top:-15%;display:grid;place-items:center;color:#fff;font-weight:700;font-size:clamp(14px,2.4vw,24px);flex:none}
+.pc .nm{font-weight:600;margin:6px 8px 0;font-size:clamp(12px,1.4vw,15px);line-height:1.2}
+.pc .hd{color:var(--muted);font-size:clamp(11px,1.1vw,12.5px);margin:3px 10px 0;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.pc .post{font-size:clamp(11px,1.15vw,13px);margin:6px 10px 0;line-height:1.35;color:var(--text);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.pc .hd{-webkit-line-clamp:1}
+.pc .btn{margin:auto 10px 10px;width:calc(100% - 20px);border:1px solid var(--blue);color:var(--blue);border-radius:16px;padding:5px 0;font-weight:600;font-size:13px}
+.pc .life{position:absolute;left:0;bottom:0;height:3px;background:var(--blue)}
+.cell.idle .pc{background:#fbfbfa}
+.skel{width:60%;height:8px;border-radius:4px;background:#eceae6;margin-top:8px}
+.cell.up .pc{cursor:pointer;animation:rise .16s ease-out}
+.cell.up .pc:hover{border-color:var(--blue)}
+@keyframes rise{from{transform:translateY(14px) scale(.96);opacity:0}}
+.cell.hit .pc{transform:scale(.93);opacity:.4}
+.flash{position:absolute;left:50%;top:40%;transform:translateX(-50%);font-weight:800;font-size:20px;pointer-events:none;animation:fl .7s ease-out forwards;z-index:3;white-space:nowrap}
+.flash.good{color:var(--green)}.flash.bad{color:var(--red)}.flash.gold{color:var(--gold)}
+@keyframes fl{to{transform:translate(-50%,-28px);opacity:0}}
+.hint{color:var(--muted);font-size:12.5px;margin-top:12px;line-height:1.5}
+
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.45);display:grid;place-items:center;padding:16px;z-index:30}
+.dlg{background:#fff;border-radius:10px;box-shadow:0 12px 40px rgba(0,0,0,.25);width:min(420px,100%);overflow:hidden}
+.dlg h2{margin:0;padding:14px 18px;font-size:18px;font-weight:600;border-bottom:1px solid var(--line)}
+.dlg .in{padding:14px 18px;line-height:1.5;color:#333}
+.dlg table{width:100%;border-collapse:collapse;margin-top:6px;font-variant-numeric:tabular-nums}
+.dlg td{padding:5px 0;border-bottom:1px solid #f0efec}.dlg td:last-child{text-align:right;font-weight:600}
+.dlg .acts{display:flex;justify-content:flex-end;gap:8px;padding:12px 18px;border-top:1px solid var(--line)}
+.pri{background:var(--blue);color:#fff;border-radius:18px;padding:7px 18px;font-weight:600}
+.pri:hover{background:var(--blueDk)}
+
+body.boss .game{display:none!important}
+.side .row.decoyOnly{display:none}
+body.boss .side .row.decoyOnly{display:flex}
+
+@media (max-width:860px){.wrap{grid-template-columns:minmax(0,1fr)}.side{order:2}.search{display:none}.ni span{display:none}.ni{min-width:48px;padding:0 8px}}
+@media (max-width:520px){.grid{gap:8px}.pc .post{-webkit-line-clamp:2}.pc .btn{font-size:12px}.ni:nth-child(n+4){display:none}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<header class="nav">
+  <div class="navin">
+    <span class="logo">nw</span>
+    <div class="search">Search</div>
+    <nav class="icons" aria-hidden="true">
+      <span class="ni"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3 3 10v11h6v-6h6v6h6V10z"/></svg><span>Home</span></span>
+      <span class="ni on"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="8" r="3.5"/><path d="M2 20c0-4 3-6.5 7-6.5s7 2.5 7 6.5z"/><circle cx="17" cy="9" r="2.8"/><path d="M16.5 13.2c3 .2 5.5 2.2 5.5 5.8h-4.5"/></svg><span>My Network</span></span>
+      <span class="ni"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" fill="none" stroke="currentColor" stroke-width="2"/></svg><span>Jobs</span></span>
+      <span class="ni"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h16v12H8l-4 4z"/></svg><span>Messaging</span></span>
+      <span class="ni"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3a6 6 0 0 0-6 6v4l-2 3h16l-2-3V9a6 6 0 0 0-6-6zM10 19a2 2 0 0 0 4 0z"/></svg><span>Notifications</span><b class="bd" id="notif">9</b></span>
+      <span class="ni"><span class="me">F</span><span>Me ▾</span></span>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <aside class="side">
+    <div class="box">
+      <h3>Manage my network</h3>
+      <div class="row"><span>Connections</span><b>512</b></div>
+      <div class="row game"><span>Profile views</span><b class="blue" id="sScore">0</b></div>
+      <div class="row game"><span>Posts muted</span><b id="sMuted">0</b></div>
+      <div class="row game"><span>Streak</span><b id="sStreak">0</b></div>
+      <div class="row game"><span>Best session</span><b id="sBest">0</b></div>
+      <div class="row decoyOnly"><span>Following &amp; followers</span><b>1,204</b></div>
+      <div class="row decoyOnly"><span>Groups</span><b>6</b></div>
+      <div class="row decoyOnly"><span>Events</span><b>2</b></div>
+      <div class="row decoyOnly"><span>Pages</span><b>14</b></div>
+      <div class="foot game">Mute the cringe. Don’t mute your actual colleagues. Keys 1–9 match the grid, like a phone keypad (7 8 9 on top). Esc hides it all.</div>
+    </div>
+  </aside>
+
+  <section class="main">
+    <div class="box">
+      <div class="mh"><h2 id="mTitle">People you may know from Studio Ops</h2><span class="tm game" id="tm"></span></div>
+      <div class="bar game"><i id="bar" style="width:100%"></i></div>
+      <div class="grid" id="grid"></div>
+      <p class="hint game" id="hint">Posts pop up in the grid. Click <b>Mute</b> on cringe. Leave the genuine ones alone: they have a green button.</p>
+    </div>
+  </section>
+</main>
+
+<div class="scrim" id="scrim" hidden><div class="dlg" id="dlg"></div></div>
+
+<script>
+(function(){
+const $=id=>document.getElementById(id);
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const FIRST=['Chad','Brad','Tiffany','Gavin','Kyle','Brooke','Tristan','Madison','Rupert','Jasper','Harper','Blake','Serena','Dominic','Kenzie'];
+const LAST=['Sterling','Maxwell','Hustle','Vance','Ashford','Bloom','Rhodes','Kingsley','Frost','Achebe','Delacroix','Moreau','Pike'];
+const COLS=['#0b63b5','#a0376a','#4f7d3a','#b4552d','#6b4f9e','#0f7c86','#8a6d1f','#c43e1c','#5a5fb0','#3f5b66'];
+const COVERS=['linear-gradient(120deg,#a0b9d6,#c8d6e5)','linear-gradient(120deg,#d8c1a8,#eadbc8)','linear-gradient(120deg,#b6cfbf,#d7e6dc)','linear-gradient(120deg,#c9bfd9,#e2dcec)','linear-gradient(120deg,#d4b8b8,#ead7d7)'];
+const CRINGE=[
+ ['CEO | Visionary | Keynote Speaker | Dad','I fired my best employee. Here’s why it was the biggest gift I’ve ever given. 🧵'],
+ ['Growth Hacker 🚀 | Ex-Startup','Woke up at 3:45am. Cold plunge. Gratitude journal. What did YOU do today?'],
+ ['Thought Leader | Top Voice','My toddler spilled juice. Here’s what it taught me about B2B sales.'],
+ ['Talent Partner','Exciting opportunity! Unpaid. 10 years’ experience needed in a 3-year-old tool.'],
+ ['Founder & Chief Vibes Officer','Humbled and honoured to announce that I’ve been humbled and honoured.'],
+ ['Disruptor | Mentor | Human','Unpopular opinion: water is wet. Agree? 👇'],
+ ['Brand Evangelist','Comment “YES” and I’ll DM you my free 47-page guide to going viral.'],
+ ['Serial Entrepreneur','Rejected from 400 jobs. Here’s what I learned (number 7 will shock you).'],
+ ['Chief Inspiration Officer','Just had a little cry in the car about leadership. 😢 #vulnerability'],
+ ['AI Prompt Whisperer','I asked AI to write this post. Then I asked it to write my personality.'],
+ ['Hustle Coach','Sleep is a subscription. I cancelled mine. DM me “GRIND”.'],
+ ['Personal Branding Expert','I don’t have hobbies. I have side hustles. And so should your kids.'],
+ ['Web3 | Metaverse | Synergy','The office is dead. Anyway, join me at our new office launch party.'],
+ ['Leadership Guru','Great leaders don’t take lunch breaks. They take lunch meetings. Thoughts?'],
+];
+const GENUINE=[
+ ['Priya Shah','Account Director at Studio Ops','Started a new position 🎉','Congratulate'],
+ ['Tom Whitfield','Motion Designer','Celebrating 3 years at Studio Ops','Say congrats'],
+ ['Janet Cole','Office Manager','Shared the photos from summer drinks','Like'],
+ ['Mark Delaney','Account Manager','Posted the finished spring campaign','Like'],
+ ['Sophie Grant','Marketing Lead at Brightwave','Hiring a Junior Designer (real salary, listed)','View job'],
+ ['Helen Ward','Creative Director at Studio Ops','Speaking at a design conference next month','Like'],
+];
+const GOLD=['Recruiter with an actual job in your field','Salary: listed. Hours: sane. Hybrid: real.'];
+
+/* ---------- grid ---------- */
+const cells=[];
+function buildGrid(){
+  $('grid').innerHTML=Array.from({length:9},(_,i)=>`<div class="cell idle" data-i="${i}"></div>`).join('');
+  document.querySelectorAll('.cell').forEach((el,i)=>{cells[i]={el,m:null};el.onclick=()=>whack(i);paintIdle(i)});
+}
+function paintIdle(i){
+  const c=cells[i];c.el.className='cell idle';
+  c.el.innerHTML=`<div class="pc"><div class="cov" style="background:#efedea"></div><div class="av" style="background:#dedbd6"></div><div class="skel"></div><div class="skel" style="width:40%"></div></div>`;
+}
+function initials(n){return n.split(' ').map(w=>w[0]).join('').slice(0,2)}
+function paintMole(i){
+  const c=cells[i],m=c.m;
+  c.el.className='cell up';
+  const btn=m.kind==='cringe'?`<button class="btn" tabindex="-1">Mute</button>`:m.kind==='gold'?`<button class="btn" tabindex="-1" style="border-color:var(--gold);color:var(--gold)">Connect</button>`:`<button class="btn" tabindex="-1" style="border-color:var(--green);color:var(--green)">${m.btn}</button>`;
+  c.el.innerHTML=`<div class="pc"><div class="cov" style="background:${m.cov}"></div><div class="av" style="background:${m.col}">${initials(m.name)}</div>
+   <div class="nm">${m.name}</div><div class="hd">${m.head}</div><div class="post">${m.post}</div>${btn}<div class="life" id="life${i}"></div></div>`;
+}
+function paintDecoy(){
+  const P=[['Dan Morris','Print Manager at Printwise'],['Leah Carter','Senior Designer'],['Owen Pryce','Photographer'],['Aisha Khan','Brand Strategist'],['Ben Tully','Copywriter'],['Grace Lim','UX Designer at Brightwave'],['Sam Ellis','Art Director'],['Nadia Hart','Producer'],['Rhys Evans','Motion Designer']];
+  cells.forEach((c,i)=>{c.el.className='cell';c.el.innerHTML=`<div class="pc"><div class="cov" style="background:${COVERS[i%5]}"></div><div class="av" style="background:${COLS[i]}">${initials(P[i][0])}</div><div class="nm">${P[i][0]}</div><div class="hd">${P[i][1]}</div><div class="post" style="color:var(--muted)">${3+i*2} mutual connections</div><button class="btn" tabindex="-1">Connect</button></div>`});
+}
+
+/* ---------- game ---------- */
+const DUR=60;
+let best=0;try{best=+localStorage.getItem('nw-best')||0}catch(e){}
+let state='idle',boss=false,G;
+function start(){
+  closeDlg();G={t:0,score:0,muted:0,oops:0,missed:0,streak:0,maxStreak:0,spawnT:.4};
+  cells.forEach((c,i)=>{c.m=null;paintIdle(i)});state='play';hud();last=performance.now();
+}
+function spawn(){
+  const free=cells.map((c,i)=>c.m?null:i).filter(i=>i!=null);if(!free.length)return;
+  const i=pick(free),p=G.t/DUR;
+  const life=Math.max(.75,1.6-p*.85);
+  const r=Math.random();let m;
+  if(r<.05)m={kind:'gold',name:pick(FIRST)+' '+pick(LAST),head:GOLD[0],post:GOLD[1]};
+  else if(r<.28){const g=pick(GENUINE);m={kind:'genuine',name:g[0],head:g[1],post:g[2],btn:g[3]}}
+  else{const c=pick(CRINGE);m={kind:'cringe',name:pick(FIRST)+' '+pick(LAST),head:c[0],post:c[1]}}
+  m.life=m.kind==='genuine'?life*1.1:life;m.left=m.life;m.col=pick(COLS);m.cov=pick(COVERS);
+  cells[i].m=m;paintMole(i);
+}
+function flash(i,txt,cls){const f=document.createElement('span');f.className='flash '+cls;f.textContent=txt;cells[i].el.appendChild(f);setTimeout(()=>f.remove(),700)}
+function whack(i){
+  if(state!=='play'||boss)return;const c=cells[i],m=c.m;if(!m)return;
+  c.m=null;c.el.classList.add('hit');
+  if(m.kind==='cringe'){G.streak++;G.maxStreak=Math.max(G.maxStreak,G.streak);const pts=10+Math.min(40,G.streak*2);G.score+=pts;G.muted++;flash(i,'+'+pts,'good')}
+  else if(m.kind==='gold'){G.score+=75;G.streak++;flash(i,'+75 Connected','gold')}
+  else{G.score=Math.max(0,G.score-40);G.oops++;G.streak=0;flash(i,`You muted ${m.name.split(' ')[0]}`,'bad')}
+  setTimeout(()=>{if(!c.m)paintIdle(i)},160);hud();
+}
+function hud(){
+  if(!G)return;$('sScore').textContent=G.score.toLocaleString('en-GB');$('sMuted').textContent=G.muted;$('sStreak').textContent=G.streak;$('sBest').textContent=best.toLocaleString('en-GB');
+  $('notif').textContent=Math.min(99,9+G.muted);
+  const left=Math.max(0,DUR-G.t);$('tm').textContent=`Session ends in 0:${String(Math.ceil(left)).padStart(2,'0')}`;$('bar').style.width=(left/DUR*100)+'%';
+}
+function end(){
+  state='over';cells.forEach((c,i)=>{c.m=null;paintIdle(i)});
+  const nb=G.score>best;if(nb){best=G.score;try{localStorage.setItem('nw-best',best)}catch(e){}}hud();
+  dlg('Your weekly network stats',`${nb&&G.score?'Best week yet. ':''}Here’s how your minute of networking went.
+   <table><tr><td>Profile views (score)</td><td>${G.score.toLocaleString('en-GB')}</td></tr><tr><td>Cringe posts muted</td><td>${G.muted}</td></tr><tr><td>Colleagues muted by accident</td><td>${G.oops}</td></tr><tr><td>Cringe that got away</td><td>${G.missed}</td></tr><tr><td>Longest streak</td><td>${G.maxStreak}</td></tr><tr><td>Best ever</td><td>${best.toLocaleString('en-GB')}</td></tr></table>`,'Start new session',start);
+}
+
+/* ---------- dialog ---------- */
+function dlg(title,html,act,fn){$('dlg').innerHTML=`<h2>${title}</h2><div class="in">${html}</div><div class="acts"><button class="pri" id="dBtn">${act}</button></div>`;$('scrim').hidden=false;$('dBtn').onclick=fn;$('dBtn').focus()}
+const closeDlg=()=>$('scrim').hidden=true;
+
+/* ---------- boss ---------- */
+function toggleBoss(){
+  boss=!boss;document.body.classList.toggle('boss',boss);
+  if(boss){$('scrim').dataset.v=$('scrim').hidden?'':'1';$('scrim').hidden=true;if(state==='play')state='held';paintDecoy();$('notif').textContent='3'}
+  else{cells.forEach((c,i)=>c.m?paintMole(i):paintIdle(i));if($('scrim').dataset.v)$('scrim').hidden=false;
+    if(state==='held')dlg('Welcome back','Your session was paused while you were looking busy.','Carry on',()=>{closeDlg();state='play';last=performance.now()});hud()}
+}
+
+/* ---------- input & loop ---------- */
+const KEYMAP={'7':0,'8':1,'9':2,'4':3,'5':4,'6':5,'1':6,'2':7,'3':8};
+addEventListener('keydown',e=>{
+  if(e.key==='Escape'){e.preventDefault();toggleBoss();return}
+  if(boss)return;
+  if(e.key in KEYMAP&&state==='play'){e.preventDefault();whack(KEYMAP[e.key])}
+});
+let last=performance.now();
+function frame(t){
+  const dt=Math.min(.05,(t-last)/1000);last=t;
+  if(state==='play'&&!boss&&!document.hidden){
+    G.t+=dt;G.spawnT-=dt;
+    if(G.spawnT<=0){spawn();if(G.t>20&&Math.random()<.35)spawn();G.spawnT=Math.max(.32,.85-G.t/DUR*.5)*(.7+Math.random()*.6)}
+    cells.forEach((c,i)=>{if(!c.m)return;c.m.left-=dt;const l=$('life'+i);if(l)l.style.width=Math.max(0,c.m.left/c.m.life*100)+'%';
+      if(c.m.left<=0){if(c.m.kind==='cringe'){G.missed++;G.streak=0}c.m=null;paintIdle(i)}});
+    hud();if(G.t>=DUR)end();
+  }
+  requestAnimationFrame(frame);
+}
+buildGrid();$('sBest').textContent=best.toLocaleString('en-GB');$('tm').textContent='Session: 60 seconds';
+dlg('Your feed needs a clear-out','Thought leaders, hustle coaches and humble-braggers keep popping up in your network. <b>Mute</b> them before they vanish. Streaks score more. But don’t mute your actual colleagues: their cards have a green button. The odd gold card is a recruiter with a real job. Grab it.','Start session',start);
+requestAnimationFrame(frame);
+})();
+</script>
+
+</html>

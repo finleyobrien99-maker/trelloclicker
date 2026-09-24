@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Look Busy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+:root{
+  --bg:#eef1f3; --panel:#ffffff; --panel2:#f6f8f9; --text:#16242a; --muted:#5d6b71; --line:#d9e0e3;
+  --navy:#173039; --navyText:#e8f0f2; --accent:#e8743b; --accentInk:#b3521f; --accentSoft:#fbe7dc; --teal:#1f7a6c;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#121a1d; --panel:#1b2529; --panel2:#202c31; --text:#e5ecee; --muted:#95a5ab; --line:#2c3a40;
+    --navy:#0c1417; --navyText:#dce7ea; --accent:#f08a55; --accentInk:#f5a87e; --accentSoft:#3a2519; --teal:#4db3a1;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#121a1d; --panel:#1b2529; --panel2:#202c31; --text:#e5ecee; --muted:#95a5ab; --line:#2c3a40;
+  --navy:#0c1417; --navyText:#dce7ea; --accent:#f08a55; --accentInk:#f5a87e; --accentSoft:#3a2519; --teal:#4db3a1;
+}
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--text);font-family:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;font-size:15px;line-height:1.5}
+a{color:inherit}
+a:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:6px}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+
+/* top bar */
+.top{background:var(--navy);color:var(--navyText)}
+.topin{max-width:1180px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:16px}
+.brand{display:flex;align-items:center;gap:10px;font-family:"Bricolage Grotesque",system-ui,sans-serif;font-weight:700;font-size:17px;white-space:nowrap}
+.brand i{width:28px;height:28px;border-radius:7px;background:var(--accent);display:grid;place-items:center;font-style:normal;color:#fff;font-size:14px;font-weight:800}
+.search{flex:1;max-width:420px;margin-left:auto;background:rgba(255,255,255,.1);border-radius:6px;padding:7px 12px;font-size:14px;opacity:.85;white-space:nowrap;overflow:hidden}
+.me{width:30px;height:30px;border-radius:50%;background:#c77d3a;color:#fff;display:grid;place-items:center;font-weight:600;font-size:13px;flex:none}
+.tabsnav{max-width:1180px;margin:0 auto;padding:0 16px;display:flex;gap:22px;font-size:14px;overflow-x:auto;scrollbar-width:none}
+.tabsnav span{padding:8px 0 10px;opacity:.75;white-space:nowrap;border-bottom:2px solid transparent}
+.tabsnav span.on{opacity:1;border-bottom-color:var(--accent);font-weight:600}
+
+.wrap{max-width:1180px;margin:0 auto;padding:28px 16px 48px;display:grid;grid-template-columns:minmax(0,1fr);gap:36px}
+
+/* hero */
+.hero{grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:16px 32px}
+.hero h1{margin:0;font-family:"Bricolage Grotesque",system-ui,sans-serif;font-weight:800;font-size:clamp(34px,6vw,64px);line-height:.98;letter-spacing:-.02em;text-wrap:balance}
+.hero h1 em{font-style:normal;color:var(--accentInk)}
+.hero p{margin:10px 0 0;color:var(--muted);max-width:52ch;font-size:16px}
+.panic{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px;display:flex;gap:14px;align-items:center;max-width:380px}
+.panic kbd{font-family:"Bricolage Grotesque",system-ui,sans-serif;font-weight:800;font-size:18px;background:var(--navy);color:var(--navyText);border-radius:8px;padding:8px 12px;box-shadow:0 3px 0 rgba(0,0,0,.35);flex:none}
+.panic p{margin:0;font-size:14px;color:var(--text)}
+.panic b{font-weight:600}
+
+/* apps */
+.sec h2{margin:0 0 12px;font-family:"Bricolage Grotesque",system-ui,sans-serif;font-size:22px;font-weight:700;display:flex;align-items:baseline;gap:10px}
+.sec h2 small{font-family:"IBM Plex Sans",system-ui,sans-serif;font-size:13px;font-weight:500;color:var(--muted)}
+.apps{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:18px}
+.app{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:0 14px 12px;overflow:hidden;display:grid;grid-template-columns:44px minmax(0,1fr);gap:4px 12px;text-decoration:none;transition:border-color .15s,transform .15s}
+.app:hover{border-color:var(--accent);transform:translateY(-3px);box-shadow:0 10px 24px -14px rgba(20,30,50,.45)}
+.shot{grid-column:1/-1;margin:0 -14px 10px;aspect-ratio:8/5;background:var(--panel2);border-bottom:1px solid var(--line);overflow:hidden}
+.shot img{display:block;width:100%;height:100%;object-fit:cover;object-position:top left;transition:transform .35s}
+.app:hover .shot img{transform:scale(1.04)}
+body.boss .app{padding-top:14px}
+.ic{grid-row:span 3;align-self:start;width:44px;height:44px;border-radius:11px;display:grid;place-items:center;color:#fff}
+.ic svg{width:24px;height:24px}
+.app h3{margin:0;font-size:16px;font-weight:600;line-height:1.25}
+.app span.real{font-size:13px;color:var(--accentInk);font-weight:600}
+.app .fake{font-size:13px;color:var(--muted);display:none}
+.app p{margin:4px 0 0;font-size:13.5px;color:var(--muted);line-height:1.45;grid-column:2}
+.app .foot{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding-top:10px;border-top:1px solid var(--line);font-size:12.5px;color:var(--muted)}
+.app .open{color:var(--text);font-weight:600;white-space:nowrap;flex:none;margin-left:8px}
+.like{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;background:var(--panel2);border:1px solid var(--line);border-radius:999px;padding:1px 8px}
+
+.footer{grid-column:1/-1;color:var(--muted);font-size:13px;border-top:1px solid var(--line);padding-top:16px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+
+
+/* roadmap */
+.road{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.plan{background:transparent;border:1.5px dashed var(--line);border-radius:12px;padding:12px 14px;display:grid;grid-template-columns:36px minmax(0,1fr);gap:3px 12px}
+.plan .ic{width:36px;height:36px;border-radius:9px;opacity:.55;grid-row:span 3}
+.plan .ic svg{width:20px;height:20px}
+.plan h3{margin:0;font-size:15px;font-weight:600}
+.plan p{margin:2px 0 0;font-size:13px;color:var(--muted);line-height:1.45;grid-column:2}
+.plan .foot{grid-column:1/-1;display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;font-size:12px}
+.phase{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin:18px 0 8px}
+.phase:first-of-type{margin-top:0}
+.phase i{width:8px;height:8px;border-radius:50%;background:var(--accent)}
+.plan .fake{display:none}
+body.boss .plan .fake{display:block}
+body.boss .plan .foot .fake{display:inline}
+
+/* boss mode: the intranet stops admitting anything */
+body.boss .real,body.boss .gamey{display:none!important}
+body.boss .app .fake{display:block}
+body.boss .app .foot .fake{display:inline}
+body.boss .hero h1 em{color:inherit}
+
+@media (max-width:900px){.search{display:none}.me{margin-left:auto}}
+@media (prefers-reduced-motion:reduce){.app,.shot img{transition:none}.app:hover,.app:hover .shot img{transform:none}}
+</style>
+
+<header class="top">
+  <div class="topin">
+    <div class="brand"><i>SO</i>Studio Ops Intranet</div>
+    <div class="search">Search people, policies and pages</div>
+    <span class="me">F</span>
+  </div>
+  <nav class="tabsnav" aria-hidden="true"><span class="on">Home</span><span>News</span><span>People</span><span>Policies</span><span>IT help</span><span>Facilities</span></nav>
+</header>
+
+<main class="wrap">
+  <section class="hero">
+    <div>
+      <h1><span class="gamey">Look <em>Busy.</em></span><span class="fake-h" hidden>Good afternoon, Fin.</span></h1>
+      <p class="gamey">Sixteen games dressed up as the apps you already have open at work. Each one looks like the real thing from across the office, and every one of them has a panic button.</p>
+      <p class="fake-p" hidden>Everything you need for the working day, all in one place.</p>
+    </div>
+    <div class="panic gamey"><kbd>Esc</kbd><p><b>Someone coming?</b> Press Esc in any app and it turns into dull, convincing work. Works on this page too.</p></div>
+  </section>
+
+  <section class="sec">
+    <h2>Your apps <small class="gamey">16 apps · 0 productivity</small></h2>
+    <div class="apps" id="apps"></div>
+  </section>
+
+
+  <section class="sec roadsec">
+    <h2><span class="gamey">Roadmap</span><span class="fake-h" hidden>IT rollout schedule</span> <small><span class="gamey">4 more apps to reach 20</span><span class="fake-h" hidden>Q4 · subject to change</span></small></h2>
+    <div id="road"></div>
+  </section>
+
+
+  <footer class="footer"><span>Studio Ops Intranet · Last updated today</span><span class="gamey">Built for looking busy, not for being busy.</span></footer>
+</main>
+
+<script>
+(function(){
+const A='';
+const I={
+ chat:'<path d="M4 5h16v11H9l-5 4v-4H4z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>',
+ quest:'<path d="M4 5h16v11H9l-5 4v-4H4z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M12 7.5l1 2.1 2.3.3-1.7 1.6.4 2.3-2-1.1-2 1.1.4-2.3-1.7-1.6 2.3-.3z" fill="currentColor"/>',
+ board:'<rect x="3" y="4" width="5" height="15" rx="1.5" fill="currentColor"/><rect x="9.5" y="4" width="5" height="10" rx="1.5" fill="currentColor"/><rect x="16" y="4" width="5" height="7" rx="1.5" fill="currentColor"/>',
+ cards:'<rect x="3" y="6" width="11" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="1.8" transform="rotate(-8 8 13)"/><rect x="10" y="4" width="11" height="14" rx="2" fill="currentColor"/>',
+ grid:'<rect x="3" y="4" width="18" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M3 9.5h18M3 15h18M9 4v16M15 4v16" stroke="currentColor" stroke-width="1.4"/>',
+ cal:'<rect x="3" y="5" width="18" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M3 10h18M8 3v4M16 3v4" stroke="currentColor" stroke-width="1.8"/><rect x="7" y="13" width="4" height="4" rx="1" fill="currentColor"/>',
+ mail:'<rect x="3" y="5" width="18" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m4 6 8 6.5L20 6" fill="none" stroke="currentColor" stroke-width="1.8"/>',
+ chart:'<path d="M3 20h18" stroke="currentColor" stroke-width="1.8"/><path d="m4 16 5-6 4 3 7-8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
+ spark:'<circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="3" fill="currentColor"/>',
+ pen:'<path d="M12 3 17 13l-5 8-5-8z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="12.5" r="1.4" fill="currentColor"/>',
+ slides:'<rect x="3" y="5" width="18" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="7" y="8.5" width="10" height="2" rx="1" fill="currentColor"/><path d="M12 17v3M9 20h6" stroke="currentColor" stroke-width="1.8"/>',
+ update:'<circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="1.4" stroke-dasharray="2 3.2"/><circle cx="12" cy="4" r="2" fill="currentColor"/>',
+ people:'<circle cx="9" cy="8" r="3.2" fill="currentColor"/><path d="M2.5 19c.4-3.6 3-5.6 6.5-5.6s6.1 2 6.5 5.6z" fill="currentColor"/><circle cx="17" cy="9" r="2.5" fill="currentColor"/><path d="M16.5 13.2c2.8.2 4.6 2 5 5h-4.2" fill="currentColor"/>',
+ printer:'<rect x="6.5" y="3" width="11" height="5" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="3" y="8" width="18" height="8" rx="1.5" fill="currentColor"/><rect x="6.5" y="13" width="11" height="7" fill="#fff" stroke="currentColor" stroke-width="1.6"/>',
+ video:'<rect x="3" y="6" width="12" height="12" rx="2" fill="currentColor"/><path d="m15 10 6-3.5v11L15 14z" fill="currentColor"/>',
+};
+const APPS=[
+ ['chat','#4a3a7a','Threadline','Team chat','Dungeon crawler','Every ticket is a monster. Type replies to fight, clear channels, get promoted to Creative Director.','Slack','threadline-chat.html'],
+ ['quest','#1c2433','Hubbub','Team chat','Text adventure RPG','A whole office to explore. Channels are places, DMs are people. Inventory, quests, fights, and a deadline at 17:30.','Slack','hubbub-rpg.html'],
+ ['board','#2c6b7a','Taskwall','Project board','Idle clicker','Tick off design tasks for story points, hire a whole studio, and let them work while you don’t.','Trello','taskwall-clicker.html'],
+ ['cards','#5b6f80','Q3 Delivery Sprint','Sprint planning','Deck-builder roguelite','Play task cards against Scope Creep, Reply-all Chains and the Quarterly Review.','Trello','taskwall-deckbuilder.html'],
+ ['grid','#1e8e3e','Q3 Budget Forecast','Spreadsheet','Minesweeper','Open cells without hitting a #DIV/0!. Q1–Q3 tabs are the difficulty.','Google Sheets','budget-minesweeper.html'],
+ ['cal','#0b57d0','Team Calendar','Calendar','Tetris','Meetings fall into your fortnight. Book a slot solid across ten days to clear it.','Google Calendar','calendar-tetris.html'],
+ ['mail','#1f5fa8','Mail','Email','Inbox triage','Reply, archive, junk or report phishing as IT’s rules get stricter every day.','Outlook','mail-inbox.html'],
+ ['chart','#1a73e8','AdPilot','Ad campaigns','Bullet hell','You’re the data point on the performance chart. Dodge rival bids and bot traffic.','Google Ads','adpilot-bullethell.html'],
+ ['spark','#2b5f75','Assistant','AI assistant','Space Invaders','Shoot the words of a waffly AI answer before it reaches your message box.','AI chat','assistant-invaders.html'],
+ ['pen','#2d2d2d','hole_01_final.psd','Image editor','Pen tool golf','Draw a Bézier path, stroke it, and sink the ball in as few tries as you can.','Photoshop','pen-tool-golf.html'],
+ ['slides','#c48f00','Q3 Brand Review','Presentations','Snake','Steer a selected text box around the slide eating bullet points and charts. Every five items adds a slide.','Google Slides','slides-snake.html'],
+ ['update','#0a5fa8','Working on updates','System update','Rhythm game','Hit the dots on the beat as they come round the update spinner. Three updates, three difficulties. Has music.','Windows Update','update-rhythm.html'],
+ ['people','#0b63b5','My Network','Professional network','Whack-a-mole','Mute cringe thought leaders as they pop up in “People you may know”. Don’t mute your actual colleagues.','LinkedIn','network-whack.html'],
+ ['chart','#2d2d2d','Task Manager','System monitor','Tower defence','Processes march along the CPU graph. Start services beside it to end them before your memory hits 100%.','Task Manager','task-defence.html'],
+ ['printer','#6b6f74','Print Queue','Printers','Time management','Route documents to the right printer and deal with paper, toner and jams before colleagues give up.','printer settings','print-queue.html'],
+ ['video','#6264c4','Weekly WIP sync','Video meetings','Flappy Bird','Flap your camera bubble through columns of colleagues’ video tiles.','Teams','meeting-flappy.html'],
+];
+const SHOT={"threadline-chat.html": "threadline", "hubbub-rpg.html": "hubbub-rpg", "taskwall-clicker.html": "taskwall-clicker", "taskwall-deckbuilder.html": "taskwall-deckbuilder", "budget-minesweeper.html": "budget-minesweeper", "calendar-tetris.html": "calendar-tetris", "mail-inbox.html": "mail-inbox", "adpilot-bullethell.html": "adpilot-bullethell", "assistant-invaders.html": "assistant-invaders", "pen-tool-golf.html": "pen-tool-golf", "slides-snake.html": "slides-snake", "update-rhythm.html": "update-rhythm", "network-whack.html": "network-whack", "task-defence.html": "task-defence", "print-queue.html": "print-queue", "meeting-flappy.html": "meeting-flappy"};
+const FAKE={'Team chat':'Messages and channels for the whole studio.','Project board':'Track tasks and deadlines for current campaigns.','Sprint planning':'Plan and review this quarter’s sprints.','Spreadsheet':'Budgets, forecasts and reporting.','Calendar':'Meetings, rooms and team availability.','Email':'Your work inbox.','Ad campaigns':'Paid media performance and reporting.','AI assistant':'Help with writing, research and ideas.','Image editor':'Artwork, retouching and layouts.','Presentations':'Decks for pitches, reviews and all-hands.','System update':'Installing the latest updates. Please wait.','Professional network':'Connections, contacts and industry news.','System monitor':'Performance and running processes.','Printers':'Printers, scanners and the print queue.','Video meetings':'Calls, stand-ups and client meetings.'};
+document.getElementById('apps').innerHTML=APPS.map(([ic,c,name,kind,game,desc,like,id])=>`
+ <a class="app" href="${A+id}">
+  <span class="shot real"><img src="shots/${SHOT[id]}.webp" alt="${name} mid-game" loading="lazy" width="800" height="500"></span>
+  <span class="ic" style="background:${c}"><svg viewBox="0 0 24 24">${I[ic]}</svg></span>
+  <h3>${name}</h3>
+  <span class="real">${game}</span><span class="fake">${kind}</span>
+  <p class="real">${desc}</p><p class="fake">${FAKE[kind]}</p>
+  <span class="foot"><span class="like real">Looks like ${like}</span><span class="like fake">${kind}</span><span class="open">Open ↗</span></span>
+ </a>`).join('');
+
+const ROAD=[
+ ['Phase 1 · Quick wins',[
+  ['grid','#6b4f9e','Timesheets','Timesheet','Sudoku','Fill the week so every project adds up to its hours. No project twice in a day.','a timesheet tool'],
+  ['cal','#1f7a6c','Annual Leave','Holiday booker','2048','Merge half days into days into weeks. Reach a fortnight off before the grid fills up.','an HR portal'],
+  ['board','#8a6d1f','Font Library','Font manager','Wordle','Guess the typeface from one glyph. Each miss reveals another letter.','a font manager'],
+ ]],
+ ['Phase 2 · Designer specials',[
+  ['pen','#c43e1c','Swatches','Colour picker','Colour matching','Nail the colour by eye with hue, saturation and brightness sliders before the timer runs out.','a colour picker'],
+  ['mail','#3a7ab8','Password Reset','Account security','Rules puzzle','Every password rule is dafter than the last. Keep all of them true at once.','a password page'],
+ ]],
+];
+document.getElementById('road').innerHTML=ROAD.map(([ph,items])=>`<div class="phase"><i></i>${ph}</div><div class="road">${items.map(([ic,c,name,kind,game,desc,like])=>`
+ <div class="plan"><span class="ic" style="background:${c}"><svg viewBox="0 0 24 24">${I[ic]}</svg></span>
+  <h3>${name}</h3><span class="real" style="font-size:13px;color:var(--accentInk);font-weight:600">${game}</span><span class="fake" style="font-size:13px;color:var(--muted)">${kind}</span>
+  <p class="real">${desc}</p><p class="fake">Coming to your desktop this quarter.</p>
+  <span class="foot"><span class="like real">Looks like ${like}</span><span class="like">Planned</span></span></div>`).join('')}</div>`).join('');
+function toggle(){
+  const on=document.body.classList.toggle('boss');
+  document.querySelectorAll('.fake-h').forEach(e=>e.hidden=!on);document.querySelector('.fake-p').hidden=!on;
+  document.title=on?'Home – Studio Ops Intranet':'Look Busy';
+}
+addEventListener('keydown',e=>{if(e.key==='Escape'){e.preventDefault();toggle()}});
+})();
+</script>
+
+</html>

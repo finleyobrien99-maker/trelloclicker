@@ -1,0 +1,387 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Q3 Campaign Board</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --top:#2c3e44; --topText:#e6eef0; --boardBg:#5b7680; --barBg:rgba(0,0,0,.18); --barText:#ffffff;
+  --col:#eceff0; --card:#ffffff; --cardHover:#f7f9f9; --text:#1e2a2e; --muted:#5f6d72; --line:#d8dee0;
+  --accent:#1f6f8b; --accentSoft:#dcecf2; --good:#3d8a55; --goodSoft:#e1f1e6; --hot:#d2632c; --hotSoft:#fbe7dc;
+  --shadow:0 1px 0 rgba(20,40,45,.18); --shadowUp:0 8px 24px rgba(10,25,30,.28);
+  --l1:#4f9a6a; --l2:#d9a63a; --l3:#c75a4a; --l4:#6c6fc2; --l5:#3a8fb3;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --top:#141c1f; --topText:#d6e1e4; --boardBg:#243238; --barBg:rgba(0,0,0,.25); --barText:#eef4f5;
+    --col:#182023; --card:#263034; --cardHover:#2c383c; --text:#e2e9eb; --muted:#9aaab0; --line:#34404a;
+    --accent:#5fb3d0; --accentSoft:#1f3a44; --good:#6cc48a; --goodSoft:#1f3a2a; --hot:#f08a55; --hotSoft:#43291c;
+    --shadow:0 1px 0 rgba(0,0,0,.4); --shadowUp:0 8px 24px rgba(0,0,0,.55);
+  }
+}
+:root[data-theme="dark"]{
+  --top:#141c1f; --topText:#d6e1e4; --boardBg:#243238; --barBg:rgba(0,0,0,.25); --barText:#eef4f5;
+  --col:#182023; --card:#263034; --cardHover:#2c383c; --text:#e2e9eb; --muted:#9aaab0; --line:#34404a;
+  --accent:#5fb3d0; --accentSoft:#1f3a44; --good:#6cc48a; --goodSoft:#1f3a2a; --hot:#f08a55; --hotSoft:#43291c;
+  --shadow:0 1px 0 rgba(0,0,0,.4); --shadowUp:0 8px 24px rgba(0,0,0,.55);
+}
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{background:var(--boardBg);color:var(--text);font-family:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif;font-size:14px;overflow:hidden;font-variant-numeric:tabular-nums}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.app{display:flex;flex-direction:column;height:100%}
+
+/* top nav */
+.nav{background:var(--top);color:var(--topText);display:flex;align-items:center;gap:14px;padding:8px 16px;min-height:46px}
+.logo{display:flex;align-items:center;gap:8px;font-weight:700;letter-spacing:-.01em}
+.logo i{width:20px;height:20px;border-radius:4px;background:var(--topText);display:grid;grid-template-columns:1fr 1fr;gap:2px;padding:3px}
+.logo i b{background:var(--top);border-radius:1px}
+.logo i b:first-child{height:12px}.logo i b:last-child{height:7px}
+.nav .menuitem{font-size:13px;opacity:.85}
+.nav .me{margin-left:auto;width:28px;height:28px;border-radius:50%;background:#c77d3a;color:#fff;font-weight:700;display:grid;place-items:center;font-size:12px}
+
+/* board bar */
+.bar{background:var(--barBg);color:var(--barText);display:flex;align-items:center;gap:10px;padding:8px 16px;flex-wrap:wrap}
+.bar h1{margin:0;font-size:18px;font-weight:700;padding:4px 6px}
+.chip{background:rgba(255,255,255,.16);border-radius:4px;padding:5px 10px;font-size:13px;font-weight:500;color:var(--barText);display:inline-flex;align-items:center;gap:6px}
+button.chip:hover{background:rgba(255,255,255,.26)}
+.stats{display:flex;gap:8px;flex-wrap:wrap}
+.chip b{font-weight:700}
+.chip.frenzy{background:var(--hot);color:#fff}
+.members{margin-left:auto;display:flex;align-items:center;gap:8px}
+.faces{display:flex}
+.faces span{width:28px;height:28px;border-radius:50%;border:2px solid var(--boardBg);margin-left:-6px;display:grid;place-items:center;font-size:11px;font-weight:700;color:#fff}
+
+/* board */
+.board{flex:1;display:flex;gap:12px;align-items:flex-start;overflow-x:auto;overflow-y:hidden;padding:12px 16px 16px;min-height:0}
+.list{flex:0 0 272px;max-height:100%;background:var(--col);border-radius:10px;display:flex;flex-direction:column;box-shadow:var(--shadow)}
+.list-h{display:flex;justify-content:space-between;align-items:center;padding:10px 12px 6px;font-weight:600}
+.list-h span{color:var(--muted);font-weight:500;font-size:13px}
+.cards{overflow-y:auto;padding:4px 8px 10px;display:flex;flex-direction:column;gap:8px;min-height:10px}
+.card{background:var(--card);border-radius:8px;box-shadow:var(--shadow);padding:8px 10px;text-align:left;width:100%;display:block;border:1px solid transparent}
+.card .labels{display:flex;gap:4px;margin-bottom:6px;flex-wrap:wrap}
+.lb{height:8px;width:40px;border-radius:4px}
+.lbt{font-size:11px;font-weight:600;color:#fff;border-radius:4px;padding:2px 6px}
+.card .ttl{line-height:1.35}
+.card .meta{display:flex;align-items:center;gap:10px;margin-top:8px;font-size:12px;color:var(--muted)}
+.card .meta .av{margin-left:auto;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:10px;font-weight:700}
+.mute{color:var(--muted);font-size:12px;padding:2px 4px;line-height:1.4}
+
+/* active card */
+.active{cursor:pointer;border:1px solid var(--accent);transition:transform .06s}
+.active:hover{background:var(--cardHover)}
+.active:active{transform:scale(.985)}
+.active .ttl{font-size:15px;font-weight:600}
+.check{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:12px;color:var(--muted)}
+.check .track{flex:1;height:8px;border-radius:4px;background:var(--line);overflow:hidden}
+.check .track i{display:block;height:100%;background:var(--accent);transition:width .12s}
+.hint{font-size:12px;color:var(--accent);margin-top:8px;font-weight:500}
+.done-card .ttl{color:var(--muted)}
+.tick{display:inline-grid;place-items:center;width:16px;height:16px;border-radius:50%;background:var(--good);color:#fff;font-size:10px;margin-right:6px;vertical-align:-3px}
+.pop{animation:pop .35s ease}
+@keyframes pop{from{transform:translateY(-6px);opacity:.3}to{transform:none;opacity:1}}
+
+/* shop */
+.hire{display:grid;grid-template-columns:34px 1fr auto;gap:10px;align-items:center}
+.hire .av{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;font-size:12px}
+.hire .nm{font-weight:600}
+.hire .sub{font-size:12px;color:var(--muted)}
+.own{font-size:18px;font-weight:700;color:var(--muted);min-width:24px;text-align:right}
+.buy{margin-top:8px;width:100%;border-radius:5px;padding:6px 8px;font-size:13px;font-weight:600;background:var(--accentSoft);color:var(--accent);text-align:center}
+.buy:disabled{opacity:.45;cursor:default}
+.buy:not(:disabled):hover{background:var(--accent);color:#fff}
+.locked{opacity:.55}
+.up .ttl{font-weight:600}
+.up .desc{font-size:12px;color:var(--muted);margin-top:2px}
+
+/* quick win */
+.win{position:fixed;z-index:30;background:var(--hotSoft);color:var(--text);border:1px solid var(--hot);border-radius:8px;padding:8px 12px;box-shadow:var(--shadowUp);max-width:230px;text-align:left;animation:pop .3s ease}
+.win b{color:var(--hot);display:block;font-size:12px;text-transform:uppercase;letter-spacing:.04em}
+.float{position:fixed;pointer-events:none;font-weight:700;color:var(--accent);z-index:40;animation:up .7s ease-out forwards;text-shadow:0 1px 0 var(--card)}
+@keyframes up{to{transform:translateY(-40px);opacity:0}}
+.toast{position:fixed;left:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));background:var(--top);color:var(--topText);padding:10px 14px;border-radius:8px;box-shadow:var(--shadowUp);max-width:min(360px,calc(100vw - 32px));z-index:50;font-size:13px;line-height:1.4}
+
+.decoy{display:none}
+body.boss .decoy{display:flex}
+body.boss .game{display:none!important}
+.reset{font-size:12px;color:var(--muted);text-decoration:underline;padding:4px;align-self:flex-start;margin:0 8px 10px}
+
+@media (max-width:640px){
+  .nav .menuitem{display:none}
+  .bar h1{font-size:16px}
+  .members .faces{display:none}
+  .list{flex-basis:78vw}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<div class="app">
+  <nav class="nav">
+    <div class="logo"><i><b></b><b></b></i>Taskwall</div>
+    <span class="menuitem">Workspaces ⌄</span>
+    <span class="menuitem">Recent ⌄</span>
+    <span class="menuitem">Starred ⌄</span>
+    <span class="me">F</span>
+  </nav>
+
+  <div class="bar">
+    <h1>Q3 Campaign Delivery</h1>
+    <span class="chip">Board</span>
+    <div class="stats game">
+      <span class="chip">Story points <b id="pts">0</b></span>
+      <span class="chip">Velocity <b id="cps">0</b>/s</span>
+      <span class="chip frenzy" id="frenzy" hidden></span>
+    </div>
+    <div class="members">
+      <div class="faces"><span style="background:#a0376a">PS</span><span style="background:#5a5fb0">TW</span><span style="background:#4f7d3a">MD</span><span style="background:#c77d3a">F</span></div>
+      <button class="chip" id="filterBtn" title="Filter (Esc)">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 3h12M4.5 8h7M7 13h2"/></svg>Filter
+      </button>
+    </div>
+  </div>
+
+  <!-- the game -->
+  <div class="board game" id="board">
+    <section class="list"><div class="list-h">To do <span id="todoN">37</span></div><div class="cards" id="todo"></div></section>
+    <section class="list"><div class="list-h">Doing <span>1</span></div><div class="cards" id="doing"></div></section>
+    <section class="list"><div class="list-h">Done <span id="doneN">0</span></div><div class="cards" id="done"></div></section>
+    <section class="list"><div class="list-h">Team <span id="teamN">0</span></div><div class="cards" id="team"></div></section>
+    <section class="list"><div class="list-h">Requests <span id="upN">0</span></div><div class="cards" id="ups"></div><button class="reset" id="reset">Archive board and start over</button></section>
+  </div>
+
+  <!-- the disguise -->
+  <div class="board decoy" id="decoy"></div>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+(function(){
+const $=id=>document.getElementById(id);
+const L=['--l1','--l2','--l3','--l4','--l5'];
+const LN=['Social','Print','Urgent','Motion','Web'];
+const TASKS=["Resize banners for socials","Export assets @2x","Fix kerning on the headline","Colour-correct the hero shot","Mask out product (again)","15s cut-down edit","Update the brand deck","Rename 400 unnamed layers","Chase client for feedback","Swap placeholder copy","Render animation v3","Retouch product shots","Make the logo bigger","Package fonts for printer","Storyboard the teaser","Tidy the shared drive","Proof the leaflet","Bleed + crop marks","Alt text for the web banners","Subtitle the reel","Clip-path the model shot","New thumbnail for YouTube","Remove the tattoo from the stock photo","Try it in blue","Try it back in orange","Reply to 'quick tweak' email","Build the email header","Motion test for the logo sting","Batch export 60 SKUs","Match colour to Pantone swatch"];
+const HIRES=[
+ {id:'intern',n:'Intern',ini:'IN',c:'#6c6fc2',cost:15,rate:.1,d:'Mostly makes tea'},
+ {id:'free',n:'Freelancer',ini:'FL',c:'#3a8fb3',cost:100,rate:1,d:'Invoices on time, at least'},
+ {id:'jr',n:'Junior Designer',ini:'JD',c:'#4f9a6a',cost:1100,rate:8,d:'Knows all the shortcuts'},
+ {id:'sr',n:'Senior Designer',ini:'SD',c:'#b4552d',cost:12000,rate:47,d:'Has opinions about kerning'},
+ {id:'ad',n:'Art Director',ini:'AD',c:'#a0376a',cost:130000,rate:260,d:'Points at things, they get done'},
+ {id:'agency',n:'Partner Agency',ini:'PA',c:'#8a6d1f',cost:1.4e6,rate:1400,d:'A whole floor of people'},
+ {id:'farm',n:'Render Farm',ini:'RF',c:'#3f5b66',cost:2e7,rate:7800,d:'Humming in a cupboard somewhere'},
+ {id:'studio',n:'Overnight Studio',ini:'OS',c:'#6b4f9e',cost:3.3e8,rate:44000,d:'Work gets done while you sleep'},
+ {id:'ai',n:'Autopilot Pipeline',ini:'AP',c:'#2f6f5f',cost:5.1e9,rate:260000,d:'Nobody knows how it works'},
+];
+const UPS=[
+ {id:'keys',n:'Learn keyboard shortcuts',d:'Clicking is twice as good',cost:100,req:s=>1,fx:{click:2}},
+ {id:'mon',n:'Second monitor',d:'Clicking is twice as good',cost:500,req:s=>s.total>=200,fx:{click:2}},
+ {id:'intern2',n:'Intern onboarding pack',d:'Interns twice as productive',cost:1000,req:s=>s.own.intern>=1,fx:{h:'intern',m:2}},
+ {id:'free2',n:'Freelancer retainer',d:'Freelancers twice as productive',cost:5000,req:s=>s.own.free>=1,fx:{h:'free',m:2}},
+ {id:'mech',n:'Clacky mechanical keyboard',d:'Clicking is twice as good',cost:10000,req:s=>s.total>=5000,fx:{click:2}},
+ {id:'coffee',n:'Proper coffee machine',d:'Whole team +10%',cost:20000,req:s=>s.total>=10000,fx:{all:1.1}},
+ {id:'intern3',n:'Actually pay the interns',d:'Interns twice as productive',cost:25000,req:s=>s.own.intern>=10,fx:{h:'intern',m:2}},
+ {id:'jr2',n:'Shared design system',d:'Junior Designers twice as productive',cost:50000,req:s=>s.own.jr>=1,fx:{h:'jr',m:2}},
+ {id:'macro',n:'Actions & macros',d:'Each click also earns 1% of velocity',cost:100000,req:s=>s.total>=50000,fx:{pct:.01}},
+ {id:'free3',n:'Freelancer Slack channel',d:'Freelancers twice as productive',cost:120000,req:s=>s.own.free>=10,fx:{h:'free',m:2}},
+ {id:'sr2',n:'Mentoring scheme',d:'Senior Designers twice as productive',cost:500000,req:s=>s.own.sr>=1,fx:{h:'sr',m:2}},
+ {id:'week',n:'Four-day week',d:'Whole team +25%',cost:2e6,req:s=>s.total>=1e6,fx:{all:1.25}},
+ {id:'ad2',n:'Brand bible',d:'Art Directors twice as productive',cost:5e6,req:s=>s.own.ad>=1,fx:{h:'ad',m:2}},
+ {id:'macro2',n:'Batch processing',d:'Each click also earns 2% more of velocity',cost:1e7,req:s=>s.total>=5e6,fx:{pct:.02}},
+ {id:'jr3',n:'Junior pay rise',d:'Junior Designers twice as productive',cost:3e7,req:s=>s.own.jr>=10,fx:{h:'jr',m:2}},
+ {id:'agency2',n:'Long-term retainer',d:'Partner Agencies twice as productive',cost:5e7,req:s=>s.own.agency>=1,fx:{h:'agency',m:2}},
+ {id:'dog',n:'Office dog',d:'Whole team +50%',cost:2e8,req:s=>s.total>=1e8,fx:{all:1.5}},
+ {id:'farm2',n:'Bigger GPUs',d:'Render Farms twice as productive',cost:5e8,req:s=>s.own.farm>=1,fx:{h:'farm',m:2}},
+ {id:'studio2',n:'Timezone handovers',d:'Overnight Studios twice as productive',cost:5e9,req:s=>s.own.studio>=1,fx:{h:'studio',m:2}},
+ {id:'ai2',n:'Don\'t ask how it works',d:'Autopilot Pipelines twice as productive',cost:8e10,req:s=>s.own.ai>=1,fx:{h:'ai',m:2}},
+ {id:'bonus',n:'Christmas bonus',d:'Whole team ×2',cost:1e11,req:s=>s.total>=5e10,fx:{all:2}},
+];
+const WINS=["Client: ‘love it, no changes’","Meeting cancelled — free hour!","Printer works first time","Found the missing font","Sign-off on round one","Wi-Fi is fast today"];
+
+function fresh(){const own={};HIRES.forEach(h=>own[h.id]=0);return {pts:0,total:0,cards:0,clicks:0,prog:0,own,ups:[],seed:0,todo:[],done:[],t:Date.now()}}
+let S=fresh();
+try{const s=JSON.parse(localStorage.getItem('tw-save')||'null');if(s&&s.own){S=Object.assign(fresh(),s);S.own=Object.assign(fresh().own,s.own)}}catch(e){}
+function save(){S.t=Date.now();try{localStorage.setItem('tw-save',JSON.stringify(S))}catch(e){}}
+
+const NEED=10;
+let frenzyUntil=0, frenzyMult=1, boss=false;
+
+function fmt(n){
+  if(n<1000) return n<10&&n%1?n.toFixed(1):Math.floor(n).toLocaleString('en-GB');
+  const u=['K','M','B','T','Qa','Qi'];let i=-1;while(n>=1000&&i<u.length-1){n/=1000;i++}
+  return (n<10?n.toFixed(2):n<100?n.toFixed(1):Math.floor(n))+u[i];
+}
+function mults(){
+  let click=1,all=1,pct=0;const hm={};HIRES.forEach(h=>hm[h.id]=1);
+  S.ups.forEach(id=>{const f=UPS.find(u=>u.id===id).fx;if(f.click)click*=f.click;if(f.all)all*=f.all;if(f.pct)pct+=f.pct;if(f.h)hm[f.h]*=f.m});
+  return {click,all,pct,hm};
+}
+function cps(){const m=mults();let t=0;HIRES.forEach(h=>t+=S.own[h.id]*h.rate*m.hm[h.id]);return t*m.all*(Date.now()<frenzyUntil?frenzyMult:1)}
+function clickVal(){const m=mults();return m.click*(Date.now()<frenzyUntil?frenzyMult:1)+cps()*m.pct}
+const cost=h=>Math.ceil(h.cost*Math.pow(1.15,S.own[h.id]));
+const pickTask=()=>{const t=TASKS[S.seed++%TASKS.length];return {t,l:[(S.seed*7)%5,(S.seed*3+1)%5].filter((v,i,a)=>a.indexOf(v)===i).slice(0,1+S.seed%2)}};
+if(!S.todo.length) for(let i=0;i<5;i++) S.todo.push(pickTask());
+let current=S.cur||pickTask();S.cur=current;
+
+/* ---------- render ---------- */
+const labels=l=>`<div class="labels">${l.map(i=>`<span class="lbt" style="background:var(${L[i]})">${LN[i]}</span>`).join('')}</div>`;
+function renderTodo(){
+  $('todo').innerHTML=S.todo.map((c,i)=>`<div class="card">${labels(c.l)}<div class="ttl">${c.t}</div>${i<2?`<div class="meta"><span>Due ${['Wed','Thu','Fri'][i]}</span></div>`:''}</div>`).join('');
+  $('todoN').textContent=30+S.todo.length+(S.seed%9);
+}
+function renderDoing(){
+  const p=S.prog;
+  $('doing').innerHTML=`<button class="card active pop" id="act">${labels(current.l)}<div class="ttl">${current.t}</div>
+    <div class="check"><span>☑ ${p}/${NEED}</span><div class="track"><i style="width:${p/NEED*100}%"></i></div></div>
+    <div class="meta"><span>Due today</span><span class="av" style="background:#c77d3a">F</span></div>
+    <div class="hint">Click to tick off a subtask · +<span id="cv">${fmt(clickVal())}</span> pts</div></button>`;
+  $('act').addEventListener('click',onClick);
+}
+function updDoing(){
+  const a=$('act');if(!a)return;
+  a.querySelector('.check span').textContent='☑ '+S.prog+'/'+NEED;
+  a.querySelector('.track i').style.width=(S.prog/NEED*100)+'%';
+}
+function renderDone(){
+  $('done').innerHTML=S.done.map((c,i)=>`<div class="card done-card${i===0?' pop':''}">${labels(c.l)}<div class="ttl"><span class="tick">✓</span>${c.t}</div><div class="meta"><span>${c.by}</span></div></div>`).join('')||'<div class="mute">Nothing done yet. Classic.</div>';
+  $('doneN').textContent=fmt(S.cards);
+}
+function renderTeam(){
+  const m=mults();let html='',shown=0,staff=0;
+  for(const h of HIRES){
+    const idx=HIRES.indexOf(h);
+    const visible=S.own[h.id]>0||idx===0||S.own[HIRES[idx-1].id]>0||S.total>=h.cost*.5;
+    staff+=S.own[h.id];
+    if(!visible){ if(shown===idx){html+=`<div class="card locked"><div class="hire"><span class="av" style="background:var(--muted)">?</span><div><div class="nm">Role not advertised yet</div><div class="sub">Keep shipping</div></div><span></span></div></div>`} break;}
+    shown++;
+    const each=h.rate*m.hm[h.id]*m.all;
+    html+=`<div class="card"><div class="hire"><span class="av" style="background:${h.c}">${h.ini}</span><div><div class="nm">${h.n}</div><div class="sub">${h.d} · +${fmt(each)}/s each</div></div><span class="own">${S.own[h.id]||''}</span></div>
+      <button class="buy" data-h="${h.id}">Hire · ${fmt(cost(h))} pts</button></div>`;
+  }
+  $('team').innerHTML=html;$('teamN').textContent=staff;
+  $('team').querySelectorAll('[data-h]').forEach(b=>b.onclick=()=>hire(b.dataset.h));
+  refreshBuy();
+}
+function availUps(){return UPS.filter(u=>!S.ups.includes(u.id)&&u.req(S)).sort((a,b)=>a.cost-b.cost)}
+let upKey='';
+function renderUps(force){
+  const a=availUps(),k=a.map(u=>u.id).join();
+  if(k===upKey&&!force) return; upKey=k;
+  $('ups').innerHTML=a.slice(0,6).map(u=>`<div class="card up"><div class="labels"><span class="lbt" style="background:var(--l4)">Request</span></div><div class="ttl">${u.n}</div><div class="desc">${u.d}</div><button class="buy" data-u="${u.id}">Approve · ${fmt(u.cost)} pts</button></div>`).join('')||'<div class="mute">No requests waiting for sign-off.</div>';
+  $('upN').textContent=a.length;
+  $('ups').querySelectorAll('[data-u]').forEach(b=>b.onclick=()=>buyUp(b.dataset.u));
+  refreshBuy();
+}
+function refreshBuy(){
+  document.querySelectorAll('[data-h]').forEach(b=>b.disabled=S.pts<cost(HIRES.find(h=>h.id===b.dataset.h)));
+  document.querySelectorAll('[data-u]').forEach(b=>b.disabled=S.pts<UPS.find(u=>u.id===b.dataset.u).cost);
+}
+function renderStats(){
+  $('pts').textContent=fmt(S.pts);$('cps').textContent=fmt(cps());
+  const cv=$('cv');if(cv)cv.textContent=fmt(clickVal());
+  const f=$('frenzy'),left=Math.ceil((frenzyUntil-Date.now())/1000);
+  if(left>0){f.hidden=false;f.textContent=`Team in the zone ×${frenzyMult} · ${left}s`}else f.hidden=true;
+}
+
+/* ---------- actions ---------- */
+function earn(n){S.pts+=n;S.total+=n}
+function floatAt(x,y,txt){
+  const s=document.createElement('span');s.className='float';s.textContent=txt;s.style.left=(x-10)+'px';s.style.top=(y-20)+'px';
+  document.body.appendChild(s);setTimeout(()=>s.remove(),700);
+}
+function onClick(e){
+  const v=clickVal();earn(v);S.clicks++;S.prog++;
+  floatAt(e.clientX||innerWidth/2,e.clientY||innerHeight/2,'+'+fmt(v));
+  if(S.prog>=NEED){
+    const bonus=v*5;earn(bonus);
+    completeCard(current,'Moved by you');
+    current=S.todo.shift();S.todo.push(pickTask());S.cur=current;S.prog=0;
+    renderTodo();renderDoing();
+  }else updDoing();
+  renderStats();refreshBuy();
+}
+function completeCard(c,by){S.cards++;S.done.unshift({t:c.t,l:c.l,by});S.done=S.done.slice(0,6);renderDone()}
+function hire(id){
+  const h=HIRES.find(x=>x.id===id),c=cost(h);if(S.pts<c)return;
+  S.pts-=c;S.own[id]++;renderTeam();renderUps();renderStats();save();
+}
+function buyUp(id){
+  const u=UPS.find(x=>x.id===id);if(S.pts<u.cost||S.ups.includes(id))return;
+  S.pts-=u.cost;S.ups.push(id);renderUps(true);renderTeam();renderStats();save();
+  toast(`Approved: ${u.n}. ${u.d}.`);
+}
+let toastT;function toast(t){const el=$('toast');el.textContent=t;el.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>el.hidden=true,4000)}
+
+/* team auto-completes cards (cosmetic) */
+let teamAcc=0;
+function teamTick(dt){
+  const r=cps();if(r<=0)return;
+  teamAcc+=r*dt/(NEED*Math.max(1,mults().click)*3);
+  if(teamAcc>=1){
+    const n=Math.floor(teamAcc);teamAcc-=n;
+    const owned=HIRES.filter(h=>S.own[h.id]>0);const who=owned[Math.floor(Math.random()*owned.length)];
+    S.cards+=n-1;completeCard(pickTask(),'Moved by '+who.n+(n>1?` (+${fmt(n-1)} more)`:''));
+  }
+}
+
+/* quick wins */
+function spawnWin(){
+  if(boss){schedWin();return}
+  const b=document.createElement('button');b.className='win';
+  b.innerHTML=`<b>Quick win</b>${WINS[Math.floor(Math.random()*WINS.length)]}`;
+  b.style.left=Math.max(16,Math.random()*(innerWidth-260))+'px';
+  b.style.top=Math.max(110,Math.random()*(innerHeight-120))+'px';
+  b.onclick=()=>{
+    b.remove();
+    if(Math.random()<.5){frenzyMult=7;frenzyUntil=Date.now()+30000;toast('Everyone’s in the zone. Velocity ×7 for 30 seconds.')}
+    else{const g=Math.max(13,Math.min(S.pts*.15,cps()*900)+13);earn(g);toast(`Nice. +${fmt(g)} points.`)}
+    renderStats();
+  };
+  document.body.appendChild(b);setTimeout(()=>b.remove(),13000);schedWin();
+}
+function schedWin(){setTimeout(spawnWin,(60+Math.random()*90)*1000)}
+
+/* ---------- disguise ---------- */
+const DECOY=[
+ ['To do',[['Brand review prep',[4]],['Spring campaign — print specs',[1]],['Update email templates',[4]],['Photography shot list',[0]]]],
+ ['In progress',[['Social cut-downs (9:16, 1:1, 4:5)',[0,3]],['Retouch product shots — batch 2',[1]]]],
+ ['Review',[['Landing page hero v2',[4,2]],['Motion sting — logo reveal',[3]]]],
+ ['Done',[['Moodboard sign-off',[0]],['Font licences renewed',[1]],['Q2 asset archive',[4]]]],
+];
+$('decoy').innerHTML=DECOY.map(([n,cs])=>`<section class="list"><div class="list-h">${n} <span>${cs.length}</span></div><div class="cards">${cs.map(([t,l],i)=>`<div class="card">${labels(l)}<div class="ttl">${t}</div>${i===0?'<div class="meta"><span>Due Fri</span><span class="av" style="background:#a0376a">PS</span></div>':''}</div>`).join('')}</div></section>`).join('');
+function toggleBoss(){boss=!boss;document.body.classList.toggle('boss',boss);document.querySelectorAll('.win,.float').forEach(e=>e.remove());$('toast').hidden=true}
+$('filterBtn').onclick=toggleBoss;
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){e.preventDefault();toggleBoss()}});
+
+let armed=false;
+$('reset').onclick=()=>{
+  if(!armed){armed=true;$('reset').textContent='Click again to archive (wipes progress)';setTimeout(()=>{armed=false;$('reset').textContent='Archive board and start over'},3000);return}
+  try{localStorage.removeItem('tw-save')}catch(e){}S=fresh();for(let i=0;i<5;i++)S.todo.push(pickTask());current=pickTask();S.cur=current;
+  upKey='';renderAll();
+};
+
+/* ---------- loop ---------- */
+function renderAll(){renderTodo();renderDoing();renderDone();renderTeam();renderUps(true);renderStats()}
+const away=(Date.now()-(S.t||Date.now()))/1000;
+renderAll();
+if(away>60&&cps()>0){const g=cps()*Math.min(away,8*3600)*.5;earn(g);toast(`While you were away the team closed ${fmt(g)} points.`);renderStats()}
+let last=performance.now(),acc=0;
+setInterval(()=>{
+  const t=performance.now(),dt=(t-last)/1000;last=t;
+  earn(cps()*dt);teamTick(dt);
+  acc+=dt;renderStats();
+  if(acc>.5){acc=0;refreshBuy();renderUps();if(S.total>0)renderTeamIfNew()}
+},100);
+let teamKey='';
+function renderTeamIfNew(){const k=HIRES.map(h=>S.total>=h.cost*.5?1:0).join('');if(k!==teamKey){teamKey=k;renderTeam()}}
+setInterval(save,5000);
+document.addEventListener('visibilitychange',save);
+schedWin();
+})();
+</script>
+
+</html>

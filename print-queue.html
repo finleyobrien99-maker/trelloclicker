@@ -1,0 +1,309 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Print Queue</title>
+<style>
+:root{
+  --bg:#f3f3f3; --surface:#fafafa; --card:#ffffff; --text:#1b1b1b; --muted:#5f5f5f; --line:#e3e3e3; --hover:#eeeeee;
+  --accent:#0f6cbd; --accentSoft:#e3eef9; --good:#107c10; --goodSoft:#dff6dd; --bad:#c42b1c; --badSoft:#fde7e9; --warn:#9d5d00; --warnSoft:#fff4ce;
+  --mono:#3b3b3b; --colour:#b146c2; --a3:#0f7b6c;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#202020; --surface:#272727; --card:#2d2d2d; --text:#f3f3f3; --muted:#b9b9b9; --line:#3a3a3a; --hover:#353535;
+    --accent:#4cc2ff; --accentSoft:#1d3a4d; --good:#6ccb5f; --goodSoft:#1e3b1d; --bad:#ff99a4; --badSoft:#442726; --warn:#f2c661; --warnSoft:#433519;
+    --mono:#d6d6d6; --colour:#e08bef; --a3:#45c7b3;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#202020; --surface:#272727; --card:#2d2d2d; --text:#f3f3f3; --muted:#b9b9b9; --line:#3a3a3a; --hover:#353535;
+  --accent:#4cc2ff; --accentSoft:#1d3a4d; --good:#6ccb5f; --goodSoft:#1e3b1d; --bad:#ff99a4; --badSoft:#442726; --warn:#f2c661; --warnSoft:#433519;
+  --mono:#d6d6d6; --colour:#e08bef; --a3:#45c7b3;
+}
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--text);font-family:"Segoe UI Variable","Segoe UI",system-ui,-apple-system,sans-serif;font-size:13.5px;overflow:hidden;user-select:none;-webkit-user-select:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.app{display:grid;grid-template-rows:40px auto minmax(0,1fr);height:100%}
+.title{display:flex;align-items:center;gap:10px;padding:0 0 0 14px}
+.pico{width:16px;height:16px;display:grid;place-items:center}
+.winctl{margin-left:auto;display:flex;height:100%}.winctl span{width:46px;display:grid;place-items:center;color:var(--muted)}
+
+.head{padding:6px 24px 14px;display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap}
+.crumb{font-size:26px;font-weight:600;line-height:1.2}
+.crumb span{color:var(--muted);font-weight:400}
+.hud{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+.pill{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:6px 10px;display:flex;align-items:center;gap:8px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.pill b{font-weight:600}
+.meter{width:70px;height:6px;border-radius:3px;background:var(--line);overflow:hidden}
+.meter i{display:block;height:100%;background:var(--good);transition:width .3s}
+.meter.low i{background:var(--bad)}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:5px;border:1px solid var(--line);background:var(--card);white-space:nowrap}
+.btn:hover:not(:disabled){background:var(--hover)}
+.btn:disabled{opacity:.45;cursor:default}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.warn{background:var(--warnSoft);border-color:var(--warn);color:var(--warn)}
+.btn.bad{background:var(--badSoft);border-color:var(--bad);color:var(--bad)}
+
+.work{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:16px;padding:0 24px 18px;min-height:0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:8px;min-height:0;display:flex;flex-direction:column}
+.card h2{margin:0;padding:12px 14px;font-size:14px;font-weight:600;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:8px}
+.card h2 small{font-weight:400;color:var(--muted);font-size:12px}
+.qwrap{overflow-y:auto;flex:1}
+table.q{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+.q th{position:sticky;top:0;background:var(--card);text-align:left;font-weight:400;color:var(--muted);font-size:12px;padding:8px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
+.q td{padding:8px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
+.q td.doc{max-width:220px;overflow:hidden;text-overflow:ellipsis}
+.q tr.job{cursor:pointer}
+.q tr.job:hover{background:var(--hover)}
+.q tr.sel{background:var(--accentSoft);box-shadow:inset 3px 0 0 var(--accent)}
+.q tr.new td{animation:nw .5s ease}
+@keyframes nw{from{background:var(--accentSoft)}}
+.tag{display:inline-block;font-size:11px;font-weight:600;border-radius:4px;padding:1px 6px;border:1px solid currentColor}
+.tag.mono{color:var(--mono)}.tag.colour{color:var(--colour)}.tag.a3{color:var(--a3)}
+.wait{width:70px;height:5px;border-radius:3px;background:var(--line);overflow:hidden;display:inline-block;vertical-align:middle}
+.wait i{display:block;height:100%}
+.empty{padding:24px 14px;color:var(--muted);text-align:center}
+
+.printers{display:flex;flex-direction:column;gap:10px;overflow-y:auto;min-height:0}
+.pr{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:12px 14px;display:grid;grid-template-columns:44px minmax(0,1fr);gap:4px 12px}
+.pr.can{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.pr .ic{grid-row:span 3;width:44px;height:44px;border-radius:8px;background:var(--surface);border:1px solid var(--line);display:grid;place-items:center}
+.pr h3{margin:0;font-size:14px;font-weight:600;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.st{font-size:12.5px;color:var(--muted)}
+.st.ok{color:var(--good)}.st.warn{color:var(--warn)}.st.bad{color:var(--bad);font-weight:600}
+.prog{grid-column:2;height:6px;border-radius:3px;background:var(--line);overflow:hidden}
+.prog i{display:block;height:100%;background:var(--accent);transition:width .2s linear}
+.sup{grid-column:1/-1;display:flex;gap:14px;font-size:12px;color:var(--muted);margin-top:4px;font-variant-numeric:tabular-nums;flex-wrap:wrap}
+.sup .bar{display:inline-block;width:50px;height:5px;border-radius:3px;background:var(--line);overflow:hidden;vertical-align:middle;margin-left:4px}
+.sup .bar i{display:block;height:100%;background:var(--muted)}
+.sup .bar.lo i{background:var(--bad)}
+.acts{grid-column:1/-1;display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.log{padding:10px 14px;font-size:12.5px;color:var(--muted);display:flex;flex-direction:column;gap:4px;max-height:120px;overflow-y:auto}
+.log b{color:var(--text);font-weight:600}
+
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.35);display:grid;place-items:center;padding:16px;z-index:20}
+.dlg{background:var(--card);border:1px solid var(--line);border-radius:8px;box-shadow:0 16px 40px rgba(0,0,0,.3);width:min(420px,100%);padding:20px 22px}
+.dlg h2{margin:0 0 8px;font-size:19px;font-weight:600}
+.dlg p{margin:0 0 8px;line-height:1.5}
+.dlg table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;margin-top:4px}
+.dlg td{padding:4px 0;border-bottom:1px solid var(--line)}.dlg td:last-child{text-align:right;font-weight:600}
+.dlg .row{display:flex;justify-content:flex-end;gap:8px;margin-top:14px}
+
+body.boss .game{display:none!important}
+@media (max-width:860px){.work{grid-template-columns:minmax(0,1fr);overflow-y:auto}.card.queue{max-height:46vh}.head,.work{padding-left:14px;padding-right:14px}.crumb{font-size:21px}.hud{margin-left:0}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<div class="app">
+  <header class="title">
+    <span class="pico"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="4" y="1.5" width="8" height="4"/><rect x="1.5" y="5.5" width="13" height="6" rx="1"/><rect x="4" y="9.5" width="8" height="5"/></svg></span>
+    <span>Settings</span>
+    <div class="winctl" aria-hidden="true"><span>–</span><span>□</span><span>✕</span></div>
+  </header>
+  <div class="head">
+    <div class="crumb"><span>Bluetooth &amp; devices ›</span> Printers &amp; scanners</div>
+    <div class="hud game">
+      <span class="pill">Office mood <span class="meter" id="moodM"><i style="width:100%"></i></span> <b id="mood">100%</b></span>
+      <span class="pill">🕘 <b id="clock">09:00</b></span>
+      <span class="pill">Pages <b id="pages">0</b></span>
+      <span class="pill">Score <b id="score">0</b></span>
+    </div>
+    <button class="btn" id="viewBtn" title="View (Esc)">Manage ▾</button>
+  </div>
+
+  <div class="work">
+    <section class="card queue">
+      <h2>Print queue <small id="qCount">0 documents</small></h2>
+      <div class="qwrap"><table class="q" id="q"></table></div>
+      <div class="log game" id="log"></div>
+    </section>
+    <section class="printers" id="printers"></section>
+  </div>
+</div>
+<div class="scrim" id="scrim" hidden><div class="dlg" id="dlg"></div></div>
+
+<script>
+(function(){
+const $=id=>document.getElementById(id);
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const PEOPLE=['Priya','Tom','Janet','Mark','Helen','Sophie','Dan','Leah','Owen','Aisha','Ben','Grace','Sam','Nadia','Rhys'];
+const DOCS={
+ mono:['Minutes_Monday_WIP.docx','Invoice_PW-2231.pdf','Boarding pass.pdf','Q3 budget (FINAL).xlsx','Recipe - lasagne.pdf','Contract v4 (signed).pdf','Fire drill rota.docx','Timesheet_wk38.xlsx','Crossword answers.pdf','Car insurance renewal.pdf','Brief - Brightwave.docx'],
+ colour:['Spring moodboard.pdf','Proof - leaflet v3.pdf','Holiday photos (37).jpg','Brand guidelines.pdf','Pitch deck - FINAL.pptx','Birthday card - Janet.pdf','Pie chart (urgent).pptx','Colour swatches.pdf'],
+ a3:['Poster proof A3.pdf','Floor plan.pdf','Storyboard sheet.pdf','Campaign wall.pdf','Seating chart A3.pdf'],
+};
+const PR=[
+ {id:'p1',n:'Floor 2 Mono Laser',kinds:['mono'],speed:3,paperMax:120,tonerUse:.35,ico:'M'},
+ {id:'p2',n:'Studio Colour',kinds:['mono','colour'],speed:1.5,paperMax:80,tonerUse:.8,ico:'C'},
+ {id:'p3',n:'Plotter (A3)',kinds:['a3'],speed:.9,paperMax:40,tonerUse:1.4,ico:'A3'},
+];
+const DAY=150; // seconds from 09:00 to 17:30
+
+let best=0;try{best=+localStorage.getItem('pq-best')||0}catch(e){}
+let S,boss=false,uid=1;
+function fresh(){
+  return {t:0,mood:100,score:0,pages:0,done:0,lost:0,jobs:[],sel:null,spawnT:1,over:false,running:false,log:[],
+    pr:PR.map(p=>({...p,paper:p.paperMax,toner:100,state:'idle',job:null,prog:0,fix:null,jam:0,busyT:0}))};
+}
+S=fresh();
+
+/* ---------- jobs ---------- */
+function spawn(){
+  const r=Math.random(),kind=r<.55?'mono':r<.85?'colour':'a3';
+  const pages=kind==='mono'?rnd(2,28):kind==='colour'?rnd(1,14):rnd(1,5);
+  const pat=Math.max(26,55-S.t/DAY*22)+rnd(0,10);
+  const j={id:uid++,kind,pages,owner:pick(PEOPLE),doc:pick(DOCS[kind]),pat,left:pat,fresh:true};
+  S.jobs.push(j);if(S.sel==null)S.sel=j.id;
+}
+const compatible=(p,j)=>p.kinds.includes(j.kind);
+function send(pi){
+  if(boss||S.over||!S.running)return;const p=S.pr[pi],j=S.jobs.find(x=>x.id===S.sel);if(!j)return;
+  if(!compatible(p,j)){note(`<b>${p.n}</b> can’t print ${j.kind==='a3'?'A3':j.kind==='colour'?'in colour':'that'}.`);return}
+  if(p.job){note(`<b>${p.n}</b> is busy.`);return}
+  p.job=j;p.prog=0;p.state=p.state==='idle'?'printing':p.state;S.jobs=S.jobs.filter(x=>x!==j);
+  const nx=S.jobs[0];S.sel=nx?nx.id:null;render();
+}
+
+/* ---------- printer faults ---------- */
+function fixStep(pi,what){
+  const p=S.pr[pi];if(boss||S.over)return;
+  if(what==='paper'){p.fix={k:'paper',t:1.4,label:'Loading paper…'}}
+  else if(what==='toner'){p.fix={k:'toner',t:2,label:'Replacing toner…'}}
+  else if(what==='jam'){p.jam++;if(p.jam>=3){p.jam=0;p.state=p.job?'printing':'idle';note(`Jam cleared on <b>${p.n}</b>.`)}}
+  render();
+}
+const JAMSTEPS=['Open tray','Pull out crumpled paper','Close tray'];
+
+/* ---------- update ---------- */
+function update(dt){
+  S.t+=dt;
+  S.spawnT-=dt;if(S.spawnT<=0){spawn();S.spawnT=Math.max(2,6-S.t/DAY*4)*(.7+Math.random()*.6);dirtyQ=true}
+  for(const j of S.jobs){j.left-=dt;if(j.left<=0){j.gone=1;S.mood-=12;S.lost++;log(`<b>${j.owner}</b> gave up on “${j.doc}” and walked to the printer on floor 3.`)}}
+  if(S.jobs.some(j=>j.gone)){S.jobs=S.jobs.filter(j=>!j.gone);if(!S.jobs.find(j=>j.id===S.sel))S.sel=S.jobs[0]?.id??null;dirtyQ=true}
+  for(const p of S.pr){
+    if(p.fix){p.fix.t-=dt;if(p.fix.t<=0){if(p.fix.k==='paper')p.paper=p.paperMax;else p.toner=100;p.fix=null;if(p.state==='nopaper'||p.state==='notoner')p.state=p.job?'printing':'idle';dirtyP=true}continue}
+    if(p.state!=='printing'||!p.job)continue;
+    const before=Math.floor(p.prog);p.prog+=p.speed*dt;
+    const printed=Math.min(Math.floor(p.prog),p.job.pages)-before;
+    for(let i=0;i<printed;i++){
+      p.paper--;p.toner=Math.max(0,p.toner-p.tonerUse*(p.job.kind==='mono'&&p.id==='p2'?.6:1));S.pages++;
+      if(Math.random()<.006+S.t/DAY*.012){p.state='jam';p.jam=0;log(`<b>${p.n}</b>: paper jam in tray 2.`);break}
+      if(p.paper<=0){p.paper=0;p.state='nopaper';log(`<b>${p.n}</b> is out of paper.`);break}
+      if(p.toner<=0){p.state='notoner';log(`<b>${p.n}</b> is out of toner.`);break}
+    }
+    if(p.state!=='printing'){p.prog=Math.floor(p.prog);dirtyP=true;continue}
+    if(p.prog>=p.job.pages){
+      const j=p.job,bonus=Math.round(j.left/j.pat*15);S.score+=j.pages+10+bonus;S.done++;S.mood=Math.min(100,S.mood+2);
+      log(`<b>${j.owner}</b> collected “${j.doc}”. ${pick(['Cheers!','Lifesaver.','Still warm, lovely.','Took long enough.','Ta!'])}`);
+      p.job=null;p.prog=0;p.state='idle';dirtyP=true;
+    }
+  }
+  if(S.mood<=0){S.mood=0;return end(false)}
+  if(S.t>=DAY)return end(true);
+}
+let dirtyQ=true,dirtyP=true;
+function end(win){
+  S.over=true;S.running=false;const nb=S.score>best;if(nb){best=S.score;try{localStorage.setItem('pq-best',best)}catch(e){}}
+  dlg(win?'Home time':'Facilities has received a complaint',win?'17:30. The printers survived another day, and so did you.':'The office mood hit rock bottom. Someone has written a strongly worded Post-it.',
+   `<table><tr><td>Documents printed</td><td>${S.done}</td></tr><tr><td>Pages</td><td>${S.pages}</td></tr><tr><td>People who gave up</td><td>${S.lost}</td></tr><tr><td>Score</td><td>${S.score}${nb?' · new best':''}</td></tr><tr><td>Best</td><td>${best}</td></tr></table>`,
+   [['Start a new day',()=>{S=fresh();S.running=true;closeDlg();render()},1]]);
+}
+
+/* ---------- render ---------- */
+function clock(){const m=9*60+Math.floor(S.t/DAY*510);return String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0')}
+function kindTag(k){return `<span class="tag ${k}">${k==='mono'?'A4 Mono':k==='colour'?'A4 Colour':'A3'}</span>`}
+function renderQueue(){
+  if(boss){
+    $('q').innerHTML='<tr><th>Document name</th><th>Status</th><th>Owner</th><th>Pages</th><th>Submitted</th></tr><tr><td class="doc">Proof - leaflet v3.pdf</td><td>Printing</td><td>Fin</td><td>4</td><td>11:42</td></tr><tr><td class="doc">Brief - Brightwave.docx</td><td>Spooling</td><td>Priya</td><td>2</td><td>11:43</td></tr>';
+    $('qCount').textContent='2 documents';return;
+  }
+  const rows=S.jobs.map(j=>{const f=j.left/j.pat,col=f>.5?'var(--good)':f>.25?'var(--warn)':'var(--bad)';
+    return `<tr class="job${j.id===S.sel?' sel':''}${j.fresh?' new':''}" data-id="${j.id}"><td class="doc">${j.doc}</td><td>${kindTag(j.kind)}</td><td>${j.owner}</td><td>${j.pages}</td><td><span class="wait"><i style="width:${f*100}%;background:${col}"></i></span></td></tr>`}).join('');
+  S.jobs.forEach(j=>j.fresh=false);
+  $('q').innerHTML='<tr><th>Document name</th><th>Type</th><th>Owner</th><th>Pages</th><th>Patience</th></tr>'+(rows||`<tr><td colspan="5" class="empty">${S.running?'Queue empty. Enjoy it while it lasts.':'There are no documents in the queue.'}</td></tr>`);
+  $('qCount').textContent=`${S.jobs.length} document${S.jobs.length===1?'':'s'}`;
+}
+function renderPrinters(){
+  const sel=S.jobs.find(j=>j.id===S.sel);
+  $('printers').innerHTML=S.pr.map((p,i)=>{
+    if(boss)return `<div class="pr"><span class="ic">${icon(p)}</span><h3>${p.n}</h3><span class="st ok">Ready</span><span class="st">Idle · Tray 1: ${p.id==='p3'?'A3':'A4'} plain</span></div>`;
+    let st,cls='';
+    if(p.fix){st=p.fix.label;cls='warn'}
+    else if(p.state==='jam'){st='Paper jam';cls='bad'}
+    else if(p.state==='nopaper'){st='Out of paper';cls='bad'}
+    else if(p.state==='notoner'){st='Out of toner';cls='bad'}
+    else if(p.job){st=`Printing “${p.job.doc}” · page ${Math.min(p.job.pages,Math.floor(p.prog)+1)} of ${p.job.pages}`}
+    else{st='Ready';cls='ok'}
+    const can=sel&&compatible(p,sel)&&!p.job;
+    let acts='';
+    if(p.state==='jam')acts+=`<button class="btn bad" data-fix="jam" data-p="${i}">${JAMSTEPS[p.jam]} (${p.jam+1}/3)</button>`;
+    if(!p.fix&&p.state!=='jam'){
+      if(p.paper<p.paperMax)acts+=`<button class="btn${p.state==='nopaper'?' bad':p.paper<p.paperMax*.25?' warn':''}" data-fix="paper" data-p="${i}">Load paper</button>`;
+      if(p.toner<60)acts+=`<button class="btn${p.state==='notoner'?' bad':p.toner<20?' warn':''}" data-fix="toner" data-p="${i}">Replace toner</button>`;
+    }
+    if(sel&&compatible(p,sel))acts=`<button class="btn pri" data-send="${i}" ${p.job?'disabled':''}>Print here <span style="opacity:.7">${i+1}</span></button>`+acts;
+    return `<div class="pr${can?' can':''}"><span class="ic">${icon(p)}</span><h3>${p.n} ${p.kinds.map(kindTag).join(' ')}</h3><span class="st ${cls}">${st}</span>
+      <span class="prog"><i style="width:${p.job?Math.min(100,p.prog/p.job.pages*100):0}%"></i></span>
+      <div class="sup"><span>Paper ${p.paper}/${p.paperMax}<span class="bar${p.paper<p.paperMax*.2?' lo':''}"><i style="width:${p.paper/p.paperMax*100}%"></i></span></span><span>Toner ${Math.round(p.toner)}%<span class="bar${p.toner<20?' lo':''}"><i style="width:${p.toner}%"></i></span></span></div>
+      ${acts?`<div class="acts">${acts}</div>`:''}</div>`;
+  }).join('');
+}
+function icon(p){return `<svg width="24" height="24" viewBox="0 0 16 16" fill="none" stroke="${p.id==='p2'?'var(--colour)':p.id==='p3'?'var(--a3)':'var(--mono)'}" stroke-width="1.1"><rect x="4" y="1.5" width="8" height="4"/><rect x="1.5" y="5.5" width="13" height="6" rx="1"/><rect x="4" y="9.5" width="8" height="5" fill="var(--card)"/></svg>`}
+function hud(){
+  $('mood').textContent=Math.round(S.mood)+'%';$('moodM').firstElementChild.style.width=S.mood+'%';$('moodM').classList.toggle('low',S.mood<35);
+  $('clock').textContent=clock();$('pages').textContent=S.pages;$('score').textContent=S.score;
+}
+function log(t){S.log.unshift(t);S.log=S.log.slice(0,6);$('log').innerHTML=S.log.map(l=>`<div>${l}</div>`).join('')}
+const note=t=>log(t);
+function render(){renderQueue();renderPrinters();hud()}
+
+/* ---------- dialogs ---------- */
+function dlg(title,lead,html,btns){$('dlg').innerHTML=`<h2>${title}</h2><p>${lead}</p>${html||''}<div class="row">${btns.map((b,i)=>`<button class="btn${b[2]?' pri':''}" data-i="${i}">${b[0]}</button>`).join('')}</div>`;$('scrim').hidden=false;
+  $('dlg').querySelectorAll('[data-i]').forEach(b=>b.onclick=()=>btns[+b.dataset.i][1]());const p=$('dlg').querySelector('.pri');p&&p.focus()}
+const closeDlg=()=>$('scrim').hidden=true;
+
+/* ---------- boss ---------- */
+let wasOpen=false;
+function toggleBoss(){
+  boss=!boss;document.body.classList.toggle('boss',boss);
+  if(boss){wasOpen=!$('scrim').hidden;$('scrim').hidden=true}else if(wasOpen)$('scrim').hidden=false;
+  window.LookBusy&&queueMicrotask(()=>window.LookBusy.sync());render();
+}
+$('viewBtn').onclick=toggleBoss;
+
+/* ---------- input ---------- */
+// The panels re-render several times a second, so act on pointerdown (and keyboard clicks) rather than click.
+function actP(e){const b=e.target.closest('[data-send],[data-fix]');if(!b||b.disabled)return;if(b.dataset.send!=null)send(+b.dataset.send);else fixStep(+b.dataset.p,b.dataset.fix)}
+$('printers').addEventListener('pointerdown',e=>{if(e.button===0)actP(e)});
+$('printers').addEventListener('click',e=>{if(e.detail===0)actP(e)});
+$('q').addEventListener('pointerdown',e=>{const r=e.target.closest('tr.job');if(r&&!boss){S.sel=+r.dataset.id;renderQueue();renderPrinters()}});
+addEventListener('keydown',e=>{
+  if(e.key==='Escape'){e.preventDefault();toggleBoss();return}
+  if(boss||!$('scrim').hidden||e.ctrlKey||e.metaKey||e.altKey)return;
+  if(['1','2','3'].includes(e.key)){send(+e.key-1)}
+  else if(e.key==='ArrowDown'||e.key==='ArrowUp'){e.preventDefault();const i=S.jobs.findIndex(j=>j.id===S.sel);const n=Math.max(0,Math.min(S.jobs.length-1,i+(e.key==='ArrowDown'?1:-1)));if(S.jobs[n]){S.sel=S.jobs[n].id;renderQueue();renderPrinters()}}
+});
+
+/* ---------- loop ---------- */
+let last=performance.now(),acc=0;
+function frame(t){
+  const dt=Math.min(.05,(t-last)/1000);last=t;
+  if(S.running&&!boss&&!S.over&&!document.hidden){update(dt);acc+=dt;
+    if(acc>.2){acc=0;renderQueue();renderPrinters();hud()}}
+  requestAnimationFrame(frame);
+}
+render();requestAnimationFrame(frame);
+dlg('Print queue','Everyone in the office is printing at once, and you’re the only one who knows how the printers work.<br><br>Pick a document in the queue, then send it to a printer that can handle it: <b>mono</b> goes to either A4 printer, <b>colour</b> needs Studio Colour, and <b>A3</b> needs the plotter. Keep them fed with paper and toner, and clear jams (three clicks). If someone waits too long, they walk off and the office mood drops.<br><br>Keys: ↑↓ pick a document, 1–3 send it. Esc hides everything.','',[['Start the day',()=>{S.running=true;closeDlg();render()},1]]);
+
+window.LookBusy&&window.LookBusy.register({name:'Print Queue',goal:'Send each document to a printer that can handle it, and keep paper, toner and jams under control until 17:30.',controls:[['Click a document','Select it'],['↑ / ↓','Select the next or previous document'],['1–3','Send it to a printer'],['Printer buttons','Load paper, replace toner, clear jams']],file:'print-queue.html',toggle:toggleBoss,isHidden:()=>boss});
+})();
+</script>
+
+</html>
