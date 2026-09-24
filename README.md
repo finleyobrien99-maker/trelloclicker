@@ -8,6 +8,8 @@ This repo started life as `trelloclicker`, the Trello-looking idle clicker. That
 
 ## Play
 
+**Online:** https://finleyobrien99-maker.github.io/trelloclicker/
+
 Open `index.html` in a browser. There's no build step and nothing to install.
 
 Everything is plain HTML, CSS and JavaScript, one file per game. Fonts come from Google Fonts, and progress, high scores and streaks are saved in your browser's local storage.
@@ -53,6 +55,7 @@ The original Trello clicker has been rebuilt as a proper idle game. Old saves ca
 - **Sprints** are timed challenges: 150 ticks in a minute, 12 cards in two minutes, or a points target.
 - **The Kitchen** opens once you have 10 Interns. Coffee brews over time and you spend it on orders: stand-ups, biscuits, espresso, team breakfast, flat whites and a risky mystery brew.
 - **Rebranding** is the prestige system. Once you've earned 1B points all time, rebrand the studio to win awards (+1% velocity each, for good) and spend them as clout on 15 permanent perks.
+- **The office dog.** Approve the Office dog request and Biscuit wanders the board. Pet them for points, fill their mood bar to set off the zoomies (velocity ×2), and they'll fetch you quick wins. Five dog-only requests and five dog trophies to go with it.
 - **Also:** an activity ticker, a full stats page, number format settings, save export and import, and offline earnings.
 
 ### New in this version

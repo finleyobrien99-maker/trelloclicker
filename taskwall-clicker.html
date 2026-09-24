@@ -163,6 +163,19 @@ button.chip:hover{background:rgba(255,255,255,.26)}
 .ticker b{font-weight:600;opacity:.8;margin-right:6px}
 .ticker span{transition:opacity .4s}
 
+/* the office dog */
+.dog{position:fixed;left:0;bottom:calc(40px + env(safe-area-inset-bottom,0px));z-index:25;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;transition:transform 3.2s ease-in-out;user-select:none;-webkit-user-select:none;background:none;border:0;padding:0}
+.dog.zoom{transition-duration:.7s}
+.dog .b{font-size:42px;line-height:1;display:block;transform:scaleX(var(--dir,1));filter:drop-shadow(0 3px 2px rgba(0,0,0,.25))}
+.dog .tag{font-size:11px;font-weight:700;background:var(--card);color:var(--text);border-radius:999px;padding:1px 8px;box-shadow:var(--shadow);white-space:nowrap}
+.dog .mood{width:46px;height:4px;border-radius:2px;background:rgba(0,0,0,.2);overflow:hidden}
+.dog .mood i{display:block;height:100%;background:#e0567a;transition:width .3s}
+.dog .say{position:absolute;bottom:100%;margin-bottom:4px;background:var(--card);color:var(--text);font-size:12px;padding:4px 8px;border-radius:8px;box-shadow:var(--shadowUp);white-space:nowrap;animation:pop .3s ease}
+.dog.wag .b{animation:wag .18s ease-in-out 4}
+.dog.nap .b{opacity:.85}
+@keyframes wag{50%{transform:scaleX(var(--dir,1)) rotate(-8deg) translateY(-3px)}}
+.heart{position:fixed;pointer-events:none;z-index:40;color:#e0567a;font-size:18px;animation:up .9s ease-out forwards}
+
 .decoy{display:none}
 body.boss .decoy{display:flex}
 body.boss .game{display:none!important}
@@ -285,8 +298,14 @@ up({id:'mugs',n:'Bigger mugs',d:'The coffee machine holds 10 more cups',cost:5e6
 up({id:'barista',n:'Barista course',d:'Coffee brews 50% faster',cost:5e9,k:'Kitchen',req:s=>s.spells>=25,fx:{cRegen:1.5}});
 up({id:'map',n:'Stakeholder mapping',d:'Addressed feedback returns 5% more',cost:1e8,k:'People',req:s=>s.shPopped>=5,fx:{shRet:.05}});
 up({id:'sla',n:'Feedback SLAs',d:'Addressed feedback returns another 5% more',cost:1e11,k:'People',req:s=>s.shPopped>=25,fx:{shRet:.05}});
+const hasDog=s=>s.ups.includes('dog');
+up({id:'treats',n:'Dog treats in the drawer',d:'Petting the office dog earns three times as much',cost:5e8,k:'Dog',req:s=>hasDog(s)&&s.pets>=25,fx:{dogPts:3}});
+up({id:'bed',n:'A proper dog bed',d:'The office dog cheers up twice as fast',cost:5e9,k:'Dog',req:s=>hasDog(s)&&s.pets>=75,fx:{dogHappy:2}});
+up({id:'walkies',n:'Lunchtime walkies',d:'Zoomies last twice as long',cost:5e10,k:'Dog',req:s=>hasDog(s)&&s.zoomies>=3,fx:{zoomDur:2}});
+up({id:'ball',n:'Tennis ball',d:'The office dog fetches quick wins twice as often',cost:5e11,k:'Dog',req:s=>hasDog(s)&&s.fetches>=3,fx:{fetch:2}});
+up({id:'pups',n:'The office dog has puppies',d:'Whole team +20%. Productivity drops for a week, then soars.',cost:5e13,k:'Dog',req:s=>hasDog(s)&&s.pets>=500,fx:{all:1.2}});
 const UP={};U.forEach(u=>UP[u.id]=u);
-const KIND_C={Click:'var(--l5)',Team:'var(--l1)',Synergy:'var(--l4)',Office:'var(--l2)',Morale:'#c2477f',Luck:'#b7860b',Process:'var(--l3)',Kitchen:'#8a5a36',People:'#5b6f80'};
+const KIND_C={Click:'var(--l5)',Team:'var(--l1)',Synergy:'var(--l4)',Office:'var(--l2)',Morale:'#c2477f',Luck:'#b7860b',Process:'var(--l3)',Kitchen:'#8a5a36',People:'#5b6f80',Dog:'#b0703a'};
 
 /* ---------- perks (bought with clout after rebranding) ---------- */
 const PERKS=[
@@ -351,6 +370,9 @@ ach('idle','Out to lunch','Leave the board alone for 15 minutes while the team w
 ach('speed','Speed demon','Finish a card in under 1.5 seconds','Office life',()=>false,1);
 ach('away','While you were away','Come back to points your team earned without you','Office life',()=>false,1);
 ach('hoard','Hoarder','Have 1B story points in the bank with fewer than 50 hires','Office life',s=>s.pts>=1e9&&staff()<50,1);
+[[1,'Good boy'],[100,'Best friends'],[1000,'Who’s a good boy?']].forEach(([v,n],i)=>ach('dog'+i,n,`Pet the office dog ${v} time${v>1?'s':''}`,'Office life',s=>s.pets>=v));
+ach('zoom','Zoomies','Make the office dog so happy it gets the zoomies','Office life',s=>s.zoomies>=1);
+ach('fetch','Fetch!','Have the office dog fetch you a quick win','Office life',s=>s.fetches>=1);
 const ACHM={};ACH.forEach(a=>ACHM[a.id]=a);
 const morale=()=>S.ach.length*.04;
 
@@ -374,6 +396,9 @@ const TICK=[
  [s=>s.total>=1e9,'The board now has more story points than there are people on Earth.'],[s=>s.total>=1e12,'Scientists warn the backlog may now have its own gravity.'],
  [s=>s.resets>0,'The new brand guidelines are just the old ones in a different font.'],[s=>s.awards>=10,'Your awards shelf is now load-bearing.'],
  [s=>kitchenOpen(),'The kitchen coffee machine is making a noise. It’s fine. It’s fine.'],[s=>s.ach.length>=20,'Team morale is “cautiously positive”, says a survey nobody filled in.'],
+ [s=>hasDog(s),'Biscuit has stolen a sandwich from the client. The client said “it’s fine”. It is not fine.'],[s=>hasDog(s),'Biscuit sat on a keyboard and shipped a feature. It’s the best one this quarter.'],
+ [s=>hasDog(s),'Biscuit is asleep under Priya’s desk. Nobody is allowed to move.'],[s=>hasDog(s),'Biscuit has been promoted to Head of Morale. No pay rise, but loads of treats.'],
+ [s=>hasDog(s),'Someone put a tiny lanyard on Biscuit. Security let them straight in.'],[s=>s.ups.includes('pups'),'There are now four puppies in the studio. All meetings are cancelled.'],
  [s=>s.epics>0,'An epic has been closed. Nobody remembers what it was for.'],[s=>s.sprintsWon>0,'The sprint retro has produced 40 sticky notes and one action: “fewer retros”.'],
 ];
 const WINS=["Client: ‘love it, no changes’","Meeting cancelled — free hour!","Printer works first time","Found the missing font","Sign-off on round one","Wi-Fi is fast today","Someone brought doughnuts","The file actually saved","Legal approved it, no comments","Laptop update can wait till tomorrow"];
@@ -383,7 +408,7 @@ function fresh(){
   const own={};HIRES.forEach(h=>own[h.id]=0);
   return {v:2,pts:0,total:0,allTime:0,cards:0,teamCards:0,cardsAll:0,clicks:0,clicksAll:0,hand:0,handAll:0,prog:0,cur:null,todo:[],done:[],own,ups:[],ach:[],
     winsAll:0,awards:0,clout:0,perks:[],resets:0,coffee:10,spells:0,sh:[],shPopped:0,sprint:null,sprintsWon:0,epics:0,sinceEpic:0,buffs:[],kitchenSeen:false,
-    escPresses:0,runTime:0,playTime:0,firstPlayed:Date.now(),t:Date.now(),seed:0,klog:[],settings:{mode:'hire',amt:1,fmt:'short',ticker:true,floats:true}};
+    pets:0,happy:0,zoomies:0,fetches:0,escPresses:0,runTime:0,playTime:0,firstPlayed:Date.now(),t:Date.now(),seed:0,klog:[],settings:{mode:'hire',amt:1,fmt:'short',ticker:true,floats:true}};
 }
 const V1_MAP={intern2:'h_intern_0',intern3:'h_intern_1',free2:'h_free_0',free3:'h_free_1',jr2:'h_jr_0',jr3:'h_jr_1',sr2:'h_sr_0',ad2:'h_ad_0',agency2:'h_agency_0',farm2:'h_farm_0',studio2:'h_studio_0',ai2:'h_ai_0'};
 function hydrate(s){
@@ -420,13 +445,14 @@ function fmt(n){
 const fmtT=s=>{s=Math.floor(s);const h=Math.floor(s/3600),m=Math.floor(s%3600/60),x=s%60;return h?`${h}h ${m}m`:m?`${m}m ${x}s`:`${x}s`};
 const staff=()=>HIRES.reduce((a,h)=>a+S.own[h.id],0);
 function recalc(){
-  const m={click:1,pct:0,hm:{},all:1,kit:[],fingers:0,fmul:1,syn:[],winFreq:1,winDur:1,epic:1,sprint:1,cMax:0,cRegen:1,shRet:0};
+  const m={dogPts:1,dogHappy:1,zoomDur:1,fetch:1,click:1,pct:0,hm:{},all:1,kit:[],fingers:0,fmul:1,syn:[],winFreq:1,winDur:1,epic:1,sprint:1,cMax:0,cRegen:1,shRet:0};
   HIRES.forEach(h=>m.hm[h.id]=1);
   let buddy=false;
   for(const id of S.ups){const u=UP[id];if(!u)continue;const f=u.fx;
     if(f.click)m.click*=f.click;if(f.pct)m.pct+=f.pct;if(f.h)m.hm[f.h]*=f.m;if(f.all)m.all*=f.all;if(f.kit)m.kit.push(f.kit);
     if('fingers' in f){if(f.fingers===0)buddy=true;else m.fmul*=f.fingers}
     if(f.syn)m.syn.push(f.syn);if(f.winFreq)m.winFreq*=f.winFreq;if(f.winDur)m.winDur*=f.winDur;if(f.epic)m.epic*=f.epic;if(f.sprint)m.sprint*=f.sprint;
+    if(f.dogPts)m.dogPts*=f.dogPts;if(f.dogHappy)m.dogHappy*=f.dogHappy;if(f.zoomDur)m.zoomDur*=f.zoomDur;if(f.fetch)m.fetch*=f.fetch;
     if(f.cMax)m.cMax+=f.cMax;if(f.cRegen)m.cRegen*=f.cRegen;if(f.shRet)m.shRet+=f.shRet;
   }
   m.fingers=buddy?.1*m.fmul:0;
@@ -597,11 +623,11 @@ function renderPortfolio(){
 function renderStatsView(){
   const row=(a,b)=>`<div class="srow"><span>${a}</span><b>${b}</b></div>`;
   const approved=S.ups.map(id=>UP[id]).filter(Boolean);
-  $('v-stats').innerHTML=list('How to play','',`<div class="card"><p class="p"><b>Click the card in Doing</b> to tick off subtasks. Ten ticks moves it to Done.</p><p class="p">Spend points on <b>hires</b> in Team. They earn points every second (your velocity), even while you’re away.</p><p class="p">Approve <b>requests</b> for big multipliers. New ones show up as your team grows.</p><p class="p">Grab <b>quick wins</b> when they pop up. <b>Stakeholders</b> slowly siphon your velocity, but click them later and they pay back more than they took.</p><p class="p">Every 25 cards comes an <b>Epic</b>. <b>Sprints</b> are short challenges with big rewards. With 10 Interns, the <b>Kitchen</b> opens.</p><p class="p">Once you’ve earned a billion points all-time, <b>rebrand</b> in Portfolio to win awards and keep going. Esc hides everything.</p></div>`,true)
+  $('v-stats').innerHTML=list('How to play','',`<div class="card"><p class="p"><b>Click the card in Doing</b> to tick off subtasks. Ten ticks moves it to Done.</p><p class="p">Spend points on <b>hires</b> in Team. They earn points every second (your velocity), even while you’re away.</p><p class="p">Approve <b>requests</b> for big multipliers. New ones show up as your team grows.</p><p class="p">Grab <b>quick wins</b> when they pop up. <b>Stakeholders</b> slowly siphon your velocity, but click them later and they pay back more than they took.</p><p class="p">Every 25 cards comes an <b>Epic</b>. <b>Sprints</b> are short challenges with big rewards. With 10 Interns, the <b>Kitchen</b> opens.</p><p class="p">Some requests bring more than numbers. Keep an eye on the office perks.</p><p class="p">Once you’ve earned a billion points all-time, <b>rebrand</b> in Portfolio to win awards and keep going. Esc hides everything.</p></div>`,true)
    +list('Numbers','',`<div class="card">${[
      ['Story points in the bank',fmt(S.pts)],['Earned this rebrand',fmt(S.total)],['Earned all time',fmt(S.allTime)],['Velocity (base)',fmt(M.base)+'/s'],['Velocity right now',fmt(vel())+'/s'],['Each click',fmt(clickVal())],
      ['Cards you finished',`${fmt(S.cards)} (${fmt(S.cardsAll)} all time)`],['Cards the team finished',fmt(S.teamCards)],['Subtasks ticked',`${fmt(S.clicks)} (${fmt(S.clicksAll)} all time)`],['Points from clicking',`${fmt(S.hand)} (${fmt(S.handAll)} all time)`],
-     ['Team size',fmt(staff())],['Requests approved',`${S.ups.length} / ${U.length}`],['Trophies',`${S.ach.length} / ${ACH.length}`],['Quick wins grabbed',S.winsAll],['Feedback addressed',S.shPopped],['Sprints won',S.sprintsWon],['Epics closed',S.epics],['Kitchen orders',S.spells],
+     ['Team size',fmt(staff())],['Requests approved',`${S.ups.length} / ${U.length}`],['Trophies',`${S.ach.length} / ${ACH.length}`],['Quick wins grabbed',S.winsAll],['Feedback addressed',S.shPopped],['Sprints won',S.sprintsWon],['Epics closed',S.epics],['Kitchen orders',S.spells],['Office dog pets',S.pets],
      ['Rebrands',S.resets],['Awards',S.awards],['Time this rebrand',fmtT(S.runTime)],['Time played',fmtT(S.playTime)]].map(r=>row(...r)).join('')}</div>`)
    +list('Approved requests',approved.length,approved.slice().reverse().map(u=>`<div class="card"><div class="labels"><span class="lbt" style="background:${KIND_C[u.k]}">${u.k}</span></div><div class="ttl">${u.n}</div></div>`).join('')||'<div class="mute">Nothing approved yet.</div>')
    +list('Settings','',`<div class="card">
@@ -675,14 +701,14 @@ function addBuff(b,secs){S.buffs=S.buffs.filter(x=>x.id!==b.id);b.until=Date.now
 /* ---------- quick wins ---------- */
 let winT;
 function schedWin(){clearTimeout(winT);const f=M.winFreq*(perk('luckybreak')?1.25:1);winT=setTimeout(spawnWin,(60+Math.random()*90)*1000/f)}
-function spawnWin(){
-  if(boss||document.hidden){schedWin();return}
+function spawnWin(at){
+  if(boss||document.hidden){if(!at)schedWin();return}
   const b=document.createElement('button');b.className='win';
   b.innerHTML=`<b>Quick win</b>${WINS[Math.floor(Math.random()*WINS.length)]}`;
-  b.style.left=Math.max(16,Math.random()*(innerWidth-260))+'px';
-  b.style.top=Math.max(110,Math.random()*(innerHeight-140))+'px';
+  b.style.left=(at?Math.min(innerWidth-250,Math.max(16,at.x-40)):Math.max(16,Math.random()*(innerWidth-260)))+'px';
+  b.style.top=(at?Math.max(110,at.y-110):Math.max(110,Math.random()*(innerHeight-140)))+'px';
   b.onclick=()=>{b.remove();grabWin()};
-  document.body.appendChild(b);setTimeout(()=>b.remove(),13000*(perk('lanyard')?2:1));schedWin();
+  document.body.appendChild(b);setTimeout(()=>b.remove(),13000*(perk('lanyard')?2:1));if(!at)schedWin();
 }
 function grabWin(){
   S.winsAll++;
@@ -780,7 +806,7 @@ function checkAch(){for(const a of ACH)if(!S.ach.includes(a.id)&&a.test(S))unloc
 function rebrand(){
   const p=pendingAwards();if(p<1)return;
   S.sh.forEach(x=>earn(x.eaten*shReturn()));
-  const keep=['allTime','cardsAll','clicksAll','handAll','winsAll','awards','clout','perks','resets','spells','shPopped','sprintsWon','epics','escPresses','playTime','firstPlayed','ach','settings','kitchenSeen','klog'];
+  const keep=['pets','zoomies','fetches','allTime','cardsAll','clicksAll','handAll','winsAll','awards','clout','perks','resets','spells','shPopped','sprintsWon','epics','escPresses','playTime','firstPlayed','ach','settings','kitchenSeen','klog'];
   const k={};keep.forEach(x=>k[x]=S[x]);
   S=Object.assign(fresh(),k);S.awards+=p;S.clout+=p;S.resets++;
   if(perk('headstart')){S.own.intern=10;S.own.free=5}
@@ -794,6 +820,61 @@ function rebrand(){
 }
 const boardName=()=>BOARDS[Math.min(S.resets,BOARDS.length-1)]+(S.resets>=BOARDS.length?` ${S.resets-BOARDS.length+2}`:'');
 
+
+/* ---------- the office dog ---------- */
+const DOG='Biscuit';
+const DOG_SAYS=['*happy wag*','Woof!','*sniffs your lunch*','*rolls over*','Is that a biscuit?','*brings you a sock*','*sneezes*','*leans on your leg*'];
+let dogEl=null,dogPos=.5,dogNext=0,fetchAt=Date.now()+(3+Math.random()*3)*60e3,petCool=0,sayT;
+function dogSync(){
+  const on=hasDog(S)&&!boss;
+  if(!on){if(dogEl){dogEl.remove();dogEl=null}return}
+  if(!dogEl){
+    dogEl=document.createElement('button');dogEl.className='dog game';dogEl.title=`${DOG}, the office dog. Give them a pet.`;
+    dogEl.innerHTML=`<span class="b" aria-hidden="true">🐕</span><span class="tag">${DOG}</span><span class="mood"><i></i></span>`;
+    dogEl.addEventListener('click',petDog);document.body.appendChild(dogEl);placeDog(true);
+    if(!S.pets)toast(`<b>Meet ${DOG}, the office dog.</b> Give them a pet. A happy dog is a productive studio.`);
+  }
+  dogEl.querySelector('.mood i').style.width=S.happy+'%';
+}
+function placeDog(instant){
+  if(!dogEl)return;
+  const w=Math.max(0,innerWidth-80),x=dogPos*w,old=parseFloat(dogEl.dataset.x||x);
+  dogEl.style.setProperty('--dir',x>old?-1:1);dogEl.dataset.x=x;
+  if(instant){dogEl.style.transition='none';dogEl.style.transform=`translateX(${x}px)`;void dogEl.offsetWidth;dogEl.style.transition=''}
+  else dogEl.style.transform=`translateX(${x}px)`;
+}
+function dogSay(t){if(!dogEl)return;clearTimeout(sayT);let b=dogEl.querySelector('.say');if(!b){b=document.createElement('span');b.className='say';dogEl.appendChild(b)}b.textContent=t;sayT=setTimeout(()=>b.remove(),2200)}
+function dogTick(){
+  dogSync();if(!dogEl)return;
+  const now=Date.now();
+  S.happy=Math.max(0,S.happy-.5);
+  const zoom=activeBuffs().some(b=>b.id==='zoomies');
+  dogEl.classList.toggle('zoom',zoom);dogEl.classList.toggle('nap',S.happy<5&&!zoom);
+  if(zoom||now>dogNext){dogPos=zoom?(dogPos<.5?.9:.1):Math.random();placeDog();dogNext=now+(S.happy<5?20000:4000+Math.random()*6000)}
+  if(S.happy<5&&Math.random()<.05)dogSay('zzz…');
+  if(now>fetchAt&&!document.hidden){
+    fetchAt=now+(3+Math.random()*3)*60e3/M.fetch;
+    const r=dogEl.getBoundingClientRect();S.fetches++;spawnWin({x:r.left+r.width/2,y:r.top});dogSay('*drops something at your feet*');
+    toast(`<b>${DOG} fetched a quick win!</b> Grab it before someone else does.`);checkAch();
+  }
+}
+function petDog(e){
+  const now=performance.now();
+  const r=dogEl.getBoundingClientRect();
+  const h=document.createElement('span');h.className='heart';h.textContent='♥';h.style.left=(r.left+r.width/2-6+(Math.random()*20-10))+'px';h.style.top=(r.top-6)+'px';document.body.appendChild(h);setTimeout(()=>h.remove(),900);
+  dogEl.classList.remove('wag');void dogEl.offsetWidth;dogEl.classList.add('wag');
+  if(now<petCool)return;petCool=now+600;
+  const g=(M.base*velBuff()*10+clickVal()*5)*M.dogPts;earn(g);S.pets++;lastClick=Date.now();
+  floatAt(r.left+r.width/2,r.top-20,'+'+fmt(g));
+  S.happy=Math.min(100,S.happy+8*M.dogHappy);
+  if(S.happy>=100){
+    S.happy=40;S.zoomies++;addBuff({id:'zoomies',name:`${DOG} has the zoomies ×2`,vel:2,cls:'good'},30*durMult()*M.zoomDur);
+    dogSay('ZOOMIES!');toast(`<b>${DOG} has the zoomies!</b> The whole studio is energised. Velocity ×2.`);
+  }else if(Math.random()<.3)dogSay(DOG_SAYS[Math.floor(Math.random()*DOG_SAYS.length)]);
+  dogSync();renderStats();checkAch();
+}
+addEventListener('resize',()=>placeDog(true));
+
 /* ---------- disguise ---------- */
 const DECOY=[
  ['To do',[['Brand review prep',[4]],['Spring campaign — print specs',[1]],['Update email templates',[4]],['Photography shot list',[0]]]],
@@ -806,6 +887,7 @@ function toggleBoss(){
   boss=!boss;document.body.classList.toggle('boss',boss);document.querySelectorAll('.win,.float').forEach(e=>e.remove());$('toast').hidden=true;
   $('boardName').textContent=boss?'Q3 Campaign Delivery':boardName();
   if(boss){S.escPresses++;checkAch()}
+  dogSync();
 }
 
 /* ---------- input ---------- */
@@ -873,14 +955,14 @@ setInterval(()=>{
     acc=0;refreshBuy();renderUps();if(S.total>0)renderTeamIfNew();renderSH();sprintTick();
     const before=S.buffs.length;S.buffs=activeBuffs();renderBuffs();if(S.buffs.length!==before)renderStats();
   }
-  if(acc2>1){acc2=0;checkAch();maybeStakeholder();renderViews();
+  if(acc2>1){acc2=0;checkAch();maybeStakeholder();renderViews();dogTick();
     if(!ptrDown){if(view==='kitchen')renderKitchen();else if(view==='portfolio'&&!rbArmed)renderPortfolio();else if(view==='stats'&&document.activeElement!==$('saveTxt')&&!wipeArmed){renderStatsView();fillSave()}}}
   if(tickAcc>9){tickAcc=0;nextTick()}
 },100);
 function renderTeamIfNew(){const vis=teamVisible(),k=vis.length+'|'+(S.settings.mode==='sell')+S.settings.amt;if(k!==teamKey)renderTeam()}
 setInterval(save,5000);
 document.addEventListener('visibilitychange',save);
-schedWin();
+schedWin();dogSync();
 let first=false;try{first=!localStorage.getItem('tw-seen2');localStorage.setItem('tw-seen2','1')}catch(e){}
 if(first&&S.total<1)toast('Click the card in <b>Doing</b> to tick off subtasks, then spend points on hires. Esc hides the lot.');
 })();
