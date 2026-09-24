@@ -56,6 +56,14 @@ The original Trello clicker has been rebuilt as a proper idle game. Old saves ca
 - **The Kitchen** opens once you have 10 Interns. Coffee brews over time and you spend it on orders: stand-ups, biscuits, espresso, team breakfast, flat whites and a risky mystery brew.
 - **Rebranding** is the prestige system. Once you've earned 1B points all time, rebrand the studio to win awards (+1% velocity each, for good) and spend them as clout on 15 permanent perks.
 - **The office dog.** Approve the Office dog request and Biscuit wanders the board. Pet them for points, fill their mood bar to set off the zoomies (velocity ×2), and they'll fetch you quick wins. Five dog-only requests and five dog trophies to go with it.
+- **It never ends.**
+  - **Requests keep coming.** Every role gets endless upgrade tiers (II, III, IV…) past 250 hires, and office perks, click techniques and team socials generate forever.
+  - **Clients.** At 100K points, clients start offering contracts: earn X, tick N subtasks, hire N people, pet the dog. Each one you finish raises your client tier, from local cafés up to the Universe itself, with bigger targets and payouts every time. Miss one and you drop a tier.
+  - **Office floors.** Contracts pay kudos, which you spend on office floors: seven upgrades with no level cap that survive every reset.
+  - **Endless trophies.** 25 families of ranked trophies (Velocity rank IV, Intern campus VI…) sit on top of the 111 classic ones, and all of them feed morale.
+  - **Legacy perks.** Repeatable clout sinks for after you've bought every perk.
+  - **Heat death.** At 1e100 points in one rebrand, collapse the universe for Universes, which multiply everything. Numbers are capped just below JavaScript's limit, so nothing ever breaks into Infinity.
+  - **Daily streaks.** Coming back each day gives a velocity boost and kudos.
 - **Also:** an activity ticker, a full stats page, number format settings, save export and import, and offline earnings.
 
 ### New in this version
