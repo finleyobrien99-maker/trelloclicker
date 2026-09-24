@@ -1,0 +1,413 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Annual leave – Peoplehub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,700;6..12,800&display=swap">
+<style>
+:root{
+  --bg:#f5f3ef; --side:#1f3d3a; --sideText:#dfeae8; --sideMuted:#9fb8b4; --panel:#ffffff; --panel2:#f9f8f5; --text:#1f2a29; --muted:#667371; --line:#e4e1da;
+  --brand:#16857a; --brandInk:#0f6b62; --brandSoft:#dff1ee; --warn:#b4532a; --warnSoft:#fbe9df; --cell:#ece8e0; --board:#ddd8ce;
+  --shadow:0 1px 2px rgba(30,40,40,.06),0 6px 20px rgba(30,40,40,.06);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#141a19; --side:#0e1514; --sideText:#d7e4e2; --sideMuted:#86a09c; --panel:#1b2322; --panel2:#202a29; --text:#e3ebea; --muted:#98a8a6; --line:#2d3938;
+    --brand:#3fb9aa; --brandInk:#6fd3c6; --brandSoft:#1a3633; --warn:#f08a5d; --warnSoft:#3c2519; --cell:#26302f; --board:#1f2827;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 6px 20px rgba(0,0,0,.3);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#141a19; --side:#0e1514; --sideText:#d7e4e2; --sideMuted:#86a09c; --panel:#1b2322; --panel2:#202a29; --text:#e3ebea; --muted:#98a8a6; --line:#2d3938;
+  --brand:#3fb9aa; --brandInk:#6fd3c6; --brandSoft:#1a3633; --warn:#f08a5d; --warnSoft:#3c2519; --cell:#26302f; --board:#1f2827;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 6px 20px rgba(0,0,0,.3);
+}
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{background:var(--bg);color:var(--text);font-family:"Nunito Sans",system-ui,-apple-system,"Segoe UI",sans-serif;font-size:14px;font-variant-numeric:tabular-nums}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+button:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+.app{display:grid;grid-template-columns:220px minmax(0,1fr);min-height:100%}
+
+/* sidebar */
+.side{background:var(--side);color:var(--sideText);padding:16px 12px;display:flex;flex-direction:column;gap:2px}
+.logo{display:flex;align-items:center;gap:9px;font-weight:800;font-size:17px;padding:4px 8px 18px}
+.logo i{width:26px;height:26px;border-radius:8px;background:var(--brand);position:relative}
+.logo i::before,.logo i::after{content:"";position:absolute;width:8px;height:8px;border-radius:50%;background:#fff;top:6px}
+.logo i::before{left:5px}.logo i::after{right:5px;opacity:.7}
+.side a{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;color:var(--sideMuted);text-decoration:none;font-weight:600}
+.side a.on{background:rgba(255,255,255,.09);color:var(--sideText)}
+.side a svg{width:18px;height:18px;flex:none}
+.side .who{margin-top:auto;display:flex;align-items:center;gap:10px;padding:10px 8px 0;border-top:1px solid rgba(255,255,255,.1)}
+.me{width:32px;height:32px;border-radius:50%;background:#c77d3a;color:#fff;display:grid;place-items:center;font-weight:700;font-size:13px;flex:none}
+.who small{display:block;color:var(--sideMuted);font-size:12px}
+
+/* main */
+.main{padding:22px 28px 36px;min-width:0}
+.top{display:flex;flex-wrap:wrap;align-items:flex-end;gap:12px 20px;margin-bottom:18px}
+.crumb{font-size:12.5px;color:var(--muted);font-weight:600}
+.top h1{margin:2px 0 0;font-size:26px;font-weight:800;letter-spacing:-.01em}
+.acts{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+.btn{border-radius:9px;padding:9px 15px;font-weight:700;font-size:13.5px;background:var(--panel);border:1px solid var(--line);box-shadow:var(--shadow);white-space:nowrap}
+.btn:hover{border-color:var(--muted)}
+.btn.pri{background:var(--brand);border-color:var(--brand);color:#fff}
+.btn:disabled{opacity:.5;cursor:default}
+
+.cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:18px}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px;box-shadow:var(--shadow);min-width:0}
+.stat span{display:block;font-size:12px;color:var(--muted);font-weight:600}
+.stat b{display:block;font-size:24px;font-weight:800;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stat small{font-size:12px;color:var(--muted)}
+.stat.hi b{color:var(--brandInk)}
+
+.split{display:grid;grid-template-columns:auto minmax(220px,1fr);gap:18px;align-items:start}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:14px}
+.panel h2{margin:0 0 10px;font-size:14px;font-weight:800;display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.panel h2 small{font-weight:600;color:var(--muted);font-size:12px}
+
+/* board */
+:root{--bs:clamp(260px,min(calc(100vh - 290px),calc(100vw - 560px)),470px)}
+.board{position:relative;width:var(--bs);height:var(--bs);background:var(--board);border-radius:12px;padding:var(--gap);--gap:calc(var(--bs) * .025);--ts:calc((var(--bs) - var(--gap) * 5) / 4);touch-action:none;outline:none}
+.board:focus-visible{box-shadow:0 0 0 3px var(--brand)}
+.cellbg{position:absolute;left:0;top:0;width:var(--ts);height:var(--ts);border-radius:9px;background:var(--cell)}
+.tile{position:absolute;left:0;top:0;width:var(--ts);height:var(--ts);border-radius:9px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:4px;transition:transform .11s ease-in-out;will-change:transform;box-shadow:0 1px 0 rgba(0,0,0,.12)}
+.tile .n{font-weight:800;font-size:calc(var(--ts) * .16);line-height:1.1}
+.tile .d{font-weight:700;font-size:calc(var(--ts) * .12);opacity:.8;margin-top:2px}
+.tile .in{display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%}
+.tile.new .in{animation:appear .18s ease .08s both}
+.tile.merged .in{animation:pop .2s ease}
+@keyframes appear{from{transform:scale(0);opacity:0}to{transform:none;opacity:1}}
+@keyframes pop{50%{transform:scale(1.14)}}
+.over{position:absolute;inset:0;border-radius:12px;background:color-mix(in srgb,var(--panel) 82%,transparent);display:grid;place-items:center;text-align:center;padding:20px;z-index:5;backdrop-filter:blur(2px)}
+.over h3{margin:0 0 4px;font-size:22px;font-weight:800}
+.over p{margin:0 0 14px;color:var(--muted)}
+.over .row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.hintline{margin-top:10px;font-size:12.5px;color:var(--muted);display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+
+.types{display:grid;gap:6px}
+.type{display:grid;grid-template-columns:30px minmax(0,1fr) auto;gap:10px;align-items:center;font-size:13px}
+.type i{height:22px;border-radius:6px}
+.type span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.type small{color:var(--muted)}
+.type.lock{opacity:.4}
+.type.got span{font-weight:700}
+.log{list-style:none;margin:0;padding:0;display:grid;gap:6px;font-size:13px}
+.log li{display:flex;justify-content:space-between;gap:10px;padding:7px 10px;background:var(--panel2);border-radius:8px}
+.log li b{font-weight:700}
+.log li span{color:var(--muted);white-space:nowrap}
+.pill{display:inline-block;font-size:11.5px;font-weight:700;border-radius:999px;padding:2px 8px;background:var(--brandSoft);color:var(--brandInk)}
+.pill.p{background:var(--warnSoft);color:var(--warn)}
+
+/* decoy */
+.decoy{display:none}
+body.boss .decoy{display:block}
+body.boss .game{display:none!important}
+.dgrid{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:18px}
+.tbl{width:100%;border-collapse:collapse;font-size:13.5px}
+.tbl th,.tbl td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--line)}
+.tbl th{font-size:12px;color:var(--muted);font-weight:700}
+.tbl tr:last-child td{border-bottom:0}
+.bar{height:10px;border-radius:5px;background:var(--cell);overflow:hidden;display:flex;margin:6px 0 4px}
+.bar i{display:block;height:100%}
+
+.toast{position:fixed;right:18px;bottom:calc(18px + env(safe-area-inset-bottom,0px));background:var(--side);color:var(--sideText);padding:12px 16px;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.3);max-width:min(380px,calc(100vw - 36px));z-index:50;font-size:13.5px;line-height:1.45}
+.toast b{display:block;color:#8ee0d4;font-size:12px;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px}
+
+@media (max-width:1100px){
+  :root{--bs:clamp(260px,min(calc(100vh - 290px),calc(100vw - 300px)),470px)}
+  .split{grid-template-columns:minmax(0,1fr)}
+  .split>.panel:first-child{justify-self:start}
+  .sidecol{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+}
+@media (max-width:760px){
+  .app{grid-template-columns:minmax(0,1fr)}
+  .side{flex-direction:row;align-items:center;padding:8px 12px;gap:4px;overflow-x:auto;scrollbar-width:none}
+  .logo{padding:0 8px 0 0;font-size:15px}
+  .side a{padding:6px 8px;font-size:13px}
+  .side a:not(.on){display:none}
+  .side a svg{display:none}
+  .side .who{margin:0 0 0 auto;padding:0;border:0}
+  .side .who div{display:none}
+  .main{padding:16px 12px 28px}
+  .top h1{font-size:22px}
+  .acts{margin-left:0;width:100%}
+  .acts .btn{flex:1}
+  .cards{grid-template-columns:1fr 1fr}
+  :root{--bs:min(calc(100vw - 54px),440px)}
+  .split>.panel:first-child{justify-self:stretch;display:flex;flex-direction:column;align-items:center}
+  .split>.panel:first-child h2,.split>.panel:first-child .hintline{width:100%}
+  .main{display:flex;flex-direction:column}
+  .main>.split{order:1}
+  .main>.cards{order:2;margin:18px 0 0}
+  .sidecol{grid-template-columns:minmax(0,1fr)}
+  .dgrid{grid-template-columns:minmax(0,1fr)}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<div class="app">
+  <aside class="side">
+    <div class="logo"><i></i>Peoplehub</div>
+    <a href="#" onclick="return false"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 9.5 10 4l7 5.5V17H3z"/></svg>Home</a>
+    <a href="#" class="on" onclick="return false"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4.5" width="14" height="12.5" rx="2"/><path d="M3 8.5h14M7 3v3M13 3v3"/></svg>My leave</a>
+    <a href="#" onclick="return false"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="5" width="14" height="10" rx="2"/><circle cx="10" cy="10" r="2.2"/></svg>Payslips</a>
+    <a href="#" onclick="return false"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M10 16.5s-6-3.6-6-8A3.3 3.3 0 0 1 10 6a3.3 3.3 0 0 1 6 2.5c0 4.4-6 8-6 8z"/></svg>Benefits</a>
+    <a href="#" onclick="return false"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="7.5" cy="7.5" r="2.5"/><circle cx="14" cy="8.5" r="2"/><path d="M3 16c.5-3 2.3-4.5 4.5-4.5S11.5 13 12 16M12.5 12.3c2 0 3.6 1.2 4 3.7"/></svg>Team</a>
+    <a href="#" onclick="return false"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 3h6.5L15 6.5V17H5z"/><path d="M11 3v4h4"/></svg>Documents</a>
+    <div class="who"><span class="me">F</span><div>Fin<small>Designer · Studio</small></div></div>
+  </aside>
+
+  <main class="main">
+    <div class="top">
+      <div><div class="crumb">My leave</div><h1 id="h1">Annual leave planner</h1></div>
+      <div class="acts">
+        <button class="btn game" id="undoBtn" title="Withdraw last request (U)">Withdraw last</button>
+        <button class="btn" id="viewBtn" title="Overview (Esc)">Overview</button>
+        <button class="btn pri" id="newBtn" title="New leave year (R)">New leave year</button>
+      </div>
+    </div>
+
+    <div class="cards game">
+      <div class="stat hi"><span>Days booked</span><b id="score">0</b><small>this leave year</small></div>
+      <div class="stat"><span>Personal best</span><b id="best">0</b><small>days</small></div>
+      <div class="stat"><span>Biggest request</span><b id="big">Half day</b><small id="bigSub">½ day</small></div>
+      <div class="stat"><span>Withdrawals left</span><b id="undos">3</b><small>HR are watching</small></div>
+    </div>
+
+    <div class="split game">
+      <section class="panel">
+        <h2>Leave planner <small>Merge matching requests</small></h2>
+        <div class="board" id="board" tabindex="0" aria-label="Leave planner board. Use arrow keys or swipe."></div>
+        <div class="hintline"><span>Arrow keys, WASD or swipe</span><span>Goal: <b>Sabbatical</b></span></div>
+      </section>
+      <div class="sidecol" style="display:grid;gap:18px">
+        <section class="panel">
+          <h2>Leave types <small id="typesN">1 of 11 unlocked</small></h2>
+          <div class="types" id="types"></div>
+        </section>
+        <section class="panel">
+          <h2>Recent approvals</h2>
+          <ul class="log" id="log"></ul>
+        </section>
+      </div>
+    </div>
+
+    <!-- the disguise -->
+    <div class="decoy">
+      <div class="cards">
+        <div class="stat"><span>Allowance</span><b>25 days</b><small>+ 8 bank holidays</small></div>
+        <div class="stat"><span>Taken</span><b>11.5</b><small>days</small></div>
+        <div class="stat"><span>Booked</span><b>6</b><small>days</small></div>
+        <div class="stat hi"><span>Remaining</span><b>7.5</b><small>days to use by 31 Dec</small></div>
+      </div>
+      <div class="dgrid">
+        <section class="panel">
+          <h2>Upcoming leave <small>3 requests</small></h2>
+          <table class="tbl" id="dUp"></table>
+        </section>
+        <section class="panel">
+          <h2>Allowance used</h2>
+          <div class="bar"><i style="width:46%;background:var(--brand)"></i><i style="width:24%;background:#d9a441"></i></div>
+          <div style="font-size:12.5px;color:var(--muted);display:flex;gap:14px;flex-wrap:wrap"><span>● Taken 46%</span><span>● Booked 24%</span><span>○ Remaining 30%</span></div>
+          <h2 style="margin-top:18px">Bank holidays</h2>
+          <table class="tbl"><tr><td>25 Dec</td><td>Christmas Day</td></tr><tr><td>26 Dec</td><td>Boxing Day</td></tr><tr><td>1 Jan</td><td>New Year’s Day</td></tr></table>
+        </section>
+      </div>
+    </div>
+  </main>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+(function(){
+const $=id=>document.getElementById(id);
+const T=[
+ null,
+ {n:'Half day',d:'½ day',bg:'#e7efe9',fg:'#27463c'},
+ {n:'Duvet day',d:'1 day',bg:'#cfe8de',fg:'#1d4538'},
+ {n:'Long weekend',d:'2 days',bg:'#a8dccb',fg:'#153f33'},
+ {n:'City break',d:'4 days',bg:'#6fc7b0',fg:'#0f352b'},
+ {n:'Week in Spain',d:'8 days',bg:'#f2c464',fg:'#4a3405'},
+ {n:'Fortnight off',d:'16 days',bg:'#ee9b4f',fg:'#fff'},
+ {n:'Month off',d:'32 days',bg:'#e0703f',fg:'#fff'},
+ {n:'Summer off',d:'64 days',bg:'#cf4c3f',fg:'#fff'},
+ {n:'Sabbatical',d:'128 days',bg:'#8e3fb0',fg:'#fff'},
+ {n:'Career break',d:'256 days',bg:'#4f47b8',fg:'#fff'},
+ {n:'Early retirement',d:'512 days',bg:'#1d2b53',fg:'#ffd66b'},
+];
+const WIN=9;
+const QUIPS={
+ 5:'Week in Spain approved. Remember to set your out-of-office.',
+ 6:'Fortnight off approved. Priya has “a few concerns about coverage”.',
+ 7:'Month off approved. Someone has already been given your desk.',
+ 8:'Summer off approved. HR want “a quick chat, nothing to worry about”.',
+ 9:'Sabbatical approved! Nobody will notice for at least a week. Keep going for early retirement?',
+ 10:'Career break approved. They’ve started calling you “the one who left”.',
+ 11:'Early retirement. You did it. You’ve booked more leave than anyone in the history of the company.',
+};
+const N=4;
+let S,boss=false,busy=false,nextId=1;
+let best={score:0,tier:1};try{best=Object.assign(best,JSON.parse(localStorage.getItem('al-best')||'{}'))}catch(e){}
+
+function fresh(){S={tiles:[],score:0,undos:3,prev:null,over:false,won:false,top:1,log:[]};spawn(true);spawn(true)}
+function saveGame(){try{localStorage.setItem('al-game',JSON.stringify({tiles:S.tiles.map(({r,c,v})=>({r,c,v})),score:S.score,undos:S.undos,over:S.over,won:S.won,top:S.top,log:S.log}))}catch(e){}}
+function loadGame(){
+  try{const s=JSON.parse(localStorage.getItem('al-game')||'null');if(s&&Array.isArray(s.tiles)&&s.tiles.length){S=Object.assign({prev:null},s);S.tiles=s.tiles.map(t=>({...t,id:nextId++}));return true}}catch(e){}
+  return false;
+}
+const at=(r,c)=>S.tiles.find(t=>t.r===r&&t.c===c&&!t.dead);
+function spawn(quiet){
+  const empty=[];for(let r=0;r<N;r++)for(let c=0;c<N;c++)if(!at(r,c))empty.push([r,c]);
+  if(!empty.length)return;
+  const [r,c]=empty[Math.floor(Math.random()*empty.length)];
+  S.tiles.push({id:nextId++,r,c,v:Math.random()<.9?1:2,isNew:!quiet});
+}
+
+/* ---------- render ---------- */
+const board=$('board');
+function pos(r,c){return `translate(calc(var(--gap) + ${c} * (var(--ts) + var(--gap))),calc(var(--gap) + ${r} * (var(--ts) + var(--gap))))`}
+function buildBg(){
+  let h='';for(let r=0;r<N;r++)for(let c=0;c<N;c++)h+=`<div class="cellbg" style="transform:${pos(r,c)}"></div>`;
+  board.innerHTML=h;
+}
+const els=new Map();
+function paint(){
+  const live=new Set();
+  for(const t of S.tiles){
+    live.add(t.id);let el=els.get(t.id);
+    if(!el){el=document.createElement('div');el.className='tile'+(t.isNew?' new':'');el.innerHTML='<div class="in"><span class="n"></span><span class="d"></span></div>';board.appendChild(el);els.set(t.id,el)}
+    el.style.transform=pos(t.r,t.c);
+    el.style.zIndex=t.dead?1:2;
+    if(el.dataset.v!=String(t.v)){
+      el.dataset.v=t.v;const tp=T[t.v];
+      el.style.background=tp.bg;el.style.color=tp.fg;
+      el.querySelector('.n').textContent=tp.n;el.querySelector('.d').textContent=tp.d;
+    }
+    if(t.merged){el.classList.remove('merged');void el.offsetWidth;el.classList.add('merged')}
+    t.isNew=false;t.merged=false;
+  }
+  for(const [id,el] of els)if(!live.has(id)){el.remove();els.delete(id)}
+  let ov=board.querySelector('.over');
+  if(S.over){
+    if(!ov){ov=document.createElement('div');ov.className='over';board.appendChild(ov)}
+    ov.innerHTML=`<div><h3>Request declined</h3><p>“Business needs.” You booked <b>${S.score.toLocaleString('en-GB')}</b> days.</p><div class="row">${S.undos?'<button class="btn" data-a="undo">Withdraw last</button>':''}<button class="btn pri" data-a="new">New leave year</button></div></div>`;
+  }else if(ov)ov.remove();
+}
+function renderStats(){
+  $('score').textContent=S.score.toLocaleString('en-GB');
+  $('best').textContent=Math.max(best.score,S.score).toLocaleString('en-GB');
+  $('big').textContent=T[S.top].n;$('bigSub').textContent=T[S.top].d;
+  $('undos').textContent=S.undos;$('undoBtn').disabled=!S.prev||!S.undos;
+  const top=Math.max(best.tier||1,S.top);
+  $('types').innerHTML=T.slice(1).map((t,k)=>{const v=k+1,lock=v>top;return `<div class="type${lock?' lock':''}${v<=S.top?' got':''}"><i style="background:${lock?'var(--cell)':t.bg}"></i><span>${lock?'???':t.n}${v===WIN?' ★':''}</span><small>${lock?'':t.d}</small></div>`}).join('');
+  $('typesN').textContent=`${top} of 11 unlocked`;
+  $('log').innerHTML=S.log.length?S.log.slice(0,5).map(l=>`<li><b>${T[l.v].n}</b><span>${l.t} · <span class="pill">Approved</span></span></li>`).join(''):'<li><span>Nothing approved yet. Get merging.</span></li>';
+}
+
+/* ---------- move ---------- */
+function move(dir){
+  if(busy||boss||S.over)return;
+  const [dr,dc]=[[-1,0],[0,1],[1,0],[0,-1]][dir];
+  const rows=[0,1,2,3],cols=[0,1,2,3];if(dr===1)rows.reverse();if(dc===1)cols.reverse();
+  const snap={tiles:S.tiles.map(({r,c,v})=>({r,c,v})),score:S.score,top:S.top,log:S.log.slice(),won:S.won};
+  let moved=false,gained=0;const mergedInto=new Set();
+  for(const r of rows)for(const c of cols){
+    const t=at(r,c);if(!t)continue;
+    let pr=r,pc=c,nr=r+dr,nc=c+dc;
+    while(nr>=0&&nr<N&&nc>=0&&nc<N&&!at(nr,nc)){pr=nr;pc=nc;nr+=dr;nc+=dc}
+    const nx=(nr>=0&&nr<N&&nc>=0&&nc<N)?at(nr,nc):null;
+    if(nx&&nx.v===t.v&&!mergedInto.has(nx.id)&&nx.v<11){
+      t.r=nr;t.c=nc;t.dead=true;mergedInto.add(nx.id);moved=true;
+    }else if(pr!==r||pc!==c){t.r=pr;t.c=pc;moved=true}
+  }
+  if(!moved)return;
+  S.prev=snap;busy=true;paint();
+  setTimeout(()=>{
+    S.tiles=S.tiles.filter(t=>!t.dead);
+    const now=new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+    for(const t of S.tiles)if(mergedInto.has(t.id)){
+      t.v++;t.merged=true;gained+=Math.pow(2,t.v-2);
+      if(t.v>=3)S.log.unshift({v:t.v,t:now});
+      if(t.v>S.top){S.top=t.v;if(QUIPS[t.v]&&!(t.v===WIN&&S.won))toast(t.v===WIN?'Goal reached':'Approved',QUIPS[t.v]);if(t.v>=WIN)S.won=true}
+    }
+    S.log=S.log.slice(0,8);
+    S.score+=gained;spawn();
+    if(!canMove())S.over=true;
+    if(S.score>best.score||S.top>(best.tier||1)){best.score=Math.max(best.score,S.score);best.tier=Math.max(best.tier||1,S.top);try{localStorage.setItem('al-best',JSON.stringify(best))}catch(e){}}
+    paint();renderStats();saveGame();busy=false;
+  },115);
+}
+function canMove(){
+  if(S.tiles.length<N*N)return true;
+  for(const t of S.tiles){const a=at(t.r,t.c+1),b=at(t.r+1,t.c);if((a&&a.v===t.v&&t.v<11)||(b&&b.v===t.v&&t.v<11))return true}
+  return false;
+}
+function undo(){
+  if(busy||boss||!S.prev||!S.undos)return;
+  const p=S.prev;S.undos--;S.prev=null;S.over=false;
+  for(const [,el] of els)el.remove();els.clear();
+  S.tiles=p.tiles.map(t=>({...t,id:nextId++}));S.score=p.score;S.top=p.top;S.log=p.log;S.won=p.won;
+  paint();renderStats();saveGame();
+  toast('Request withdrawn',S.undos?`${S.undos} withdrawal${S.undos===1?'':'s'} left before HR start asking questions.`:'That was your last one. HR have made a note.');
+}
+function newGame(){
+  for(const [,el] of els)el.remove();els.clear();
+  fresh();paint();renderStats();saveGame();board.focus({preventScroll:true});
+}
+
+let toastT;function toast(h,t){const el=$('toast');el.innerHTML=`<b>${h}</b>${t}`;el.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>el.hidden=true,5200)}
+
+/* ---------- disguise ---------- */
+function renderDecoy(){
+  const d=new Date();const add=n=>{const x=new Date(d);x.setDate(x.getDate()+n);while(x.getDay()===0||x.getDay()===6)x.setDate(x.getDate()+1);return x};
+  const f=x=>x.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'});
+  const a=add(16),b=add(38),b2=new Date(b),c=add(61);b2.setDate(b.getDate()+3);
+  $('dUp').innerHTML=`<tr><th>Dates</th><th>Days</th><th>Type</th><th>Status</th></tr>
+   <tr><td>${f(a)}</td><td>1</td><td>Annual leave</td><td><span class="pill">Approved</span></td></tr>
+   <tr><td>${f(b)} – ${f(b2)}</td><td>4</td><td>Annual leave</td><td><span class="pill">Approved</span></td></tr>
+   <tr><td>${f(c)}</td><td>1</td><td>Annual leave</td><td><span class="pill p">Pending</span></td></tr>`;
+}
+function toggleBoss(){
+  boss=!boss;document.body.classList.toggle('boss',boss);$('toast').hidden=true;
+  $('h1').textContent=boss?'Annual leave':'Annual leave planner';
+  $('viewBtn').textContent=boss?'Planner':'Overview';
+  $('newBtn').textContent=boss?'Request leave':'New leave year';
+  if(boss)renderDecoy();
+}
+
+/* ---------- input ---------- */
+const KEYS={ArrowUp:0,ArrowRight:1,ArrowDown:2,ArrowLeft:3,w:0,d:1,s:2,a:3,W:0,D:1,S:2,A:3};
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){e.preventDefault();toggleBoss();return}
+  if(boss||e.ctrlKey||e.metaKey||e.altKey)return;
+  if(e.key in KEYS){e.preventDefault();move(KEYS[e.key]);return}
+  if(e.key==='u'||e.key==='U'||e.key==='z'||e.key==='Z'){undo();return}
+  if(e.key==='r'||e.key==='R'){newGame()}
+});
+let sx=null,sy=null;
+board.addEventListener('pointerdown',e=>{sx=e.clientX;sy=e.clientY});
+board.addEventListener('pointerup',e=>{
+  if(sx==null)return;const dx=e.clientX-sx,dy=e.clientY-sy;sx=null;
+  if(Math.max(Math.abs(dx),Math.abs(dy))<24)return;
+  move(Math.abs(dx)>Math.abs(dy)?(dx>0?1:3):(dy>0?2:0));
+});
+board.addEventListener('pointercancel',()=>sx=null);
+board.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(!b)return;b.dataset.a==='undo'?undo():newGame()});
+$('undoBtn').onclick=undo;
+$('viewBtn').onclick=toggleBoss;
+$('newBtn').onclick=()=>{if(boss){toast('Leave request','Your manager is on leave. Request queued.');return}newGame()};
+
+/* boot */
+buildBg();
+if(!loadGame())fresh();
+paint();renderStats();
+let first=false;try{first=!localStorage.getItem('al-seen');localStorage.setItem('al-seen','1')}catch(e){}
+if(first)toast('How it works','Slide requests with the arrow keys or swipe. Two the same merge into something longer. Book a sabbatical before the planner fills up. Esc hides it.');
+})();
+</script>
+
+</html>
