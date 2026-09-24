@@ -1,0 +1,553 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Threadline</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#ffffff; --bg2:#f6f8f8; --hover:#f1f4f4; --line:#e2e7e8; --text:#1c2427; --muted:#67747a;
+  --side:#173039; --side2:#1f3d47; --sideText:#bccdd1; --sideStrong:#ffffff; --sideActive:#2a6b61;
+  --accent:#1f7a6c; --accentSoft:#e3f1ee; --warn:#b4552d; --danger:#c2413a; --good:#2f8a4c;
+  --mention:#fdf3dc; --shadow:0 8px 28px rgba(15,35,40,.18);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#1a2023; --bg2:#1f2629; --hover:#232b2f; --line:#2c3539; --text:#e2e8ea; --muted:#93a1a7;
+    --side:#10191d; --side2:#172328; --sideText:#9fb2b7; --sideStrong:#ffffff; --sideActive:#23584f;
+    --accent:#4db3a1; --accentSoft:#1d3833; --warn:#e08a63; --danger:#ec6b62; --good:#5cbf7a;
+    --mention:#3a3322; --shadow:0 8px 28px rgba(0,0,0,.5);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#1a2023; --bg2:#1f2629; --hover:#232b2f; --line:#2c3539; --text:#e2e8ea; --muted:#93a1a7;
+  --side:#10191d; --side2:#172328; --sideText:#9fb2b7; --sideStrong:#ffffff; --sideActive:#23584f;
+  --accent:#4db3a1; --accentSoft:#1d3833; --warn:#e08a63; --danger:#ec6b62; --good:#5cbf7a;
+  --mention:#3a3322; --shadow:0 8px 28px rgba(0,0,0,.5);
+}
+html,body{height:100%}
+body{background:var(--bg);color:var(--text);font-family:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;font-size:15px;overflow:hidden}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.mono{font-family:"IBM Plex Mono",ui-monospace,Menlo,monospace}
+
+.app{display:grid;grid-template-columns:60px 240px minmax(0,1fr) 290px;height:100%}
+/* rail */
+.rail{background:var(--side);display:flex;flex-direction:column;align-items:center;gap:12px;padding:14px 0;border-right:1px solid rgba(255,255,255,.06)}
+.ws{width:38px;height:38px;border-radius:9px;background:#f0b64a;color:#2b1d05;font-weight:700;display:grid;place-items:center;border:0;font-size:15px}
+.ws2{background:transparent;border:1px dashed rgba(255,255,255,.25);color:var(--sideText);font-weight:500}
+/* sidebar */
+.side{background:var(--side2);color:var(--sideText);display:flex;flex-direction:column;min-height:0}
+.side-head{padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.07);display:flex;justify-content:space-between;align-items:center}
+.side-head b{color:var(--sideStrong);font-size:16px}
+.side-body{overflow:auto;padding:10px 8px;display:flex;flex-direction:column;gap:18px}
+.grp h4{margin:0 8px 6px;font-size:12px;font-weight:500;letter-spacing:.04em;text-transform:uppercase;opacity:.75}
+.ch{display:flex;align-items:center;gap:8px;width:100%;background:none;border:0;border-radius:6px;padding:5px 8px;text-align:left;color:var(--sideText)}
+.ch:hover:not(:disabled){background:rgba(255,255,255,.06)}
+.ch.active{background:var(--sideActive);color:#fff}
+.ch.unread{color:#fff;font-weight:600}
+.ch:disabled{opacity:.45;cursor:default}
+.ch .hash{opacity:.7;width:12px}
+.ch .badge{margin-left:auto;background:#d9534b;color:#fff;font-size:11px;font-weight:700;border-radius:9px;padding:1px 7px}
+.ch .lock{margin-left:auto;width:12px;height:12px}
+.dm{display:flex;align-items:center;gap:8px;padding:5px 8px;font-size:14px}
+.dot{width:8px;height:8px;border-radius:50%;background:#4fb676;flex:none}
+.dot.away{background:transparent;border:1.5px solid var(--sideText)}
+
+/* main */
+.main{display:flex;flex-direction:column;min-width:0;min-height:0;background:var(--bg)}
+.top{display:flex;align-items:center;gap:10px;padding:10px 18px;border-bottom:1px solid var(--line);min-height:58px}
+.menu{display:none;background:none;border:0;padding:6px;border-radius:6px}
+.top h2{margin:0;font-size:17px;font-weight:700}
+.topic{color:var(--muted);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tt{min-width:0;display:flex;flex-direction:column}
+.top .members{margin-left:auto;display:flex;align-items:center;gap:6px;color:var(--muted);font-size:13px;border:1px solid var(--line);border-radius:7px;padding:4px 9px;background:none;flex:none}
+.feed{flex:1;overflow-y:auto;padding:14px 0 8px}
+.day{display:flex;align-items:center;gap:10px;margin:10px 18px;color:var(--muted);font-size:12px;font-weight:600}
+.day::before,.day::after{content:"";flex:1;height:1px;background:var(--line)}
+.msg{display:grid;grid-template-columns:38px minmax(0,1fr);gap:10px;padding:6px 18px}
+.msg:hover{background:var(--hover)}
+.msg.mention{background:var(--mention)}
+.av{width:36px;height:36px;border-radius:8px;color:#fff;font-weight:600;font-size:13px;display:grid;place-items:center}
+.who{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.who b{font-weight:700}
+.who .tag{font-size:10px;font-weight:600;background:var(--line);color:var(--muted);border-radius:3px;padding:1px 4px;letter-spacing:.03em}
+.who time{color:var(--muted);font-size:12px}
+.txt{line-height:1.45;overflow-wrap:anywhere}
+.note{font-size:12px;margin-top:2px;color:var(--muted)}
+.note.hit{color:var(--accent)} .note.hurt{color:var(--danger)} .note.heal{color:var(--good)}
+.reacts{display:flex;gap:6px;margin-top:4px}
+.react{border:1px solid var(--accent);background:var(--accentSoft);border-radius:12px;padding:1px 8px;font-size:12px}
+.sys{padding:4px 18px 4px 66px;color:var(--muted);font-size:13px;line-height:1.45}
+.sys b{color:var(--text)}
+.sys .go{border:1px solid var(--line);background:var(--bg);border-radius:6px;padding:3px 10px;margin-left:6px;color:var(--accent);font-weight:600;font-size:13px}
+.sys .go:hover{border-color:var(--accent)}
+.ticket{margin-top:6px;border:1px solid var(--line);border-left:3px solid var(--warn);border-radius:6px;padding:9px 12px;max-width:420px;background:var(--bg)}
+.ticket.done{border-left-color:var(--good)}
+.t-top{display:flex;justify-content:space-between;gap:8px;font-size:11px;color:var(--muted)}
+.pri{font-weight:600;color:var(--warn)}
+.ticket.done .pri{color:var(--good)}
+.t-title{font-weight:600;margin:3px 0 7px}
+.bar{height:6px;border-radius:3px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--warn);transition:width .35s ease}
+.ticket.done .bar i{background:var(--good)}
+.t-meta{font-size:11px;color:var(--muted);margin-top:5px;font-variant-numeric:tabular-nums}
+
+.typing{height:20px;padding:0 18px;font-size:12px;color:var(--muted)}
+.compose{padding:0 18px 14px}
+.status{display:none;gap:14px;font-size:12px;color:var(--muted);padding:0 2px 6px;flex-wrap:wrap;font-variant-numeric:tabular-nums}
+.status b{color:var(--text);font-weight:600}
+.box{border:1px solid var(--line);border-radius:9px;background:var(--bg)}
+.box:focus-within{border-color:var(--muted)}
+.tools{display:flex;gap:4px;padding:6px;border-bottom:1px solid var(--line);flex-wrap:wrap;background:var(--bg2);border-radius:9px 9px 0 0}
+.tool{background:none;border:1px solid transparent;border-radius:5px;padding:3px 9px;font-size:13px;color:var(--muted)}
+.tool:hover:not(:disabled){background:var(--hover);border-color:var(--line);color:var(--text)}
+.tool:disabled{opacity:.4;cursor:default}
+.tool kbd{font-family:"IBM Plex Mono",monospace;font-size:10px;opacity:.7;margin-left:4px}
+.row{display:flex;align-items:center;gap:8px;padding:6px 8px 6px 12px}
+.row input{flex:1;border:0;background:none;color:var(--text);font:inherit;padding:6px 0;min-width:0}
+.row input:focus{outline:none}
+.send{background:var(--accent);color:#fff;border:0;border-radius:6px;padding:6px 12px;font-weight:600;font-size:13px}
+
+/* right panel */
+.panel{border-left:1px solid var(--line);background:var(--bg);overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:20px}
+.panel h3{margin:0 0 10px;font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:600}
+.prof{display:flex;gap:12px;align-items:center}
+.prof .av{width:52px;height:52px;border-radius:11px;font-size:18px}
+.prof b{display:block;font-size:17px}
+.prof span{color:var(--muted);font-size:13px}
+.stat{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
+.stat .lab{display:flex;justify-content:space-between;font-size:13px}
+.stat .lab span:last-child{color:var(--muted);font-variant-numeric:tabular-nums}
+.meter{height:7px;border-radius:4px;background:var(--line);overflow:hidden}
+.meter i{display:block;height:100%;background:var(--accent);transition:width .35s}
+.meter.cap i{background:var(--good)} .meter.cap.low i{background:var(--danger)}
+.pips{display:flex;gap:4px}
+.pips i{width:100%;height:7px;border-radius:2px;background:var(--line)}
+.pips i.on{background:var(--accent)}
+.files{display:flex;flex-direction:column;gap:6px}
+.file{display:grid;grid-template-columns:30px 1fr;gap:10px;align-items:center;border:1px solid var(--line);border-radius:7px;padding:7px 9px}
+.file .ic{width:30px;height:30px;border-radius:6px;background:var(--accentSoft);color:var(--accent);display:grid;place-items:center;font-size:10px;font-weight:700;font-family:"IBM Plex Mono",monospace}
+.file b{font-size:13px;display:block}
+.file span{font-size:12px;color:var(--muted)}
+.empty{font-size:13px;color:var(--muted)}
+.about p{margin:0 0 8px;font-size:14px;line-height:1.5}
+.about dl{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:13px;margin:0}
+.about dt{color:var(--muted)}
+.about dd{margin:0}
+
+.decoy-only{display:none!important}
+body.boss .decoy-only{display:revert!important}
+body.boss .panel .decoy-only{display:block!important}
+body.boss .game-only{display:none!important}
+body.boss #decoy{display:block!important}
+
+@media (max-width:1150px){ .app{grid-template-columns:60px 230px minmax(0,1fr)} .panel{display:none} .status{display:flex} }
+@media (max-width:760px){
+  .app{grid-template-columns:minmax(0,1fr)}
+  .rail{display:none}
+  .side{position:fixed;inset:0 auto 0 0;width:min(280px,82vw);z-index:20;transform:translateX(-105%);transition:transform .2s;box-shadow:var(--shadow);padding-top:env(safe-area-inset-top,0px)}
+  .side.open{transform:none}
+  .menu{display:block}
+  .top{padding:8px 12px}
+  .msg{padding:6px 12px}.sys{padding-left:60px;padding-right:12px}.day{margin-inline:12px}
+  .compose{padding:0 12px 12px}.typing{padding:0 12px}
+  .top .members span{display:none}
+  .tool kbd{display:none}
+}
+.scrim{display:none}
+@media (max-width:760px){.scrim.open{display:block;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:15}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="app">
+  <nav class="rail" aria-label="Workspaces">
+    <button class="ws" id="wsBtn" title="Studio Ops">SO</button>
+    <button class="ws ws2" tabindex="-1" aria-hidden="true">+</button>
+  </nav>
+
+  <aside class="side" id="side">
+    <div class="side-head"><b>Studio Ops</b><span style="font-size:12px">⌄</span></div>
+    <div class="side-body">
+      <div class="grp"><h4>Channels</h4><div id="chList"></div></div>
+      <div class="grp"><h4>Direct messages</h4>
+        <div class="dm"><span class="dot"></span>Priya Shah</div>
+        <div class="dm"><span class="dot"></span>Tom Whitfield</div>
+        <div class="dm"><span class="dot away"></span>Mark Delaney</div>
+        <div class="dm"><span class="dot away"></span>Janet Cole</div>
+      </div>
+    </div>
+  </aside>
+  <div class="scrim" id="scrim"></div>
+
+  <main class="main">
+    <header class="top">
+      <button class="menu" id="menuBtn" aria-label="Channels">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 5h14M3 10h14M3 15h14"/></svg>
+      </button>
+      <div class="tt">
+        <h2 id="chName"># general</h2>
+        <div class="topic" id="chTopic"></div>
+      </div>
+      <button class="members" id="hideBtn" title="Hide (Esc)">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6" cy="5" r="2.5"/><path d="M1.5 14c0-2.5 2-4 4.5-4s4.5 1.5 4.5 4"/><circle cx="11.5" cy="5.5" r="2"/><path d="M11 10c2 0 3.5 1.3 3.5 3.5"/></svg>
+        <span id="memCount">14</span>
+      </button>
+    </header>
+
+    <div class="feed game-only" id="feed" aria-live="polite"></div>
+    <div class="feed" id="decoy" style="display:none"></div>
+    <div class="typing" id="typing"></div>
+
+    <div class="compose">
+      <div class="status game-only" id="statusLine"></div>
+      <div class="box">
+        <div class="tools game-only" id="tools">
+          <button class="tool" data-act="reply">Reply<kbd>1</kbd></button>
+          <button class="tool" data-act="ack">👍 Acknowledge<kbd>2</kbd></button>
+          <button class="tool" data-act="coffee" id="coffeeBtn">☕ Coffee break<kbd>3</kbd></button>
+          <button class="tool" data-act="escalate" id="escBtn">Escalate<kbd>4</kbd></button>
+        </div>
+        <form class="row" id="form" autocomplete="off">
+          <input id="input" placeholder="Message #general" aria-label="Message">
+          <button class="send" type="submit">Send</button>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <aside class="panel">
+    <div class="game-only">
+      <h3>Profile</h3>
+      <div class="prof"><div class="av" style="background:#1f7a6c">F</div><div><b>Fin</b><span id="pTitle">Intern</span></div></div>
+    </div>
+    <div class="game-only">
+      <h3>Workload</h3>
+      <div class="stat"><div class="lab"><span>Capacity</span><span id="pCap"></span></div><div class="meter cap" id="capMeter"><i></i></div></div>
+      <div class="stat"><div class="lab"><span>Focus time</span><span id="pFocus"></span></div><div class="pips" id="pips"></div></div>
+      <div class="stat"><div class="lab"><span>Towards next review</span><span id="pXp"></span></div><div class="meter" id="xpMeter"><i></i></div></div>
+      <div class="stat"><div class="lab"><span>Coffee breaks left</span><span id="pCof"></span></div></div>
+    </div>
+    <div class="game-only">
+      <h3>Pinned</h3>
+      <div class="files" id="files"></div>
+    </div>
+    <div class="game-only about">
+      <h3>Shortcuts</h3>
+      <p class="empty">Type anything to reply. <span class="mono">/help</span> for commands. <b>Esc</b> or the SO button hides it all.</p>
+    </div>
+
+    <div class="decoy-only about">
+      <h3>About this channel</h3>
+      <p>Company-wide announcements and work-based matters.</p>
+      <dl><dt>Created</dt><dd>12 March 2021</dd><dt>Members</dt><dd>14</dd><dt>Managed by</dt><dd>Priya Shah</dd></dl>
+    </div>
+    <div class="decoy-only">
+      <h3>Pinned</h3>
+      <div class="files">
+        <div class="file"><div class="ic">PDF</div><div><b>Brand guidelines v3.2</b><span>Priya Shah · 4.1 MB</span></div></div>
+        <div class="file"><div class="ic">XLS</div><div><b>Q3 resourcing</b><span>Tom Whitfield · Sheet</span></div></div>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<script>
+(function(){
+const COLS=['#1f7a6c','#b4552d','#5a5fb0','#a0376a','#3a7ab8','#8a6d1f','#4f7d3a','#6b4f9e','#7a4a3a'];
+const TITLES=['Intern','Junior Designer','Designer','Middleweight Designer','Senior Designer','Lead Designer','Art Director','Creative Director','Executive Creative Director','Legend of the Studio'];
+const LOCK='<svg class="lock" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="2" y="5.5" width="8" height="5.5" rx="1"/><path d="M4 5.5V4a2 2 0 0 1 4 0v1.5"/></svg>';
+const ITEMS=[
+  {id:'phones',n:'Noise-cancelling headphones',t:'AUD',d:'Take 1 less damage from every hit',fx:s=>s.def+=1},
+  {id:'plant',n:'Desk plant (unkillable)',t:'ENV',d:'+6 max capacity',fx:s=>{s.max+=6;s.hp+=6}},
+  {id:'monitor',n:'Second monitor',t:'HW',d:'+1 reply power',fx:s=>s.atk+=1},
+  {id:'ball',n:'Stress ball',t:'ETC',d:'+1 reply power',fx:s=>s.atk+=1},
+  {id:'chair',n:'Ergonomic chair',t:'HW',d:'+8 max capacity',fx:s=>{s.max+=8;s.hp+=8}},
+  {id:'flask',n:'Big flask of tea',t:'BRW',d:'Coffee breaks heal 6 more',fx:s=>s.brew+=6},
+  {id:'shortcuts',n:'Keyboard shortcuts cheat sheet',t:'PDF',d:'+1 focus time per action (sometimes)',fx:s=>s.quick=1},
+];
+const P=(name,ini,col,bot)=>({name,ini,col,bot});
+const CH=[
+ {name:'general',topic:'Company-wide announcements and work-based matters',enc:[
+  {who:P('Autoreply','AR',4,1),title:'Out-of-office autoreply loop',pri:'Low',hp:10,atk:[2,4],open:"Thanks for your message. I'm currently out of the office with no access to email. For urgent matters please contact me on my return.",hits:["I'm currently out of the office.","I'm STILL currently out of the office.","Your message has been forwarded to my out-of-office, which is also out of office."]},
+  {who:P('Janet Cole','JC',3),title:'@channel: cake in the kitchen',pri:'Low',hp:14,atk:[3,5],open:"@channel there's cake in the kitchen!!! 🎂 first come first served",hits:["@channel it's lemon drizzle btw","@channel cake is gone now, sorry to those who missed it","@channel does anyone know whose tupperware this is"]},
+  {who:P('Tom Whitfield','TW',2),title:'RE: RE: RE: FW: Fire drill Thursday (47 replies)',pri:'Medium',hp:18,atk:[3,6],open:"Replying all — thanks for the heads up on the fire drill!",hits:["+1","Please take me off this list","Can everyone STOP replying all","Replying all to ask people to stop replying all","Thanks!"]},
+ ]},
+ {name:'design-feedback',topic:'Share work in progress. Be kind, be specific.',enc:[
+  {who:P('Client (via Mark)','CL',5),title:'"Can we make the logo bigger?"',pri:'High',hp:22,atk:[4,7],open:"Love it!! Few tiny tweaks — can we make the logo bigger? Like, a lot bigger.",hits:["Bigger.","Can it be bigger but also smaller?","My nephew does design, he reckons it needs more blue","Can we see all 40 options side by side?"]},
+  {who:P('Mark Delaney','MD',6),title:'"Make it pop"',pri:'High',hp:24,atk:[4,8],open:"Client feedback: can we make it 'pop' more? They didn't say how. EOD ideally 🙏",hits:["Can it feel more... fun?","They want it premium but also cheap-looking","Could we try it in Comic Sans, just to see?","They've gone back to version 2"]},
+  {who:P('Shared file','PSD',0,1),title:'final_FINAL_v7_USE-THIS.psd (2.4 GB)',pri:'Critical',hp:30,atk:[5,9],open:"final_FINAL_v7_USE-THIS.psd was shared with you. 214 layers. None of them are named.",hits:["Program not responding…","Scratch disks are full.","Could not complete your request because of a program error.","Layer 1 copy copy copy copy (4)","Fonts missing: 19"]},
+ ]},
+ {name:'it-helpdesk',topic:'Have you tried turning it off and on again?',enc:[
+  {who:P('IT Bot','IT',4,1),title:'Password expires today',pri:'High',hp:30,atk:[5,9],open:"Your password expires in 0 days. It must not match any of your last 24 passwords.",hits:["Password must contain a symbol, a number and a haiku.","That password was used in 2019.","Your account has been locked for your own safety.","Please verify it's you. Then verify again."]},
+  {who:P('Printer (Floor 2)','PR',7,1),title:'Printer offline (again)',pri:'Medium',hp:34,atk:[6,10],open:"PC LOAD LETTER",hits:["Paper jam in Tray 3. There is no Tray 3.","Now printing 400 copies of someone else's payslip.","Toner low. Toner was replaced yesterday.","Offline."]},
+  {who:P('Device Manager','DM',1,1),title:'Installing updates (4 of 212)',pri:'Critical',hp:38,atk:[6,10],open:"Your device will restart in 5 minutes. Save your work.",hits:["Restarting in 1 minute.","Working on updates 3%… Don't turn off your computer.","We've set your settings back to default :)","Almost there… (it is not almost there)"]},
+ ]},
+ {name:'meetings',topic:'Invites, rooms, and bookings',enc:[
+  {who:P('Priya Shah','PS',3),title:'"Got 5 mins for a quick sync?"',pri:'High',hp:40,atk:[7,11],open:"Got 5 mins for a quick sync? 📞",hits:["Sorry, running over — 5 more mins?","Can you share your screen?","You're on mute","Let's take this offline… in another meeting"]},
+  {who:P('Calendar','CA',5,1),title:'Alignment on alignment (1h 30m, recurring)',pri:'High',hp:44,atk:[7,11],open:"New invite: Alignment on alignment · weekly · no agenda attached",hits:["Updated invite: now 2 hours","Updated invite: now also on Fridays","Can someone take notes?","This meeting has been moved to lunchtime"]},
+  {who:P('Studio Events','SE',8),title:'All-hands, cameras on please',pri:'Critical',hp:48,atk:[7,12],open:"Reminder: all-hands in 2 mins. Cameras on please, let's see those smiles! 🙂",hits:["Let's go round the room and share a fun fact","Icebreaker time!","We'll open the floor to questions (there is no time for questions)","Fin, you've been quiet — any thoughts?"]},
+ ]},
+ {name:'leadership',topic:'Private · Directors only',boss:1,enc:[
+  {who:P('Director','DR',1),title:'Q4 DEADLINE — moved forward',pri:'Critical',hp:95,atk:[8,13],open:"Quick one: the deadline's moved forward to Friday. For context, it's Thursday.",hits:["Just circling back on this","Any ETA?","Can we also add three more deliverables? No change to the date","Per my last message.","Let's not lose sight of the bigger picture","Quick call?"]},
+ ]},
+];
+const REPLIES=["On it 👍","Will take a look now","Sorted — see attached","Per my last message…","Done. Anything else?","Pushed the changes","Great shout, actioning now","Noted, will pick this up","Happy to help!"];
+const DECOY=[
+ [P('Priya Shah','PS',3),'09:12',"Morning all — reminder the brand review has moved to 2pm today"],
+ [P('Tom Whitfield','TW',2),'09:26',"Has anyone got the latest version of the spring campaign deck?"],
+ [P('Fin','F',0),'09:31',"Uploading now, should be on the shared drive in 5"],
+ [P('Janet Cole','JC',3),'10:04',"Kitchen will be closed from 3 for the deep clean"],
+ [P('Mark Delaney','MD',6),'10:48',"Client signed off round 2 👍 great work team"],
+ [P('Priya Shah','PS',3),'10:52',"Amazing. Can we get the resized assets over by EOD tomorrow?"],
+ [P('Fin','F',0),'10:55',"Yep, working through the social cut-downs now"],
+];
+
+const $=id=>document.getElementById(id);
+const rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const now=()=>new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+const ME=P('Fin','F',0);
+let uid=1;
+
+function fresh(){return {lvl:1,xp:0,max:40,hp:40,atk:0,def:0,brew:0,quick:0,focus:0,coffee:3,ch:0,enc:0,items:[],won:0,seen:[0]}}
+let S=fresh();
+try{const s=JSON.parse(localStorage.getItem('tl-save')||'null'); if(s&&typeof s.lvl==='number') S=Object.assign(fresh(),s)}catch(e){}
+function save(){try{localStorage.setItem('tl-save',JSON.stringify(S))}catch(e){}}
+
+const feeds=CH.map(()=>[]);
+let view=S.ch, E=null, busy=false, blocking=false, boss=false, unread=CH.map(()=>0);
+
+/* ---------- rendering ---------- */
+function ticketHTML(e){
+  const pct=Math.max(0,e.hp)/e.max*100, done=e.hp<=0;
+  return `<div class="ticket${done?' done':''}" data-t="${e.id}">
+   <div class="t-top"><span class="mono">TKT-${e.num}</span><span class="pri">${done?'Resolved':'Priority: '+e.pri}</span></div>
+   <div class="t-title">${esc(e.title)}</div>
+   <div class="bar"><i style="width:${pct}%"></i></div>
+   <div class="t-meta">${done?'Closed by Fin':Math.max(0,e.hp)+' of '+e.max+' left · Assigned to you'}</div></div>`;
+}
+function msgEl(m){
+  const d=document.createElement('div');
+  if(m.k==='day'){d.className='day';d.textContent=m.text;return d}
+  if(m.k==='sys'){d.className='sys';d.innerHTML=m.html;
+    if(m.go!=null){const b=document.createElement('button');b.className='go';b.textContent='Open #'+CH[m.go].name;b.onclick=()=>select(m.go);d.appendChild(b)}
+    return d}
+  d.className='msg'+(m.mention?' mention':'');d.id='m'+m.id;
+  const w=m.who;
+  d.innerHTML=`<div class="av" style="background:${COLS[w.col]}">${esc(w.ini)}</div><div>
+   <div class="who"><b>${esc(w.name)}</b>${w.bot?'<span class="tag">APP</span>':''}<time>${m.t}</time></div>
+   <div class="txt">${esc(m.text)}</div>
+   ${m.enemy?ticketHTML(m.enemy):''}
+   ${m.note?`<div class="note mono ${m.nc||''}">${esc(m.note)}</div>`:''}
+   ${m.reacts?`<div class="reacts"><span class="react">👍 ${m.reacts}</span></div>`:''}</div>`;
+  return d;
+}
+function post(ch,m){
+  m.id=uid++; m.t=m.t||now(); feeds[ch].push(m);
+  if(ch===view){const f=$('feed');f.appendChild(msgEl(m));f.scrollTop=f.scrollHeight}
+  else if(m.k!=='day'){unread[ch]++;renderSide()}
+  return m;
+}
+const sys=(ch,html,go)=>post(ch,{k:'sys',html,go});
+function rerender(m){const el=$('m'+m.id); if(el) el.replaceWith(msgEl(m))}
+function updTicket(e){document.querySelectorAll(`[data-t="${e.id}"]`).forEach(el=>el.outerHTML=ticketHTML(e))}
+
+function renderFeed(){
+  const f=$('feed');f.innerHTML='';feeds[view].forEach(m=>f.appendChild(msgEl(m)));f.scrollTop=f.scrollHeight;
+}
+function renderSide(){
+  const L=$('chList');L.innerHTML='';
+  CH.forEach((c,i)=>{
+    const open=i<=S.ch||S.won;
+    const b=document.createElement('button');
+    b.className='ch'+(i===view&&!boss?' active':'')+(boss&&i===0?' active':'')+(unread[i]&&!boss?' unread':'');
+    b.disabled=!open&&!boss;
+    b.innerHTML=`<span class="hash">#</span><span>${c.name}</span>`+
+      (!open&&!boss?LOCK:(unread[i]&&!boss?`<span class="badge">${unread[i]}</span>`:''));
+    if(boss&&!open) b.style.opacity='1';
+    b.onclick=()=>{if(boss)return;select(i)};
+    L.appendChild(b);
+  });
+}
+function renderHead(){
+  const c=boss?CH[0]:CH[view];
+  $('chName').textContent='# '+c.name;
+  $('chTopic').textContent=c.topic;
+  $('input').placeholder='Message #'+c.name;
+  $('memCount').textContent=c.boss&&!boss?'4':'14';
+}
+function renderStats(){
+  const t=TITLES[Math.min(S.lvl-1,TITLES.length-1)], need=S.lvl*20;
+  $('pTitle').textContent=t;
+  $('pCap').textContent=S.hp+' / '+S.max;
+  const cm=$('capMeter');cm.firstElementChild.style.width=(S.hp/S.max*100)+'%';cm.classList.toggle('low',S.hp/S.max<.3);
+  $('pFocus').textContent=S.focus+' / 5';
+  $('pips').innerHTML=[0,1,2,3,4].map(i=>`<i class="${i<S.focus?'on':''}"></i>`).join('');
+  $('pXp').textContent=S.xp+' / '+need;
+  $('xpMeter').firstElementChild.style.width=Math.min(100,S.xp/need*100)+'%';
+  $('pCof').textContent=S.coffee;
+  $('files').innerHTML=S.items.length?S.items.map(id=>{const it=ITEMS.find(x=>x.id===id);return `<div class="file"><div class="ic">${it.t}</div><div><b>${it.n}</b><span>${it.d}</span></div></div>`}).join(''):'<div class="empty">Nothing pinned yet. Resolved tickets sometimes leave something behind.</div>';
+  $('statusLine').innerHTML=`<span>${esc(t)}</span><span>Capacity <b>${S.hp}/${S.max}</b></span><span>Focus <b>${S.focus}/5</b></span><span>Review <b>${S.xp}/${need}</b></span><span>☕ <b>${S.coffee}</b></span>`;
+  $('coffeeBtn').innerHTML=`☕ Coffee break (${S.coffee})<kbd>3</kbd>`;
+  $('coffeeBtn').disabled=S.coffee<=0;
+  $('escBtn').disabled=S.focus<3;
+}
+
+/* ---------- flow ---------- */
+function typing(who,ms){return new Promise(r=>{$('typing').textContent=who+' is typing…';setTimeout(()=>{$('typing').textContent='';r()},ms)})}
+async function spawn(){
+  if(E||S.won) return;
+  const d=CH[S.ch].enc[S.enc];
+  E=Object.assign({},d,{id:'e'+uid++,num:rnd(3100,9899),max:d.hp,hp:d.hp});
+  busy=true;
+  await typing(d.who.name,700);
+  E.msg=post(S.ch,{k:'msg',who:d.who,text:d.open,enemy:E,mention:1});
+  busy=false;
+}
+function select(i){
+  view=i;unread[i]=0;
+  $('side').classList.remove('open');$('scrim').classList.remove('open');
+  renderSide();renderHead();renderFeed();
+  if(i===S.ch&&!E&&!S.won) spawn();
+  $('input').focus({preventScroll:true});
+}
+
+async function act(kind,text){
+  if(boss||busy) return;
+  if(S.won){sys(view,'Everything is resolved. Type <b>/newgame</b> to start again as an intern.');return}
+  if(view!==S.ch){sys(view,'Nothing needs you here.',S.ch);return}
+  if(!E) return;
+  let dmg=0, m;
+  const base=[3+S.atk+S.lvl-1,7+S.atk+S.lvl-1];
+  if(kind==='reply'){
+    dmg=rnd(...base); const crit=Math.random()<.12; if(crit) dmg=Math.round(dmg*1.6);
+    m=post(S.ch,{k:'msg',who:ME,text:text||pick(REPLIES),note:(crit?'Thorough reply! ':'')+'Ticket progress +'+dmg,nc:'hit'});
+    S.focus=Math.min(5,S.focus+1+(S.quick&&Math.random()<.3?1:0));
+  }else if(kind==='ack'){
+    E.msg.reacts=(E.msg.reacts||0)+1; rerender(E.msg);
+    blocking=true; S.focus=Math.min(5,S.focus+2);
+    sys(S.ch,'You acknowledged the thread. Next hit is softened, +2 focus.');
+  }else if(kind==='coffee'){
+    if(S.coffee<=0){sys(S.ch,'No coffee breaks left in this channel. Clear it to get more.');return}
+    S.coffee--; const h=Math.min(S.max-S.hp,rnd(12,20)+S.lvl*2+S.brew); S.hp+=h;
+    post(S.ch,{k:'msg',who:ME,text:text||pick(['brb grabbing a coffee ☕','5 min break, back shortly','Kettle on, anyone want one?']),note:'Capacity +'+h,nc:'heal'});
+  }else if(kind==='escalate'){
+    if(S.focus<3){sys(S.ch,'Escalating needs 3 focus time. Reply or acknowledge to build it up.');return}
+    S.focus-=3; dmg=rnd(base[1]*2,base[1]*2+8);
+    m=post(S.ch,{k:'msg',who:ME,text:text||pick(['Looping in my line manager on this one 🙃','Flagging this as a blocker','Raising this with the account director']),note:'Escalated! Ticket progress +'+dmg,nc:'hit'});
+  }
+  if(dmg){E.hp-=dmg;updTicket(E)}
+  renderStats();save();
+  if(E.hp<=0) return win();
+  busy=true;
+  await typing(E.who.name,rnd(650,1200));
+  let hit=Math.max(1,rnd(...E.atk)-S.def);
+  if(blocking){hit=Math.ceil(hit/2);blocking=false}
+  S.hp=Math.max(0,S.hp-hit);
+  post(S.ch,{k:'msg',who:E.who,text:pick(E.hits),note:'Capacity −'+hit,nc:'hurt'});
+  renderStats();save();busy=false;
+  if(S.hp<=0) burnout();
+}
+
+function win(){
+  const e=E; E=null; busy=true;
+  sys(S.ch,`✓ <b>TKT-${e.num}</b> resolved. +${e.max} towards your next review.`);
+  S.xp+=e.max;
+  while(S.xp>=S.lvl*20){S.xp-=S.lvl*20;S.lvl++;S.max+=8;S.hp=S.max;S.atk+=0;
+    sys(S.ch,`🎉 Performance review went well. You're now <b>${TITLES[Math.min(S.lvl-1,TITLES.length-1)]}</b>. Capacity fully restored.`)}
+  const left=ITEMS.filter(i=>!S.items.includes(i.id));
+  if(left.length&&Math.random()<.45){const it=pick(left);S.items.push(it.id);it.fx(S);
+    sys(S.ch,`📎 Someone left <b>${it.n}</b> on your desk. ${it.d}.`)}
+  S.enc++;
+  if(S.enc>=CH[S.ch].enc.length){
+    if(S.ch===CH.length-1){
+      S.won=1;save();renderStats();renderSide();busy=false;
+      post(S.ch,{k:'msg',who:CH[S.ch].enc[0].who,text:"Great work this quarter, Fin. Honestly. Go home."});
+      sys(S.ch,'<b>Everyone has logged off. You won.</b> Type <b>/newgame</b> to start again as an intern.');
+      return;
+    }
+    S.ch++;S.enc=0;S.coffee=3;
+    if(!S.seen.includes(S.ch))S.seen.push(S.ch);
+    sys(S.ch-1,`Channel cleared. You've been added to <b>#${CH[S.ch].name}</b>.`,S.ch);
+    post(S.ch,{k:'day',text:'Today'});
+    sys(S.ch,`<b>Fin</b> joined #${CH[S.ch].name}.`);
+    save();renderStats();renderSide();busy=false;return;
+  }
+  save();renderStats();
+  setTimeout(()=>{busy=false;spawn()},900);
+}
+function burnout(){
+  E=null;busy=true;
+  sys(S.ch,`<b>You've been signed out: burnout.</b> Took a long weekend. Capacity restored, but #${CH[S.ch].name}'s tickets have all reopened.`);
+  S.hp=S.max;S.enc=0;S.coffee=3;S.focus=0;blocking=false;save();renderStats();
+  setTimeout(()=>{busy=false;if(view===S.ch)spawn()},1400);
+}
+
+/* ---------- boss mode ---------- */
+function renderDecoy(){
+  const d=$('decoy');d.innerHTML='';
+  d.appendChild(msgEl({k:'day',text:'Today'}));
+  DECOY.forEach(([who,t,text])=>d.appendChild(msgEl({k:'msg',who,t,text,id:'d'+uid++})));
+  d.scrollTop=d.scrollHeight;
+}
+function toggleBoss(){
+  boss=!boss;document.body.classList.toggle('boss',boss);
+  $('typing').textContent='';
+  if(boss) renderDecoy();
+  renderSide();renderHead();
+  if(!boss){const f=$('feed');f.scrollTop=f.scrollHeight}
+}
+
+/* ---------- input ---------- */
+$('form').addEventListener('submit',ev=>{
+  ev.preventDefault();
+  const v=$('input').value.trim();$('input').value='';
+  if(!v) return;
+  if(boss){DECOY.push([ME,now(),v]);renderDecoy();return}
+  if(v[0]==='/'){
+    const [cmd,...rest]=v.slice(1).split(' '),r=rest.join(' ');
+    if(cmd==='reply')return act('reply',r);
+    if(cmd==='ack')return act('ack');
+    if(cmd==='coffee')return act('coffee',r);
+    if(cmd==='escalate')return act('escalate',r);
+    if(cmd==='newgame'||(cmd==='reset'&&r==='confirm')){try{localStorage.removeItem('tl-save')}catch(e){};location.reload();return}
+    if(cmd==='reset'){sys(view,'Type <b>/reset confirm</b> to wipe your progress and start again as an intern.');return}
+    sys(view,'<b>Commands:</b> type anything to reply · <b>/ack</b> soften the next hit, +2 focus · <b>/coffee</b> restore capacity · <b>/escalate</b> big hit for 3 focus · <b>/reset</b> start over · <b>Esc</b> hide everything');
+    return;
+  }
+  act('reply',v);
+});
+$('tools').addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(b)act(b.dataset.act)});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){e.preventDefault();toggleBoss();return}
+  if(boss||document.activeElement===$('input')&&$('input').value) return;
+  const k={'1':'reply','2':'ack','3':'coffee','4':'escalate'}[e.key];
+  if(k&&!e.ctrlKey&&!e.metaKey&&!e.altKey){e.preventDefault();act(k)}
+});
+$('wsBtn').onclick=toggleBoss;
+$('hideBtn').onclick=toggleBoss;
+$('menuBtn').onclick=()=>{$('side').classList.add('open');$('scrim').classList.add('open')};
+$('scrim').onclick=()=>{$('side').classList.remove('open');$('scrim').classList.remove('open')};
+
+/* ---------- boot ---------- */
+CH.forEach((c,i)=>{
+  post(i,{k:'day',text:'Today'});
+  if(i<S.ch) sys(i,`You cleared #${c.name}. Nothing else needs you here.`);
+});
+if(S.lvl===1&&S.xp===0&&S.ch===0&&S.enc===0){
+  post(0,{k:'msg',who:P('Threadline','TL',0,1),text:"Welcome to #general. Every ticket that lands on you is a fight: type any reply to chip away at it, 👍 Acknowledge to soften the next hit, grab a coffee to recover, and Escalate once you've built up focus. Clear a channel to unlock the next. Keys 1–4 work too. Press Esc (or the SO button) and this all turns back into a boring work chat."});
+}else if(!S.won){
+  sys(S.ch,`Welcome back. You're <b>${TITLES[Math.min(S.lvl-1,TITLES.length-1)]}</b>.`);
+}else{
+  sys(S.ch,'Everything is resolved. Type <b>/newgame</b> to start again.');
+}
+renderStats();select(S.ch);
+})();
+</script>
+
+</html>

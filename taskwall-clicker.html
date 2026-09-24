@@ -1,0 +1,889 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Q3 Campaign Board</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --top:#2c3e44; --topText:#e6eef0; --boardBg:#5b7680; --barBg:rgba(0,0,0,.18); --barText:#ffffff;
+  --col:#eceff0; --card:#ffffff; --cardHover:#f7f9f9; --text:#1e2a2e; --muted:#5f6d72; --line:#d8dee0;
+  --accent:#1f6f8b; --accentSoft:#dcecf2; --good:#3d8a55; --goodSoft:#e1f1e6; --hot:#d2632c; --hotSoft:#fbe7dc; --gold:#b7860b; --goldSoft:#fbf1d3;
+  --shadow:0 1px 0 rgba(20,40,45,.18); --shadowUp:0 8px 24px rgba(10,25,30,.28);
+  --l1:#4f9a6a; --l2:#d9a63a; --l3:#c75a4a; --l4:#6c6fc2; --l5:#3a8fb3;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --top:#141c1f; --topText:#d6e1e4; --boardBg:#243238; --barBg:rgba(0,0,0,.25); --barText:#eef4f5;
+    --col:#182023; --card:#263034; --cardHover:#2c383c; --text:#e2e9eb; --muted:#9aaab0; --line:#34404a;
+    --accent:#5fb3d0; --accentSoft:#1f3a44; --good:#6cc48a; --goodSoft:#1f3a2a; --hot:#f08a55; --hotSoft:#43291c; --gold:#e8b949; --goldSoft:#3a3015;
+    --shadow:0 1px 0 rgba(0,0,0,.4); --shadowUp:0 8px 24px rgba(0,0,0,.55);
+  }
+}
+:root[data-theme="dark"]{
+  --top:#141c1f; --topText:#d6e1e4; --boardBg:#243238; --barBg:rgba(0,0,0,.25); --barText:#eef4f5;
+  --col:#182023; --card:#263034; --cardHover:#2c383c; --text:#e2e9eb; --muted:#9aaab0; --line:#34404a;
+  --accent:#5fb3d0; --accentSoft:#1f3a44; --good:#6cc48a; --goodSoft:#1f3a2a; --hot:#f08a55; --hotSoft:#43291c; --gold:#e8b949; --goldSoft:#3a3015;
+  --shadow:0 1px 0 rgba(0,0,0,.4); --shadowUp:0 8px 24px rgba(0,0,0,.55);
+}
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{background:var(--boardBg);color:var(--text);font-family:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif;font-size:14px;overflow:hidden;font-variant-numeric:tabular-nums}
+button,input,textarea,select{font:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.app{display:flex;flex-direction:column;height:100%}
+
+/* top nav */
+.nav{background:var(--top);color:var(--topText);display:flex;align-items:center;gap:14px;padding:8px 16px;min-height:46px;flex:none}
+.logo{display:flex;align-items:center;gap:8px;font-weight:700;letter-spacing:-.01em}
+.logo i{width:20px;height:20px;border-radius:4px;background:var(--topText);display:grid;grid-template-columns:1fr 1fr;gap:2px;padding:3px}
+.logo i b{background:var(--top);border-radius:1px}
+.logo i b:first-child{height:12px}.logo i b:last-child{height:7px}
+.nav .menuitem{font-size:13px;opacity:.85}
+.nav .me{margin-left:auto;width:28px;height:28px;border-radius:50%;background:#c77d3a;color:#fff;font-weight:700;display:grid;place-items:center;font-size:12px}
+
+/* board bar */
+.bar{background:var(--barBg);color:var(--barText);display:flex;align-items:center;gap:8px 10px;padding:8px 16px;flex-wrap:wrap;flex:none}
+.bar h1{margin:0;font-size:18px;font-weight:700;padding:4px 6px;white-space:nowrap}
+.chip{background:rgba(255,255,255,.16);border-radius:4px;padding:5px 10px;font-size:13px;font-weight:500;color:var(--barText);display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+button.chip:hover{background:rgba(255,255,255,.26)}
+.chip.on{background:rgba(255,255,255,.92);color:#1e2a2e;font-weight:600}
+.chip b{font-weight:700}
+.chip.buff{background:var(--hot);color:#fff}
+.chip.buff.good{background:#3d8a55}
+.chip.buff.gold{background:#b7860b}
+.chip.buff.bad{background:#6b6f74}
+.stats,.views,.buffs,.shs{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.views{overflow-x:auto;scrollbar-width:none;flex-wrap:nowrap}
+.views .dot{width:7px;height:7px;border-radius:50%;background:#ffcf5a;display:inline-block}
+.members{margin-left:auto;display:flex;align-items:center;gap:8px}
+.faces{display:flex}
+.faces span{width:28px;height:28px;border-radius:50%;border:2px solid var(--boardBg);margin-left:-6px;display:grid;place-items:center;font-size:11px;font-weight:700;color:#fff}
+.shs .lbl{font-size:12px;opacity:.85}
+.sh{position:relative;height:28px;min-width:28px;border-radius:14px;display:inline-flex;align-items:center;gap:5px;padding:0 9px 0 3px;color:#fff;font-size:11px;font-weight:700;box-shadow:0 0 0 2px rgba(255,255,255,.35);animation:bob 2.6s ease-in-out infinite}
+.sh i{width:22px;height:22px;border-radius:50%;background:rgba(0,0,0,.25);display:grid;place-items:center;font-style:normal;font-size:10px}
+.sh:hover{box-shadow:0 0 0 2px #fff}
+@keyframes bob{50%{transform:translateY(-2px)}}
+
+/* board */
+.board{flex:1;display:flex;gap:12px;align-items:flex-start;overflow-x:auto;overflow-y:hidden;padding:12px 16px 12px;min-height:0}
+.list{flex:0 0 272px;max-height:100%;background:var(--col);border-radius:10px;display:flex;flex-direction:column;box-shadow:var(--shadow)}
+.list.wide{flex-basis:320px}
+.list-h{display:flex;justify-content:space-between;align-items:center;padding:10px 12px 6px;font-weight:600;gap:8px}
+.list-h span{color:var(--muted);font-weight:500;font-size:13px}
+.cards{overflow-y:auto;padding:4px 8px 10px;display:flex;flex-direction:column;gap:8px;min-height:10px}
+.card{background:var(--card);border-radius:8px;box-shadow:var(--shadow);padding:8px 10px;text-align:left;width:100%;display:block;border:1px solid transparent}
+.card .labels{display:flex;gap:4px;margin-bottom:6px;flex-wrap:wrap}
+.lbt{font-size:11px;font-weight:600;color:#fff;border-radius:4px;padding:2px 6px}
+.card .ttl{line-height:1.35}
+.card .meta{display:flex;align-items:center;gap:10px;margin-top:8px;font-size:12px;color:var(--muted)}
+.card .meta .av{margin-left:auto;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:10px;font-weight:700}
+.card .desc{font-size:12px;color:var(--muted);margin-top:3px;line-height:1.4}
+.mute{color:var(--muted);font-size:12px;padding:2px 4px;line-height:1.4}
+.p{font-size:13px;line-height:1.45;color:var(--text);margin:0}
+.p+.p{margin-top:6px}
+
+/* active card */
+.active{cursor:pointer;border:1px solid var(--accent);transition:transform .06s}
+.active:hover{background:var(--cardHover)}
+.active:active{transform:scale(.985)}
+.active .ttl{font-size:15px;font-weight:600}
+.active.epic{border:2px solid var(--gold);background:linear-gradient(var(--goldSoft),var(--card) 60%)}
+.check{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:12px;color:var(--muted)}
+.check .track{flex:1;height:8px;border-radius:4px;background:var(--line);overflow:hidden}
+.check .track i{display:block;height:100%;background:var(--accent);transition:width .12s}
+.epic .check .track i{background:var(--gold)}
+.hint{font-size:12px;color:var(--accent);margin-top:8px;font-weight:500}
+.done-card .ttl{color:var(--muted)}
+.tick{display:inline-grid;place-items:center;width:16px;height:16px;border-radius:50%;background:var(--good);color:#fff;font-size:10px;margin-right:6px;vertical-align:-3px}
+.pop{animation:pop .35s ease}
+@keyframes pop{from{transform:translateY(-6px);opacity:.3}to{transform:none;opacity:1}}
+
+/* sprint */
+.sprint{border:1px dashed var(--hot);background:var(--hotSoft)}
+.sprint.active-s{border-style:solid}
+.sprint .row{display:flex;gap:6px;margin-top:8px}
+.sprint .row .buy{margin-top:0}
+.gauge{height:8px;border-radius:4px;background:var(--line);overflow:hidden;margin-top:8px}
+.gauge i{display:block;height:100%;background:var(--hot);transition:width .2s}
+.gauge.coffee{height:14px;border-radius:7px}
+.gauge.coffee i{background:linear-gradient(90deg,#6f4a2e,#b07a4f)}
+
+/* team + shop */
+.seg{display:flex;background:var(--line);border-radius:6px;padding:2px;gap:2px}
+.seg button{padding:3px 8px;border-radius:4px;font-size:12px;font-weight:600;color:var(--muted)}
+.seg button.on{background:var(--card);color:var(--text);box-shadow:var(--shadow)}
+.buyrow{display:flex;justify-content:space-between;gap:6px;padding:0 8px 4px}
+.hire{display:grid;grid-template-columns:34px 1fr auto;gap:10px;align-items:center}
+.hire .av{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;font-size:12px}
+.hire .nm{font-weight:600}
+.hire .sub{font-size:12px;color:var(--muted);line-height:1.35}
+.own{font-size:18px;font-weight:700;color:var(--muted);min-width:24px;text-align:right}
+.buy{margin-top:8px;width:100%;border-radius:5px;padding:6px 8px;font-size:13px;font-weight:600;background:var(--accentSoft);color:var(--accent);text-align:center}
+.buy:disabled{opacity:.45;cursor:default}
+.buy:not(:disabled):hover{background:var(--accent);color:#fff}
+.buy.sell{background:var(--hotSoft);color:var(--hot)}
+.buy.sell:not(:disabled):hover{background:var(--hot);color:#fff}
+.buy.gold{background:var(--goldSoft);color:var(--gold)}
+.buy.gold:not(:disabled):hover{background:var(--gold);color:#fff}
+.locked{opacity:.55}
+.up .ttl{font-weight:600}
+.owned-up{opacity:.75}
+
+/* trophies & perks */
+.tro{display:grid;grid-template-columns:30px 1fr;gap:9px;align-items:start}
+.tro .ic{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;font-size:15px;background:var(--goldSoft);color:var(--gold)}
+.tro.no .ic{background:var(--line);color:var(--muted)}
+.tro.no .ttl{color:var(--muted)}
+.tro .ttl{font-weight:600;font-size:13px}
+.big{font-size:26px;font-weight:700;line-height:1.1}
+.srow{display:flex;justify-content:space-between;gap:10px;padding:5px 0;border-bottom:1px solid var(--line);font-size:13px}
+.srow:last-child{border-bottom:0}
+.srow span{color:var(--muted)}
+.srow b{font-weight:600;text-align:right}
+.set{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:6px 0;font-size:13px}
+.save{width:100%;min-height:90px;border:1px solid var(--line);border-radius:6px;background:var(--cardHover);font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;padding:6px;resize:vertical;word-break:break-all}
+
+/* quick win + floats */
+.win{position:fixed;z-index:30;background:var(--goldSoft);color:var(--text);border:1px solid var(--gold);border-radius:8px;padding:8px 12px;box-shadow:var(--shadowUp);max-width:230px;text-align:left;animation:wiggle 1.6s ease-in-out infinite}
+.win b{color:var(--gold);display:block;font-size:12px;text-transform:uppercase;letter-spacing:.04em}
+@keyframes wiggle{0%,100%{transform:rotate(-1.5deg)}50%{transform:rotate(1.5deg) translateY(-2px)}}
+.float{position:fixed;pointer-events:none;font-weight:700;color:var(--accent);z-index:40;animation:up .7s ease-out forwards;text-shadow:0 1px 0 var(--card)}
+@keyframes up{to{transform:translateY(-40px);opacity:0}}
+.toast{position:fixed;left:16px;bottom:calc(44px + env(safe-area-inset-bottom,0px));background:var(--top);color:var(--topText);padding:10px 14px;border-radius:8px;box-shadow:var(--shadowUp);max-width:min(380px,calc(100vw - 32px));z-index:50;font-size:13px;line-height:1.4}
+.toast b{color:#ffcf5a}
+
+/* activity ticker */
+.ticker{flex:none;background:var(--barBg);color:var(--barText);font-size:12.5px;padding:7px 16px calc(7px + env(safe-area-inset-bottom,0px));white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:.92}
+.ticker b{font-weight:600;opacity:.8;margin-right:6px}
+.ticker span{transition:opacity .4s}
+
+.decoy{display:none}
+body.boss .decoy{display:flex}
+body.boss .game{display:none!important}
+
+@media (max-width:640px){
+  .nav .menuitem{display:none}
+  .bar h1{font-size:16px}
+  .members .faces{display:none}
+  .list,.list.wide{flex-basis:80vw}
+  #v-board .list:nth-child(2){order:-2}
+  #v-board .list:nth-child(4){order:-1}
+  .bar{padding:6px 10px}
+  .board{padding:10px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<div class="app">
+  <nav class="nav">
+    <div class="logo"><i><b></b><b></b></i>Taskwall</div>
+    <span class="menuitem">Workspaces ⌄</span>
+    <span class="menuitem">Recent ⌄</span>
+    <span class="menuitem">Starred ⌄</span>
+    <span class="me">F</span>
+  </nav>
+
+  <div class="bar">
+    <h1 id="boardName">Q3 Campaign Delivery</h1>
+    <div class="views game" id="views"></div>
+    <div class="stats game">
+      <span class="chip">Story points <b id="pts">0</b></span>
+      <span class="chip">Velocity <b id="cps">0</b>/s</span>
+    </div>
+    <div class="buffs game" id="buffs"></div>
+    <div class="members">
+      <div class="shs game" id="shs"></div>
+      <div class="faces"><span style="background:#a0376a">PS</span><span style="background:#5a5fb0">TW</span><span style="background:#4f7d3a">MD</span><span style="background:#c77d3a">F</span></div>
+      <button class="chip" id="filterBtn" title="Filter (Esc)">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 3h12M4.5 8h7M7 13h2"/></svg>Filter
+      </button>
+    </div>
+  </div>
+
+  <!-- main board -->
+  <div class="board game" id="v-board">
+    <section class="list"><div class="list-h">To do <span id="todoN">37</span></div><div class="cards" id="todo"></div></section>
+    <section class="list"><div class="list-h">Doing <span id="doingN">1</span></div><div class="cards"><div id="sprintBox"></div><div id="doing"></div></div></section>
+    <section class="list"><div class="list-h">Done <span id="doneN">0</span></div><div class="cards" id="done"></div></section>
+    <section class="list"><div class="list-h">Team <span id="teamN">0</span></div>
+      <div class="buyrow"><div class="seg" id="modeSeg"><button data-mode="hire">Hire</button><button data-mode="sell">Let go</button></div><div class="seg" id="amtSeg"><button data-amt="1">×1</button><button data-amt="10">×10</button><button data-amt="100">×100</button></div></div>
+      <div class="cards" id="team"></div></section>
+    <section class="list"><div class="list-h">Requests <span id="upN">0</span></div><div class="cards" id="ups"></div></section>
+  </div>
+  <div class="board game" id="v-kitchen" hidden></div>
+  <div class="board game" id="v-trophies" hidden></div>
+  <div class="board game" id="v-portfolio" hidden></div>
+  <div class="board game" id="v-stats" hidden></div>
+
+  <!-- the disguise -->
+  <div class="board decoy" id="decoy"></div>
+
+  <div class="ticker game" id="ticker"><b>Activity</b><span id="tickTxt"></span></div>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+(function(){
+const $=id=>document.getElementById(id);
+let FMT='short',ptrDown=false;
+document.addEventListener('pointerdown',()=>{ptrDown=true},true);
+['pointerup','pointercancel'].forEach(ev=>document.addEventListener(ev,()=>setTimeout(()=>{ptrDown=false},0),true));
+const L=['--l1','--l2','--l3','--l4','--l5'];
+const LN=['Social','Print','Urgent','Motion','Web'];
+const TASKS=["Resize banners for socials","Export assets @2x","Fix kerning on the headline","Colour-correct the hero shot","Mask out product (again)","15s cut-down edit","Update the brand deck","Rename 400 unnamed layers","Chase client for feedback","Swap placeholder copy","Render animation v3","Retouch product shots","Make the logo bigger","Package fonts for printer","Storyboard the teaser","Tidy the shared drive","Proof the leaflet","Bleed + crop marks","Alt text for the web banners","Subtitle the reel","Clip-path the model shot","New thumbnail for YouTube","Remove the tattoo from the stock photo","Try it in blue","Try it back in orange","Reply to 'quick tweak' email","Build the email header","Motion test for the logo sting","Batch export 60 SKUs","Match colour to Pantone swatch","Make it pop","Find a font that feels like Tuesday","Unflatten the flattened PSD","Rebuild the file someone called final_FINAL_v7","Explain what a vector is (again)","Get the CEO's headshot to look 'approachable'"];
+const EPICS=["Epic: Q3 rebrand rollout","Epic: Website relaunch","Epic: Christmas campaign","Epic: Annual report","Epic: Product launch toolkit","Epic: Rebuild the design system","Epic: 400-page brand bible","Epic: Every banner size known to humanity"];
+const BOARDS=['Q3 Campaign Delivery','Q4 Rebrand Rollout','Studio 2.0','Project Phoenix','New Year, New Brand','Brand Refresh (Final)','Brand Refresh (Final v2)','Brand Refresh (FINAL final)','World Domination Q1','The Everything Board'];
+
+/* ---------- hires ---------- */
+const HIRES=[
+ {id:'intern',n:'Intern',pl:'Interns',ini:'IN',c:'#6c6fc2',cost:15,rate:.1,d:'Mostly makes tea',t:['Intern onboarding pack','Actually pay the interns','A desk each','Named in the credits','Proper lunch breaks','Intern of the month','Graduate scheme']},
+ {id:'free',n:'Freelancer',pl:'Freelancers',ini:'FL',c:'#3a8fb3',cost:100,rate:1,d:'Invoices on time, at least',t:['Freelancer retainer','Freelancer Slack channel','Paying within 30 days','Their own login','Invited to the Christmas party','A day rate that isn’t insulting','Permalancers']},
+ {id:'jr',n:'Junior Designer',pl:'Junior Designers',ini:'JD',c:'#4f9a6a',cost:1100,rate:8,d:'Knows all the shortcuts',t:['Shared design system','Junior pay rise','Figma plugins','A mentor who replies','Real feedback, not “hmm”','Their own client','Promoted to “Designer”']},
+ {id:'mid',n:'Mid-weight Designer',pl:'Mid-weight Designers',ini:'MW',c:'#2f7f8f',cost:12000,rate:47,d:'Has finally stopped asking questions',t:['Component library','Fewer meetings','Noise-cancelling headphones','A second monitor that works','Actual autonomy','Ownership of the grid','The good chair']},
+ {id:'sr',n:'Senior Designer',pl:'Senior Designers',ini:'SD',c:'#b4552d',cost:130000,rate:260,d:'Has opinions about kerning',t:['Mentoring scheme','Final say on kerning','Portfolio reviews','Conference budget','Sabbatical rumours','A plant on their desk','Their own intern']},
+ {id:'ad',n:'Art Director',pl:'Art Directors',ini:'AD',c:'#a0376a',cost:1.4e6,rate:1400,d:'Points at things, they get done',t:['Brand bible','Moodboard wall','Bigger whiteboard','Laser pointer','Veto power','Swearing allowed in crits','Award entries']},
+ {id:'cd',n:'Creative Director',pl:'Creative Directors',ini:'CD',c:'#7a3fa0',cost:2e7,rate:7800,d:'Says “make it pop” with total conviction',t:['Black turtleneck','Big-picture thinking','Offsite in Lisbon','A manifesto','Vision board','TED talk','Unexplained sabbatical']},
+ {id:'agency',n:'Partner Agency',pl:'Partner Agencies',ini:'PA',c:'#8a6d1f',cost:3.3e8,rate:44000,d:'A whole floor of people',t:['Long-term retainer','Shared Slack Connect','Joint away day','Chemistry session','Master services agreement','Framework partner','Acquired them']},
+ {id:'farm',n:'Render Farm',pl:'Render Farms',ini:'RF',c:'#3f5b66',cost:5.1e9,rate:260000,d:'Humming in a cupboard somewhere',t:['Bigger GPUs','Water cooling','A second cupboard','A render queue that works','Denoiser','Cloud burst','Quantum shaders']},
+ {id:'studio',n:'Overnight Studio',pl:'Overnight Studios',ini:'OS',c:'#6b4f9e',cost:7.5e10,rate:1.6e6,d:'Work gets done while you sleep',t:['Timezone handovers','Night shift snacks','Dimmer switches','Handover doc template','Overnight pizza','Automatic video updates','Nobody sleeps']},
+ {id:'ai',n:'Autopilot Pipeline',pl:'Autopilot Pipelines',ini:'AP',c:'#2f6f5f',cost:1e12,rate:1e7,d:'Nobody knows how it works',t:['Don’t ask how it works','Prompt library','Guardrails (mostly)','A second pipeline to check the first','Self-healing builds','Sentient Jira','It asked for a pay rise']},
+ {id:'consult',n:'Brand Consultancy',pl:'Brand Consultancies',ini:'BC',c:'#9a3b3b',cost:1.4e13,rate:6.5e7,d:'Bills by the syllable',t:['Rebrand of the rebrand','A 200-slide deck','Framework with a 2×2','Workshop sticky notes','Brand onion','Brand pyramid','Brand tesseract']},
+ {id:'relay',n:'Time-zone Relay',pl:'Time-zone Relays',ini:'TZ',c:'#1f5f8f',cost:1.7e14,rate:4.3e8,d:'The sun never sets on your backlog',t:['Follow-the-sun rota','Shared calendar','Handover emojis','Always-on stand-up','Timezone converter','Crossing the date line','Tomorrow’s work, today']},
+ {id:'multi',n:'Multiverse Studio',pl:'Multiverse Studios',ini:'MV',c:'#444a8f',cost:2.1e15,rate:2.9e9,d:'Hires versions of you who said yes to everything',t:['Portal licence','Variant naming convention','Yourself as a reference','Parallel sign-off','Merge conflicts resolved','Infinite interns','Everything, everywhere, approved']},
+];
+const H={};HIRES.forEach(h=>H[h.id]=h);
+const TIER_REQ=[1,5,25,50,100,150,200],TIER_COST=[10,50,500,5e4,5e6,5e8,5e10];
+
+/* ---------- requests (upgrades) ---------- */
+const U=[];const up=o=>U.push(o);
+up({id:'keys',n:'Learn keyboard shortcuts',d:'Clicking is twice as good',cost:100,k:'Click',req:()=>true,fx:{click:2}});
+up({id:'mon',n:'Second monitor',d:'Clicking is twice as good',cost:500,k:'Click',req:s=>s.total>=200,fx:{click:2}});
+up({id:'mech',n:'Clacky mechanical keyboard',d:'Clicking is twice as good',cost:1e4,k:'Click',req:s=>s.total>=5000,fx:{click:2}});
+[['macro','Actions & macros',5e4,1e3],['macro2','Batch processing',5e6,1e5],['scripts','Automation scripts',5e8,1e7],['deck','Stream Deck',5e10,1e9],['voice','Voice commands',5e12,1e11],['neural','Neural link',5e14,1e13],['telepathy','Telepathic Jira',5e16,1e15]]
+ .forEach(([id,n,cost,hand])=>up({id,n,d:'Each click also earns 1% of your velocity',cost,k:'Click',req:s=>s.hand>=hand,fx:{pct:.01}}));
+[['buddy','Intern buddy scheme','Every Intern earns +0.1/s for each non-intern hire. So do your clicks.',1e5,25,0],['sitin','Interns sit in on everything','Intern buddy bonus ×5',1e7,50,5],['socials','Interns run the socials','Intern buddy bonus ×10',1e8,100,10],['company','The interns are the company now','Intern buddy bonus ×20',1e9,150,20]]
+ .forEach(([id,n,d,cost,own,f])=>up({id,n,d,cost,k:'Team',req:s=>s.own.intern>=own,fx:{fingers:f}}));
+HIRES.forEach(h=>h.t.forEach((n,t)=>up({id:`h_${h.id}_${t}`,n,d:`${h.pl} are twice as productive`,cost:h.cost*TIER_COST[t],k:'Team',hire:h.id,req:s=>s.own[h.id]>=TIER_REQ[t],fx:{h:h.id,m:2}})));
+[['jr','ad','Juniors shadow the Art Directors'],['free','agency','Freelancers subcontract the agency'],['mid','farm','Mid-weights learn Blender'],['intern','studio','Interns do the night shift'],['sr','consult','Seniors ghost-write the brand onion'],['ad','relay','Art Directors fly everywhere'],['farm','ai','The pipeline renders itself'],['cd','multi','The Creative Director meets themselves']]
+ .forEach(([a,b,n])=>up({id:`syn_${a}_${b}`,n,d:`${H[a].pl} +5% for each ${H[b].n}. ${H[b].pl} +0.1% for each ${H[a].n}.`,cost:Math.max(H[a].cost,H[b].cost)*30,k:'Synergy',req:s=>s.own[a]>=15&&s.own[b]>=15,fx:{syn:[a,b]}}));
+[['coffee','Proper coffee machine',1.1,2e4],['plants','Office plants',1.1,2e5],['desks','Standing desks',1.1,2e6],['week','Four-day week',1.15,2e7],['dog','Office dog',1.15,2e8],['beans','Bean bags',1.2,2e9],['roof','Rooftop terrace',1.2,2e10],['nap','Nap pods',1.25,2e11],['hols','Unlimited holiday',1.25,2e12],['chef','In-house chef',1.3,2e13],['sabb','Sabbatical scheme',1.3,2e14],['bonus','Christmas bonus',2,2e15],['equity','Everyone gets equity',2,2e17]]
+ .forEach(([id,n,m,cost])=>up({id,n,d:m>=2?'Whole team ×2':`Whole team +${Math.round((m-1)*100)}%`,cost,k:'Office',req:s=>s.total>=cost/2,fx:{all:m}}));
+[['drinks','Friday drinks',.1,5e5,10],['pizza','Pizza Friday',.125,5e7,20],['awayday','Team away day',.15,5e9,32],['pingpong','Ping-pong table',.175,5e11,45],['xmasparty','Christmas party',.2,5e13,60],['retreat','Company retreat in Portugal',.2,5e15,75]]
+ .forEach(([id,n,f,cost,ach])=>up({id,achReq:ach,n,d:()=>`Velocity +${Math.round(f*100)}% of your morale (${Math.round(morale()*100)}% right now, from trophies)`,cost,k:'Morale',req:s=>s.ach.length>=ach,fx:{kit:f}}));
+up({id:'lucky',n:'Lucky lanyard',d:'Quick wins turn up twice as often',cost:7.77e6,k:'Luck',req:s=>s.winsAll>=7,fx:{winFreq:2}});
+up({id:'seren',n:'Serendipity',d:'Quick wins turn up twice as often',cost:7.77e9,k:'Luck',req:s=>s.winsAll>=27,fx:{winFreq:2}});
+up({id:'fourleaf',n:'Four-leaf lanyard',d:'Quick win effects last twice as long',cost:7.77e12,k:'Luck',req:s=>s.winsAll>=77,fx:{winDur:2}});
+up({id:'dod',n:'Definition of done',d:'Epic cards pay out three times as much',cost:1e6,k:'Process',req:s=>s.epics>=1,fx:{epic:3}});
+up({id:'retro',n:'Proper retros',d:'Sprint rewards are doubled',cost:1e7,k:'Process',req:s=>s.sprintsWon>=1,fx:{sprint:2}});
+up({id:'mugs',n:'Bigger mugs',d:'The coffee machine holds 10 more cups',cost:5e6,k:'Kitchen',req:s=>s.spells>=5,fx:{cMax:10}});
+up({id:'barista',n:'Barista course',d:'Coffee brews 50% faster',cost:5e9,k:'Kitchen',req:s=>s.spells>=25,fx:{cRegen:1.5}});
+up({id:'map',n:'Stakeholder mapping',d:'Addressed feedback returns 5% more',cost:1e8,k:'People',req:s=>s.shPopped>=5,fx:{shRet:.05}});
+up({id:'sla',n:'Feedback SLAs',d:'Addressed feedback returns another 5% more',cost:1e11,k:'People',req:s=>s.shPopped>=25,fx:{shRet:.05}});
+const UP={};U.forEach(u=>UP[u.id]=u);
+const KIND_C={Click:'var(--l5)',Team:'var(--l1)',Synergy:'var(--l4)',Office:'var(--l2)',Morale:'#c2477f',Luck:'#b7860b',Process:'var(--l3)',Kitchen:'#8a5a36',People:'#5b6f80'};
+
+/* ---------- perks (bought with clout after rebranding) ---------- */
+const PERKS=[
+ {id:'headstart',n:'Head start',d:'Start every rebrand with 10 Interns and 5 Freelancers',cost:1},
+ {id:'savings',n:'Rainy-day fund',d:'Start every rebrand with 100K story points',cost:3},
+ {id:'coffeesub',n:'Coffee subscription',d:'Coffee machine holds 20 more cups and brews 20% faster',cost:3},
+ {id:'luckybreak',n:'Lucky break',d:'Quick wins turn up 25% more often',cost:5},
+ {id:'flexi',n:'Flexi-time',d:'Quick win and kitchen effects last 20% longer',cost:5},
+ {id:'remote',n:'Remote working',d:'Earn 90% while you’re away (up from 50%), for up to 24 hours',cost:7},
+ {id:'rolodex',n:'Agency rolodex',d:'Hires cost 5% less',cost:10},
+ {id:'negot',n:'Tough negotiator',d:'Requests cost 5% less',cost:10},
+ {id:'muscle',n:'Muscle memory',d:'Cards need 8 ticks instead of 10 (Epics need 40)',cost:15},
+ {id:'whisper',n:'Stakeholder whisperer',d:'One more stakeholder can watch, and feedback returns 15% more',cost:20},
+ {id:'keyboard',n:'Keyboard warrior',d:'Every click also earns 2% of your velocity',cost:25},
+ {id:'lanyard',n:'Golden lanyard',d:'Quick wins stay on screen twice as long',cost:30},
+ {id:'legend',n:'Industry legend',d:'Each award is worth +1.5% instead of +1%',cost:50},
+ {id:'cat',n:'Studio cat',d:'Whole team +25%. It sits on keyboards, but it’s worth it.',cost:100},
+ {id:'dynasty',n:'Studio dynasty',d:'Velocity and clicks +50%',cost:250},
+];
+const perk=id=>S.perks.includes(id);
+
+/* ---------- kitchen (coffee minigame) ---------- */
+const SPELLS=[
+ {id:'standup',n:'Stand-up meeting',d:'Get up to 30 minutes of velocity (15% of your bank at most). Sometimes it overruns.',base:5,pct:.2,fail:.15},
+ {id:'biscuits',n:'Office biscuits',d:'Instantly finish the card you’re working on.',base:3,pct:.05,fail:0},
+ {id:'espresso',n:'Espresso shot',d:'Clicks ×10 for 30 seconds.',base:6,pct:.15,fail:0},
+ {id:'breakfast',n:'Team breakfast',d:'Velocity ×1.5 for 2 minutes. Occasionally someone brings kale.',base:8,pct:.25,fail:.1},
+ {id:'flatwhite',n:'Flat white',d:'A quick win turns up right now.',base:10,pct:.4,fail:.15},
+ {id:'mystery',n:'Mystery brew',d:'Makes a random order at a discount. What could go wrong?',base:4,pct:.1,fail:.25},
+];
+const coffeeMax=()=>Math.floor(10+2*Math.sqrt(S.own.intern))+M.cMax+(perk('coffeesub')?20:0);
+const coffeeRegen=()=>.05*M.cRegen*(perk('coffeesub')?1.2:1);
+const spellCost=s=>Math.floor(s.base+s.pct*coffeeMax());
+const kitchenOpen=()=>S.own.intern>=10||S.kitchenSeen;
+
+/* ---------- stakeholders ---------- */
+const PEOPLE=[['Head of Marketing','HM','#b23a48'],['The Client','CL','#2d6a9f'],['Legal','LG','#5b5f66'],['Procurement','PR','#7a5c1e'],['Brand Police','BP','#8e44ad'],['The CEO’s nephew','CN','#c0612b'],['Regional VP','VP','#1f7a6c']];
+const shMax=()=>5+(perk('whisper')?1:0);
+
+/* ---------- trophies ---------- */
+const ACH=[];const ach=(id,n,d,cat,test,shadow)=>ACH.push({id,n,d,cat,test,shadow});
+[[1,'Warm-up'],[1e3,'Getting going'],[1e5,'Busy bee'],[1e7,'Productive'],[1e9,'Machine'],[1e11,'Unstoppable'],[1e13,'Legendary output'],[1e15,'Mythical'],[1e17,'Beyond Jira'],[1e19,'Heat death of the backlog']]
+ .forEach(([v,n],i)=>ach('pts'+i,n,`Earn ${fmt(v)} story points in one rebrand`,'Output',s=>s.total>=v));
+[[1,'Ticking over'],[10,'Momentum'],[100,'Flow state'],[1e3,'Well-oiled'],[1e4,'Hitting your stride'],[1e5,'All cylinders'],[1e6,'Ludicrous speed'],[1e7,'Warp factor'],[1e8,'Time dilation'],[1e9,'Relativistic'],[1e10,'Singularity'],[1e11,'Omnipresent']]
+ .forEach(([v,n],i)=>ach('vel'+i,n,`Reach a velocity of ${fmt(v)}/s`,'Output',()=>M.base>=v));
+[[100,'Clicky'],[1e3,'RSI incoming'],[1e4,'Wrist of steel'],[5e4,'Carpal champion']].forEach(([v,n],i)=>ach('clk'+i,n,`Tick off ${fmt(v)} subtasks by hand`,'Output',s=>s.clicksAll>=v));
+[[1e3,'Hands-on'],[1e6,'Handcrafted'],[1e9,'Artisan'],[1e12,'Bespoke']].forEach(([v,n],i)=>ach('hand'+i,n,`Earn ${fmt(v)} points by clicking`,'Output',s=>s.handAll>=v));
+[[10,'First sprint'],[100,'Card shark'],[500,'Throughput'],[2000,'Kanban master']].forEach(([v,n],i)=>ach('card'+i,n,`Finish ${fmt(v)} cards yourself`,'Output',s=>s.cardsAll>=v));
+[[1,'Epic win'],[10,'Epic saga']].forEach(([v,n],i)=>ach('epic'+i,n,`Close ${v} Epic card${v>1?'s':''}`,'Output',s=>s.epics>=v));
+HIRES.forEach(h=>[[1,`Hired: ${h.n}`],[50,`${h.n} squad`],[100,`${h.n} department`]].forEach(([v,n])=>ach(`own_${h.id}_${v}`,n,`Have ${v} ${v===1?h.n:h.pl}`,'Team',s=>s.own[h.id]>=v)));
+ach('fullhouse','Full house','Have at least one of every hire','Team',s=>HIRES.every(h=>s.own[h.id]>0));
+[[10,'Paperwork'],[25,'Sign-off machine'],[50,'Procurement pro'],[100,'Budget holder']].forEach(([v,n],i)=>ach('ups'+i,n,`Approve ${v} requests`,'Office life',s=>s.ups.length>=v));
+[[1,'Lucky break'],[7,'Charmed'],[27,'Golden touch'],[77,'Horseshoe in the printer']].forEach(([v,n],i)=>ach('win'+i,n,`Grab ${v} quick win${v>1?'s':''}`,'Office life',s=>s.winsAll>=v));
+[[1,'Feedback addressed'],[10,'Stakeholder management'],[50,'Politically savvy']].forEach(([v,n],i)=>ach('sh'+i,n,`Address feedback from ${v} stakeholder${v>1?'s':''}`,'Office life',s=>s.shPopped>=v));
+[[1,'Sprint finished'],[5,'Agile'],[25,'Scrum master']].forEach(([v,n],i)=>ach('spr'+i,n,`Win ${v} sprint${v>1?'s':''}`,'Office life',s=>s.sprintsWon>=v));
+[[1,'First brew'],[25,'Barista'],[100,'Caffeine dependency']].forEach(([v,n],i)=>ach('brew'+i,n,`Order ${v} thing${v>1?'s':''} from the kitchen`,'Office life',s=>s.spells>=v));
+[[1,'New look'],[5,'Serial rebrander'],[10,'Identity crisis']].forEach(([v,n],i)=>ach('rb'+i,n,`Rebrand the studio ${v} time${v>1?'s':''}`,'Office life',s=>s.resets>=v));
+ach('boss10','Nothing to see here','Hide the board 10 times','Office life',s=>s.escPresses>=10,1);
+ach('night','Night owl','Play between midnight and 5am','Office life',()=>new Date().getHours()<5,1);
+ach('friday','Friday feeling','Play after 4pm on a Friday','Office life',()=>{const d=new Date();return d.getDay()===5&&d.getHours()>=16},1);
+ach('idle','Out to lunch','Leave the board alone for 15 minutes while the team works','Office life',s=>M.base>0&&Date.now()-lastClick>9e5&&!document.hidden,1);
+ach('speed','Speed demon','Finish a card in under 1.5 seconds','Office life',()=>false,1);
+ach('away','While you were away','Come back to points your team earned without you','Office life',()=>false,1);
+ach('hoard','Hoarder','Have 1B story points in the bank with fewer than 50 hires','Office life',s=>s.pts>=1e9&&staff()<50,1);
+const ACHM={};ACH.forEach(a=>ACHM[a.id]=a);
+const morale=()=>S.ach.length*.04;
+
+/* ---------- activity ticker ---------- */
+const TICK=[
+ [()=>1,'Priya has renamed the board. Again.'],[()=>1,'Someone has replied-all to the whole studio asking who took their oat milk.'],
+ [()=>1,'Tom is “just jumping on a quick call”. It’s been 90 minutes.'],[()=>1,'The printer on floor 2 has achieved sentience and chosen violence.'],
+ [()=>1,'A client has asked for the logo to be “more logo”.'],[()=>1,'Reminder: the fridge will be cleared on Friday. It will not be cleared on Friday.'],
+ [()=>1,'Mo has started a thread called “quick question”. It has 214 replies.'],[()=>1,'IT have scheduled a restart for 14:00. It is always 14:00.'],
+ [s=>s.total<1e4,'You are one person with a to-do list. For now.'],[s=>s.total<1e4,'Your velocity is mostly vibes at this point.'],
+ [s=>s.own.intern>0,'An intern has made a round of tea. Nobody asked. Everyone wanted tea.'],[s=>s.own.intern>=25,'The interns have formed a union. Their only demand: biscuits.'],
+ [s=>s.own.free>0,'A freelancer has sent an invoice with “URGENT” in the subject line.'],[s=>s.own.jr>0,'A junior designer has discovered the pen tool. They are not okay.'],
+ [s=>s.own.mid>0,'A mid-weight designer has quietly fixed everyone’s file naming. Hero.'],[s=>s.own.sr>0,'A senior designer is kerning a word nobody will ever read.'],
+ [s=>s.own.ad>0,'An art director has pointed at something. It is now done.'],[s=>s.own.cd>0,'The creative director says the concept “needs to breathe”.'],
+ [s=>s.own.agency>0,'The partner agency has sent a 90-slide deck to say “yes”.'],[s=>s.own.farm>0,'The render farm sounds like a hairdryer in a wind tunnel.'],
+ [s=>s.own.studio>0,'Work has appeared overnight. Nobody asks questions.'],[s=>s.own.ai>0,'The autopilot pipeline has approved its own timesheet.'],
+ [s=>s.own.consult>0,'The brand consultancy has invoiced you for the word “synergy”.'],[s=>s.own.relay>0,'Somewhere, it is always Monday morning for someone on your team.'],
+ [s=>s.own.multi>0,'A version of you from another universe left a note: “Try it in blue.”'],
+ [s=>s.sh.length>0,'A stakeholder has left a comment: “Can we make it pop?”'],[s=>s.sh.length>=3,'Three stakeholders are having a meeting about your meeting.'],
+ [s=>s.winsAll>0,'Rumour has it quick wins are real. Keep your eyes peeled.'],[s=>s.total>=1e6,'Finance would like to know what a “story point” is, and why you have a million.'],
+ [s=>s.total>=1e9,'The board now has more story points than there are people on Earth.'],[s=>s.total>=1e12,'Scientists warn the backlog may now have its own gravity.'],
+ [s=>s.resets>0,'The new brand guidelines are just the old ones in a different font.'],[s=>s.awards>=10,'Your awards shelf is now load-bearing.'],
+ [s=>kitchenOpen(),'The kitchen coffee machine is making a noise. It’s fine. It’s fine.'],[s=>s.ach.length>=20,'Team morale is “cautiously positive”, says a survey nobody filled in.'],
+ [s=>s.epics>0,'An epic has been closed. Nobody remembers what it was for.'],[s=>s.sprintsWon>0,'The sprint retro has produced 40 sticky notes and one action: “fewer retros”.'],
+];
+const WINS=["Client: ‘love it, no changes’","Meeting cancelled — free hour!","Printer works first time","Found the missing font","Sign-off on round one","Wi-Fi is fast today","Someone brought doughnuts","The file actually saved","Legal approved it, no comments","Laptop update can wait till tomorrow"];
+
+/* ---------- state ---------- */
+function fresh(){
+  const own={};HIRES.forEach(h=>own[h.id]=0);
+  return {v:2,pts:0,total:0,allTime:0,cards:0,teamCards:0,cardsAll:0,clicks:0,clicksAll:0,hand:0,handAll:0,prog:0,cur:null,todo:[],done:[],own,ups:[],ach:[],
+    winsAll:0,awards:0,clout:0,perks:[],resets:0,coffee:10,spells:0,sh:[],shPopped:0,sprint:null,sprintsWon:0,epics:0,sinceEpic:0,buffs:[],kitchenSeen:false,
+    escPresses:0,runTime:0,playTime:0,firstPlayed:Date.now(),t:Date.now(),seed:0,klog:[],settings:{mode:'hire',amt:1,fmt:'short',ticker:true,floats:true}};
+}
+const V1_MAP={intern2:'h_intern_0',intern3:'h_intern_1',free2:'h_free_0',free3:'h_free_1',jr2:'h_jr_0',jr3:'h_jr_1',sr2:'h_sr_0',ad2:'h_ad_0',agency2:'h_agency_0',farm2:'h_farm_0',studio2:'h_studio_0',ai2:'h_ai_0'};
+function hydrate(s){
+  if(!s||typeof s!=='object'||!s.own)return null;
+  const n=fresh();
+  if(!s.v){ // saves from the first version of the game
+    Object.assign(n,{pts:+s.pts||0,total:+s.total||0,allTime:+s.total||0,cards:+s.cards||0,cardsAll:+s.cards||0,clicks:+s.clicks||0,clicksAll:+s.clicks||0,prog:+s.prog||0,cur:s.cur||null,todo:s.todo||[],done:s.done||[],seed:+s.seed||0,t:+s.t||Date.now()});
+    for(const k in s.own)if(k in n.own)n.own[k]=+s.own[k]||0;
+    n.ups=[...new Set((s.ups||[]).map(id=>V1_MAP[id]||id).filter(id=>UP[id]))];
+    return n;
+  }
+  const o=Object.assign(n,s);o.own=Object.assign(fresh().own,s.own);o.settings=Object.assign(fresh().settings,s.settings||{});
+  o.ups=(o.ups||[]).filter(id=>UP[id]);o.ach=(o.ach||[]).filter(id=>ACHM[id]);o.perks=(o.perks||[]).filter(id=>PERKS.some(p=>p.id===id));
+  o.sh=Array.isArray(o.sh)?o.sh:[];o.buffs=Array.isArray(o.buffs)?o.buffs:[];o.klog=Array.isArray(o.klog)?o.klog:[];
+  return o;
+}
+let S=fresh(),M={};
+try{const h=hydrate(JSON.parse(localStorage.getItem('tw-save')||'null'));if(h)S=h}catch(e){}
+function save(){S.t=Date.now();try{localStorage.setItem('tw-save',JSON.stringify(S))}catch(e){}}
+
+let boss=false,view='board',lastClick=Date.now(),cardStart=0,nextSprintAt=Date.now()+4*60e3;
+
+/* ---------- maths ---------- */
+function fmt(n){
+  if(!isFinite(n))return '∞';
+  const f=FMT;
+  if(n<1000) return n<10&&n%1?(Math.floor(n*10)/10).toFixed(1):Math.floor(n).toLocaleString('en-GB');
+  if(f==='full'&&n<1e21) return Math.floor(n).toLocaleString('en-GB');
+  if(f==='sci') return n.toExponential(2).replace('e+','e');
+  const u=['K','M','B','T','Qa','Qi','Sx','Sp','Oc','No','Dc'];let i=-1;while(n>=1000&&i<u.length-1){n/=1000;i++}
+  if(n>=1000) return (n*Math.pow(1000,i+1)).toExponential(2).replace('e+','e');
+  return (n<10?n.toFixed(2):n<100?n.toFixed(1):Math.floor(n))+u[i];
+}
+const fmtT=s=>{s=Math.floor(s);const h=Math.floor(s/3600),m=Math.floor(s%3600/60),x=s%60;return h?`${h}h ${m}m`:m?`${m}m ${x}s`:`${x}s`};
+const staff=()=>HIRES.reduce((a,h)=>a+S.own[h.id],0);
+function recalc(){
+  const m={click:1,pct:0,hm:{},all:1,kit:[],fingers:0,fmul:1,syn:[],winFreq:1,winDur:1,epic:1,sprint:1,cMax:0,cRegen:1,shRet:0};
+  HIRES.forEach(h=>m.hm[h.id]=1);
+  let buddy=false;
+  for(const id of S.ups){const u=UP[id];if(!u)continue;const f=u.fx;
+    if(f.click)m.click*=f.click;if(f.pct)m.pct+=f.pct;if(f.h)m.hm[f.h]*=f.m;if(f.all)m.all*=f.all;if(f.kit)m.kit.push(f.kit);
+    if('fingers' in f){if(f.fingers===0)buddy=true;else m.fmul*=f.fingers}
+    if(f.syn)m.syn.push(f.syn);if(f.winFreq)m.winFreq*=f.winFreq;if(f.winDur)m.winDur*=f.winDur;if(f.epic)m.epic*=f.epic;if(f.sprint)m.sprint*=f.sprint;
+    if(f.cMax)m.cMax+=f.cMax;if(f.cRegen)m.cRegen*=f.cRegen;if(f.shRet)m.shRet+=f.shRet;
+  }
+  m.fingers=buddy?.1*m.fmul:0;
+  if(perk('keyboard'))m.pct+=.02;
+  m.awardMult=1+S.awards*(perk('legend')?.015:.01);
+  m.perkMult=(perk('cat')?1.25:1)*(perk('dynasty')?1.5:1);
+  m.kitMult=m.kit.reduce((a,f)=>a*(1+S.ach.length*.04*f),1);
+  const nonIntern=staff()-S.own.intern;
+  m.each={};let raw=0;
+  for(const h of HIRES){
+    let e=h.rate*m.hm[h.id];
+    for(const [a,b] of m.syn){if(a===h.id)e*=1+.05*S.own[b];if(b===h.id)e*=1+.001*S.own[a]}
+    if(h.id==='intern')e+=m.fingers*nonIntern;
+    m.each[h.id]=e;raw+=e*S.own[h.id];
+  }
+  m.global=m.all*m.kitMult*m.awardMult*m.perkMult;
+  m.base=raw*m.global;
+  m.clickBase=(m.click+m.fingers*nonIntern)*m.awardMult*(perk('dynasty')?1.5:1);
+  M=m;
+}
+const activeBuffs=()=>{const n=Date.now();return S.buffs.filter(b=>b.until>n)};
+const velBuff=()=>activeBuffs().reduce((a,b)=>a*(b.vel||1),1);
+const clickBuff=()=>activeBuffs().reduce((a,b)=>a*(b.click||1),1);
+const shFactor=()=>1-.05*S.sh.length;
+const vel=()=>M.base*velBuff()*shFactor();
+const clickVal=()=>(M.clickBase+M.base*velBuff()*M.pct)*clickBuff();
+const disc=()=>perk('rolodex')?.95:1;
+function hireCost(h,n){const b=h.cost*Math.pow(1.15,S.own[h.id]);return Math.ceil(b*(Math.pow(1.15,n)-1)/.15*disc())}
+function sellValue(h,n){n=Math.min(n,S.own[h.id]);if(!n)return 0;const b=h.cost*Math.pow(1.15,S.own[h.id]-n);return Math.floor(b*(Math.pow(1.15,n)-1)/.15*disc()*.25)}
+const upCost=u=>Math.ceil(u.cost*(perk('negot')?.95:1));
+const awardsFor=x=>Math.floor(Math.cbrt(x/1e9));
+const need=()=>{const c=S.cur||{};return Math.round((c.epic?50:10)*(perk('muscle')?.8:1))};
+
+/* ---------- cards ---------- */
+const pickTask=()=>{const t=TASKS[S.seed++%TASKS.length];return {t,l:[(S.seed*7)%5,(S.seed*3+1)%5].filter((v,i,a)=>a.indexOf(v)===i).slice(0,1+S.seed%2)}};
+function nextCard(){
+  if(S.sinceEpic>=25){S.sinceEpic=0;return {t:EPICS[S.epics%EPICS.length],l:[2,3],epic:true}}
+  const c=S.todo.shift();S.todo.push(pickTask());return c;
+}
+if(!S.todo.length)for(let i=0;i<5;i++)S.todo.push(pickTask());
+if(!S.cur)S.cur=pickTask();
+
+/* ---------- render: board ---------- */
+const labels=l=>`<div class="labels">${l.map(i=>`<span class="lbt" style="background:var(${L[i]})">${LN[i]}</span>`).join('')}</div>`;
+function renderTodo(){
+  $('todo').innerHTML=S.todo.map((c,i)=>`<div class="card">${labels(c.l)}<div class="ttl">${c.t}</div>${i<2?`<div class="meta"><span>Due ${['Wed','Thu','Fri'][i]}</span></div>`:''}</div>`).join('');
+  $('todoN').textContent=30+S.todo.length+(S.seed%9);
+}
+function renderDoing(){
+  const c=S.cur,p=S.prog,N=need();
+  $('doing').innerHTML=`<button class="card active pop${c.epic?' epic':''}" id="act">${c.epic?'<div class="labels"><span class="lbt" style="background:var(--gold)">Epic</span></div>':labels(c.l)}<div class="ttl">${c.t}</div>
+    <div class="check"><span>☑ ${p}/${N}</span><div class="track"><i style="width:${p/N*100}%"></i></div></div>
+    <div class="meta"><span>${c.epic?'Big one. Big payout.':'Due today'}</span><span class="av" style="background:#c77d3a">F</span></div>
+    <div class="hint">Click to tick off a subtask · +<span id="cv">${fmt(clickVal())}</span> pts</div></button>`;
+  $('act').addEventListener('click',onClick);
+  $('doingN').textContent=S.sprint?2:1;
+}
+function updDoing(){
+  const a=$('act');if(!a)return;const N=need();
+  a.querySelector('.check span').textContent='☑ '+S.prog+'/'+N;
+  a.querySelector('.track i').style.width=(S.prog/N*100)+'%';
+}
+function renderDone(){
+  $('done').innerHTML=S.done.map((c,i)=>`<div class="card done-card${i===0?' pop':''}">${labels(c.l)}<div class="ttl"><span class="tick">✓</span>${c.t}</div><div class="meta"><span>${c.by}</span></div></div>`).join('')||'<div class="mute">Nothing done yet. Classic.</div>';
+  $('doneN').textContent=fmt(S.cards+S.teamCards);
+}
+let teamKey='';
+function teamVisible(){
+  const out=[];for(let i=0;i<HIRES.length;i++){const h=HIRES[i];if(S.own[h.id]>0||i===0||S.own[HIRES[i-1].id]>0||S.total>=h.cost*.5)out.push(h);else break}
+  return out;
+}
+function renderTeam(){
+  const vis=teamVisible(),sell=S.settings.mode==='sell',n=S.settings.amt;teamKey=vis.length+'|'+sell+n;
+  let html='';
+  for(const h of vis){
+    const each=M.each[h.id]*M.global,share=M.base?each*S.own[h.id]/M.base*100:0;
+    html+=`<div class="card"><div class="hire"><span class="av" style="background:${h.c}">${h.ini}</span><div><div class="nm">${h.n}</div><div class="sub">${h.d}<br>+${fmt(each)}/s each${S.own[h.id]?` · ${share<1?share.toFixed(1):Math.round(share)}% of velocity`:''}</div></div><span class="own">${S.own[h.id]||''}</span></div>
+      ${sell?`<button class="buy sell" data-h="${h.id}">Let go ${n>1?'×'+Math.min(n,S.own[h.id]||n)+' ':''}· +${fmt(sellValue(h,n))} pts</button>`:`<button class="buy" data-h="${h.id}">Hire${n>1?' ×'+n:''} · ${fmt(hireCost(h,n))} pts</button>`}</div>`;
+  }
+  if(vis.length<HIRES.length)html+=`<div class="card locked"><div class="hire"><span class="av" style="background:var(--muted)">?</span><div><div class="nm">Role not advertised yet</div><div class="sub">Keep shipping</div></div><span></span></div></div>`;
+  $('team').innerHTML=html;$('teamN').textContent=staff();
+  $('modeSeg').querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.mode===S.settings.mode));
+  $('amtSeg').querySelectorAll('button').forEach(b=>b.classList.toggle('on',+b.dataset.amt===n));
+  refreshBuy();
+}
+const availUps=()=>U.filter(u=>!S.ups.includes(u.id)&&u.req(S)).sort((a,b)=>a.cost-b.cost);
+let upKey='';
+function renderUps(force){
+  const a=availUps(),k=a.map(u=>u.id).join();
+  if(k===upKey&&!force)return;upKey=k;
+  $('ups').innerHTML=a.map(u=>`<div class="card up"><div class="labels"><span class="lbt" style="background:${KIND_C[u.k]}">${u.k}</span>${u.hire?`<span class="lbt" style="background:${H[u.hire].c}">${H[u.hire].n}</span>`:''}</div><div class="ttl">${u.n}</div><div class="desc">${typeof u.d==='function'?u.d():u.d}</div><button class="buy" data-u="${u.id}">Approve · ${fmt(upCost(u))} pts</button></div>`).join('')||'<div class="mute">No requests waiting for sign-off. Hire more people, and they’ll start asking for things.</div>';
+  $('upN').textContent=a.length;refreshBuy();
+}
+function refreshBuy(){
+  const sell=S.settings.mode==='sell',n=S.settings.amt;
+  document.querySelectorAll('#team [data-h]').forEach(b=>{const h=H[b.dataset.h];b.disabled=sell?S.own[h.id]<1:S.pts<hireCost(h,n)});
+  document.querySelectorAll('#ups [data-u]').forEach(b=>b.disabled=S.pts<upCost(UP[b.dataset.u]));
+}
+let spKey='';
+function renderSprint(){
+  const sp=S.sprint,box=$('sprintBox');
+  if(!sp){box.innerHTML='';spKey='';return}
+  const now=Date.now(),key=sp.state+sp.type;
+  if(key===spKey){
+    if(sp.state==='offer'){const t=box.querySelector('[data-left]');if(t)t.textContent=Math.max(0,Math.ceil((sp.offerUntil-now)/1000))}
+    else{const pr=sprintProgress();box.querySelector('.lbt').textContent=`Sprint · ${Math.max(0,Math.ceil((sp.until-now)/1000))}s left`;box.querySelector('.gauge i').style.width=Math.min(100,pr/sp.target*100)+'%';box.querySelector('.desc').textContent=`${fmt(pr)} / ${fmt(sp.target)}`}
+    return;
+  }
+  spKey=key;
+  if(sp.state==='offer'){
+    box.innerHTML=`<div class="card sprint"><div class="labels"><span class="lbt" style="background:var(--hot)">Sprint proposed</span></div><div class="ttl"><b>${sp.title}</b></div><div class="desc">Win: ${fmt(sprintReward())} pts and velocity ×1.25 for 5 minutes. Offer ends in <span data-left>${Math.ceil((sp.offerUntil-now)/1000)}</span>s.</div><div class="row"><button class="buy" data-sp="go">Start sprint</button><button class="buy sell" data-sp="skip">Not now</button></div></div>`;
+  }else{
+    const pr=sprintProgress(),left=Math.max(0,Math.ceil((sp.until-now)/1000));
+    box.innerHTML=`<div class="card sprint active-s"><div class="labels"><span class="lbt" style="background:var(--hot)">Sprint · ${left}s left</span></div><div class="ttl"><b>${sp.title}</b></div><div class="gauge"><i style="width:${Math.min(100,pr/sp.target*100)}%"></i></div><div class="desc">${fmt(pr)} / ${fmt(sp.target)}</div></div>`;
+  }
+}
+function renderStats(){
+  $('pts').textContent=fmt(S.pts);$('cps').textContent=fmt(vel());
+  const cv=$('cv');if(cv)cv.textContent=fmt(clickVal());
+}
+function renderBuffs(){
+  const now=Date.now();
+  $('buffs').innerHTML=activeBuffs().map(b=>`<span class="chip buff ${b.cls||''}" title="${b.d||''}">${b.name} · ${Math.ceil((b.until-now)/1000)}s</span>`).join('');
+}
+function renderSH(force){
+  const el=$('shs'),btns=el.querySelectorAll('[data-sh]');
+  if(!force&&btns.length===S.sh.length){btns.forEach((b,i)=>{b.lastChild.textContent=fmt(S.sh[i].eaten*shReturn());b.title=`${S.sh[i].n} has feedback. Click to address it. They’re sitting on ${fmt(S.sh[i].eaten)} points.`});return}
+  if(ptrDown&&!force)return;
+  el.innerHTML=S.sh.length?`<span class="lbl">Watching:</span>`+S.sh.map((p,i)=>`<button class="sh" data-sh="${i}" style="background:${p.c}" title="${p.n} has feedback. Click to address it. They’re sitting on ${fmt(p.eaten)} points."><i>${p.ini}</i><span>${fmt(p.eaten*shReturn())}</span></button>`).join(''):'';
+}
+let viewsHtml='';
+function renderViews(force){
+  const k=kitchenOpen(),c=Math.floor(S.coffee);
+  const v=[['board','Board'],['kitchen',k?`Kitchen ☕${c}`:'Kitchen 🔒'],['trophies',`Trophies ${S.ach.length}/${ACH.length}`],['portfolio',`Portfolio${pendingAwards()>0?' <span class="dot"></span>':''}`],['stats','Stats']];
+  const html=v.map(([id,n])=>`<button class="chip${view===id?' on':''}" data-view="${id}">${n}</button>`).join('');
+  if(html!==viewsHtml&&(force||!ptrDown)){viewsHtml=html;$('views').innerHTML=html}
+}
+
+/* ---------- render: other boards ---------- */
+function list(title,count,body,wide){return `<section class="list${wide?' wide':''}"><div class="list-h">${title} <span>${count??''}</span></div><div class="cards">${body}</div></section>`}
+function renderKitchen(){
+  const el=$('v-kitchen');
+  if(!kitchenOpen()){el.innerHTML=list('Kitchen','',`<div class="card"><div class="ttl"><b>The kitchen is locked</b></div><p class="p desc">Hire 10 Interns and they’ll find the coffee machine. You own ${S.own.intern}.</p></div>`);return}
+  const mx=coffeeMax(),c=S.coffee,r=coffeeRegen();
+  el.innerHTML=list('Coffee machine','',`<div class="card"><div class="big">☕ ${Math.floor(c)} / ${mx}</div><div class="gauge coffee"><i style="width:${c/mx*100}%"></i></div><p class="p desc" style="margin-top:8px">A cup every ${Math.round(1/r)}s. More Interns means a bigger machine (they make the tea).</p></div>
+      <div class="card"><p class="p desc">Orders cost coffee. Some can go wrong, which is half the fun.</p></div>`)
+   +list('Orders',SPELLS.length,SPELLS.map(s=>{const cost=spellCost(s);return `<div class="card"><div class="ttl"><b>${s.n}</b></div><div class="desc">${s.d}${s.fail?` <i>${Math.round(s.fail*100)}% chance it goes wrong.</i>`:''}</div><button class="buy gold" data-spell="${s.id}" ${c<cost?'disabled':''}>Order · ${cost} ☕</button></div>`}).join(''),true)
+   +list('Kitchen log',S.klog.length,S.klog.map(l=>`<div class="card"><div class="desc" style="margin:0">${l}</div></div>`).join('')||'<div class="mute">Nothing ordered yet.</div>');
+}
+function renderTrophies(){
+  const cats=['Output','Team','Office life'];
+  const mk=a=>{const got=S.ach.includes(a.id);return `<div class="card"><div class="tro${got?'':' no'}"><span class="ic">${got?'★':'☆'}</span><div><div class="ttl">${got||!a.shadow?a.n:'???'}</div><div class="desc">${got||!a.shadow?a.d:'A secret. Keep playing.'}</div></div></div></div>`};
+  const kits=U.filter(u=>u.k==='Morale');
+  $('v-trophies').innerHTML=list('Team spirit','',`<div class="card"><div class="big">${S.ach.length} / ${ACH.length}</div><p class="p desc">Every trophy adds 4% morale. You’re on <b>${Math.round(morale()*100)}%</b>.</p><p class="p desc">Morale does nothing by itself. Team socials turn it into velocity: right now they add <b>+${Math.round((M.kitMult-1)*100)}%</b>.</p></div>`
+      +kits.map(u=>{const got=S.ups.includes(u.id);return `<div class="card${got?'':' locked'}"><div class="ttl"><b>${u.n}</b></div><div class="desc">${got?'Approved':S.ach.length>=u.achReq?'Waiting in Requests':'Unlocks at '+u.achReq+' trophies'}</div></div>`}).join(''))
+    +cats.map(c=>{const as=ACH.filter(a=>a.cat===c);return list(c,`${as.filter(a=>S.ach.includes(a.id)).length}/${as.length}`,as.map(mk).join(''))}).join('');
+}
+function pendingAwards(){return Math.max(0,awardsFor(S.allTime)-S.awards)}
+let rbArmed=false;
+function renderPortfolio(){
+  const p=pendingAwards(),nextAt=Math.pow(S.awards+p+1,3)*1e9;
+  const intro=`<div class="card"><div class="ttl"><b>Rebrand the studio</b></div><p class="p desc">Start again with a new name. You lose points, hires and requests, but keep trophies, perks and awards.</p><p class="p desc">Each award is worth <b>+${perk('legend')?1.5:1}% velocity</b> forever, and you can spend awards as clout on perks.</p></div>`;
+  $('v-portfolio').innerHTML=list('Rebrand','',intro+`<div class="card"><div class="srow"><span>Awards held</span><b>${S.awards} (+${fmt((M.awardMult-1)*100)}%)</b></div><div class="srow"><span>Clout to spend</span><b>${S.clout}</b></div><div class="srow"><span>Points earned, all time</span><b>${fmt(S.allTime)}</b></div><div class="srow"><span>Awards if you rebrand now</span><b style="color:var(--gold)">+${p}</b></div><div class="srow"><span>Next award at</span><b>${fmt(nextAt)} all-time</b></div>
+      <button class="buy gold" id="rbBtn" ${p<1?'disabled':''}>${p<1?'Earn 1B points all-time to win an award':rbArmed?'Click again to rebrand. Really.':`Rebrand for ${p} award${p>1?'s':''}`}</button></div>`)
+   +list('Perks',`${S.perks.length}/${PERKS.length}`,PERKS.map(q=>{const got=perk(q.id);return `<div class="card${got?' owned-up':''}"><div class="ttl"><b>${q.n}</b></div><div class="desc">${q.d}</div>${got?'<div class="hint" style="color:var(--good)">✓ Yours for keeps</div>':`<button class="buy gold" data-perk="${q.id}" ${S.clout<q.cost?'disabled':''}>Buy · ${q.cost} clout</button>`}</div>`}).join(''),true)
+   +list('Past rebrands',S.resets,S.resets?BOARDS.slice(0,Math.min(S.resets,BOARDS.length)).map((b,i)=>`<div class="card done-card"><div class="ttl"><span class="tick">✓</span>${b}</div><div class="meta"><span>Rebrand ${i+1}</span></div></div>`).join(''):'<div class="mute">No rebrands yet. The logo is still the one the founder drew on a napkin.</div>');
+}
+function renderStatsView(){
+  const row=(a,b)=>`<div class="srow"><span>${a}</span><b>${b}</b></div>`;
+  const approved=S.ups.map(id=>UP[id]).filter(Boolean);
+  $('v-stats').innerHTML=list('How to play','',`<div class="card"><p class="p"><b>Click the card in Doing</b> to tick off subtasks. Ten ticks moves it to Done.</p><p class="p">Spend points on <b>hires</b> in Team. They earn points every second (your velocity), even while you’re away.</p><p class="p">Approve <b>requests</b> for big multipliers. New ones show up as your team grows.</p><p class="p">Grab <b>quick wins</b> when they pop up. <b>Stakeholders</b> slowly siphon your velocity, but click them later and they pay back more than they took.</p><p class="p">Every 25 cards comes an <b>Epic</b>. <b>Sprints</b> are short challenges with big rewards. With 10 Interns, the <b>Kitchen</b> opens.</p><p class="p">Once you’ve earned a billion points all-time, <b>rebrand</b> in Portfolio to win awards and keep going. Esc hides everything.</p></div>`,true)
+   +list('Numbers','',`<div class="card">${[
+     ['Story points in the bank',fmt(S.pts)],['Earned this rebrand',fmt(S.total)],['Earned all time',fmt(S.allTime)],['Velocity (base)',fmt(M.base)+'/s'],['Velocity right now',fmt(vel())+'/s'],['Each click',fmt(clickVal())],
+     ['Cards you finished',`${fmt(S.cards)} (${fmt(S.cardsAll)} all time)`],['Cards the team finished',fmt(S.teamCards)],['Subtasks ticked',`${fmt(S.clicks)} (${fmt(S.clicksAll)} all time)`],['Points from clicking',`${fmt(S.hand)} (${fmt(S.handAll)} all time)`],
+     ['Team size',fmt(staff())],['Requests approved',`${S.ups.length} / ${U.length}`],['Trophies',`${S.ach.length} / ${ACH.length}`],['Quick wins grabbed',S.winsAll],['Feedback addressed',S.shPopped],['Sprints won',S.sprintsWon],['Epics closed',S.epics],['Kitchen orders',S.spells],
+     ['Rebrands',S.resets],['Awards',S.awards],['Time this rebrand',fmtT(S.runTime)],['Time played',fmtT(S.playTime)]].map(r=>row(...r)).join('')}</div>`)
+   +list('Approved requests',approved.length,approved.slice().reverse().map(u=>`<div class="card"><div class="labels"><span class="lbt" style="background:${KIND_C[u.k]}">${u.k}</span></div><div class="ttl">${u.n}</div></div>`).join('')||'<div class="mute">Nothing approved yet.</div>')
+   +list('Settings','',`<div class="card">
+      <div class="set"><span>Numbers</span><div class="seg" id="fmtSeg">${[['short','1.2M'],['full','1,200,000'],['sci','1.2e6']].map(([k,n])=>`<button data-fmt="${k}" class="${S.settings.fmt===k?'on':''}">${n}</button>`).join('')}</div></div>
+      <div class="set"><span>Activity ticker</span><div class="seg"><button data-set="ticker" data-val="1" class="${S.settings.ticker?'on':''}">On</button><button data-set="ticker" data-val="0" class="${S.settings.ticker?'':'on'}">Off</button></div></div>
+      <div class="set"><span>Floating numbers</span><div class="seg"><button data-set="floats" data-val="1" class="${S.settings.floats?'on':''}">On</button><button data-set="floats" data-val="0" class="${S.settings.floats?'':'on'}">Off</button></div></div></div>
+     <div class="card"><div class="ttl"><b>Save file</b></div><p class="p desc">The game saves itself every few seconds. Copy this to move your board to another browser.</p><textarea class="save" id="saveTxt" spellcheck="false"></textarea><div style="display:flex;gap:6px;margin-top:6px"><button class="buy" data-act="export">Copy save</button><button class="buy" data-act="import">Load pasted save</button></div></div>
+     <div class="card"><div class="ttl"><b>Archive board</b></div><p class="p desc">Wipes everything, including trophies and awards. There is no undo.</p><button class="buy sell" data-act="wipe">${wipeArmed?'Click again. Everything goes.':'Archive board and start over'}</button></div>`);
+}
+function renderView(){
+  ['board','kitchen','trophies','portfolio','stats'].forEach(v=>$('v-'+v).hidden=view!==v);
+  if(view==='kitchen')renderKitchen();else if(view==='trophies')renderTrophies();else if(view==='portfolio')renderPortfolio();else if(view==='stats')renderStatsView();
+  renderViews(true);
+}
+
+/* ---------- actions ---------- */
+function earn(n){S.pts+=n;S.total+=n;S.allTime+=n}
+function floatAt(x,y,txt){
+  if(!S.settings.floats)return;
+  const s=document.createElement('span');s.className='float';s.textContent=txt;s.style.left=(x-10)+'px';s.style.top=(y-20)+'px';
+  document.body.appendChild(s);setTimeout(()=>s.remove(),700);
+}
+function onClick(e){
+  const v=clickVal();earn(v);S.hand+=v;S.handAll+=v;S.clicks++;S.clicksAll++;S.prog++;lastClick=Date.now();
+  if(S.prog===1)cardStart=performance.now();
+  if(S.sprint&&S.sprint.state==='active'&&S.sprint.type==='ticks')S.sprint.prog++;
+  floatAt(e.clientX||innerWidth/2,e.clientY||innerHeight/2,'+'+fmt(v));
+  if(S.prog>=need())finishCard(v);else updDoing();
+  renderStats();refreshBuy();
+}
+function finishCard(v){
+  const c=S.cur;v=v||clickVal();
+  let bonus=v*5;
+  if(c.epic){bonus=(v*50+M.base*velBuff()*60)*M.epic;S.epics++;toast(`<b>Epic closed!</b> ${c.t.replace('Epic: ','')} is done. +${fmt(bonus)} points.`)}
+  else if(performance.now()-cardStart<1500&&S.prog>=need())unlock('speed');
+  earn(bonus);S.cards++;S.cardsAll++;S.sinceEpic++;
+  if(S.sprint&&S.sprint.state==='active'&&S.sprint.type==='cards')S.sprint.prog++;
+  completeCard(c,'Moved by you');
+  S.cur=nextCard();S.prog=0;renderTodo();renderDoing();
+}
+function completeCard(c,by){S.done.unshift({t:c.t,l:c.l,by});S.done=S.done.slice(0,6);renderDone()}
+function hire(id){
+  const h=H[id],n=S.settings.amt;
+  if(S.settings.mode==='sell'){const k=Math.min(n,S.own[id]);if(!k)return;const g=sellValue(h,k);S.own[id]-=k;S.pts+=g;toast(`Let ${k} ${k===1?h.n:h.pl} go. HR are drafting a very careful email. +${fmt(g)} points.`)}
+  else{const c=hireCost(h,n);if(S.pts<c)return;S.pts-=c;S.own[id]+=n}
+  recalc();renderTeam();renderUps();renderStats();save();
+}
+function buyUp(id){
+  const u=UP[id],c=upCost(u);if(S.pts<c||S.ups.includes(id))return;
+  S.pts-=c;S.ups.push(id);recalc();renderUps(true);renderTeam();renderStats();save();
+  toast(`Approved: <b>${u.n}</b>. ${typeof u.d==='function'?u.d():u.d}.`);
+}
+let toastT;function toast(t){const el=$('toast');el.innerHTML=t;el.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>el.hidden=true,4500)}
+
+/* team auto-completes cards (cosmetic) */
+let teamAcc=0;
+function teamTick(dt){
+  const r=vel();if(r<=0)return;
+  teamAcc+=r*dt/(10*Math.max(1,M.click)*3);
+  if(teamAcc>=1){
+    const n=Math.floor(teamAcc);teamAcc-=n;
+    const owned=HIRES.filter(h=>S.own[h.id]>0);if(!owned.length)return;const who=owned[Math.floor(Math.random()*owned.length)];
+    S.teamCards+=n;completeCard(pickTask(),'Moved by '+who.n+(n>1?` (+${fmt(n-1)} more)`:''));
+  }
+}
+
+/* ---------- buffs ---------- */
+const durMult=()=>M.winDur*(perk('flexi')?1.2:1);
+function addBuff(b,secs){S.buffs=S.buffs.filter(x=>x.id!==b.id);b.until=Date.now()+secs*1000;S.buffs.push(b);renderBuffs();renderStats()}
+
+/* ---------- quick wins ---------- */
+let winT;
+function schedWin(){clearTimeout(winT);const f=M.winFreq*(perk('luckybreak')?1.25:1);winT=setTimeout(spawnWin,(60+Math.random()*90)*1000/f)}
+function spawnWin(){
+  if(boss||document.hidden){schedWin();return}
+  const b=document.createElement('button');b.className='win';
+  b.innerHTML=`<b>Quick win</b>${WINS[Math.floor(Math.random()*WINS.length)]}`;
+  b.style.left=Math.max(16,Math.random()*(innerWidth-260))+'px';
+  b.style.top=Math.max(110,Math.random()*(innerHeight-140))+'px';
+  b.onclick=()=>{b.remove();grabWin()};
+  document.body.appendChild(b);setTimeout(()=>b.remove(),13000*(perk('lanyard')?2:1));schedWin();
+}
+function grabWin(){
+  S.winsAll++;
+  const owned=HIRES.filter(h=>S.own[h.id]>=10),free=availUps().filter(u=>u.cost<=Math.max(S.pts*5,1e4));
+  const opts=[['lucky',45],['frenzy',35],['rush',8]];
+  if(owned.length)opts.push(['surge',10]);
+  if(free.length)opts.push(['free',2]);
+  let r=Math.random()*opts.reduce((a,o)=>a+o[1],0),pick='lucky';
+  for(const [k,w] of opts){if((r-=w)<0){pick=k;break}}
+  const d=durMult();
+  if(pick==='lucky'){const g=Math.min(S.pts*.15,M.base*velBuff()*900)+13;earn(g);toast(`<b>Quick win!</b> The client loved it. +${fmt(g)} points.`)}
+  else if(pick==='frenzy'){addBuff({id:'frenzy',name:'In the zone ×7',vel:7,cls:'good'},77*d);toast('<b>Quick win!</b> Everyone’s in the zone. Velocity ×7.')}
+  else if(pick==='rush'){addBuff({id:'rush',name:'Deadline rush ×777',click:777,cls:'gold'},13*d);toast('<b>Deadline rush!</b> Clicks ×777 for a few seconds. Go go go.')}
+  else if(pick==='surge'){const h=owned[Math.floor(Math.random()*owned.length)],m=1+.1*S.own[h.id];addBuff({id:'surge',name:`${h.pl} on fire ×${fmt(m)}`,vel:m,cls:'good'},30*d);toast(`<b>Quick win!</b> Your ${h.pl} are on fire. Velocity ×${fmt(m)}.`)}
+  else{const u=free[0];S.ups.push(u.id);recalc();renderUps(true);renderTeam();toast(`<b>Quick win!</b> Finance waved through <b>${u.n}</b> for free.`)}
+  checkAch();renderStats();save();
+}
+
+/* ---------- stakeholders ---------- */
+const shReturn=()=>1.1+M.shRet+(perk('whisper')?.15:0);
+function maybeStakeholder(){
+  if(S.runTime<300||M.base<=0||S.sh.length>=shMax()||boss)return;
+  if(Math.random()<1/120){
+    const used=S.sh.map(p=>p.n),pool=PEOPLE.filter(p=>!used.includes(p[0]));const [n,ini,c]=(pool.length?pool:PEOPLE)[Math.floor(Math.random()*(pool.length||PEOPLE.length))];
+    S.sh.push({n,ini,c,eaten:0});renderSH(true);renderStats();
+    if(S.shPopped<3)toast(`<b>${n}</b> is now watching this board. They’ll siphon a little velocity. Click them to address their feedback — they give back more than they took.`);
+  }
+}
+function popSH(i){
+  const p=S.sh[i];if(!p)return;const g=p.eaten*shReturn();S.sh.splice(i,1);earn(g);S.shPopped++;
+  toast(`Addressed ${p.n}’s feedback. +${fmt(g)} points (they were sitting on it).`);renderSH(true);renderStats();checkAch();save();
+}
+
+/* ---------- sprints ---------- */
+const sprintReward=()=>Math.max(M.base*600,clickVal()*150,500)*M.sprint;
+function offerSprint(){
+  const types=[
+    {type:'ticks',title:'Tick off 150 subtasks in 60 seconds',target:150,dur:60},
+    {type:'cards',title:'Move 12 cards to Done yourself in 2 minutes',target:12,dur:120},
+  ];
+  if(M.base>0)types.push({type:'points',title:`Earn ${fmt(Math.max(1000,M.base*135))} points in 90 seconds`,target:Math.max(1000,M.base*135),dur:90});
+  const t=types[Math.floor(Math.random()*types.length)];
+  S.sprint=Object.assign({state:'offer',offerUntil:Date.now()+60e3,prog:0},t);renderSprint();renderDoing();
+  toast(`<b>Sprint proposed:</b> ${t.title}. It’s at the top of the Doing list.`);
+}
+function sprintProgress(){const sp=S.sprint;return sp.type==='points'?S.total-sp.start:sp.prog}
+function startSprint(){const sp=S.sprint;if(!sp||sp.state!=='offer')return;sp.state='active';sp.until=Date.now()+sp.dur*1000;sp.start=S.total;sp.prog=0;renderSprint()}
+function endSprint(won){
+  if(won){const g=sprintReward();earn(g);S.sprintsWon++;addBuff({id:'glow',name:'Sprint glow ×1.25',vel:1.25,cls:'gold'},300*durMult());toast(`<b>Sprint won!</b> +${fmt(g)} points and velocity ×1.25 for 5 minutes.`)}
+  else toast('Sprint missed. It’s going in the next sprint, like everything else.');
+  S.sprint=null;nextSprintAt=Date.now()+(8+Math.random()*4)*60e3;renderSprint();renderDoing();checkAch();save();
+}
+function sprintTick(){
+  const now=Date.now(),sp=S.sprint;
+  if(!sp){if(now>nextSprintAt&&S.runTime>180&&!boss)offerSprint();return}
+  if(sp.state==='offer'&&now>sp.offerUntil){S.sprint=null;nextSprintAt=now+(8+Math.random()*4)*60e3;renderSprint();renderDoing();return}
+  if(sp.state==='active'){if(sprintProgress()>=sp.target)endSprint(true);else if(now>sp.until)endSprint(false);else renderSprint()}
+  else renderSprint();
+}
+
+/* ---------- kitchen ---------- */
+function cast(id,discount){
+  const s=SPELLS.find(x=>x.id===id);if(!s)return;
+  const cost=Math.floor(spellCost(s)*(discount||1));
+  if(!discount){if(S.coffee<cost)return;S.coffee-=cost;S.spells++}
+  const fail=Math.random()<(discount?.25:s.fail);
+  const d=durMult();let msg='';
+  if(s.id==='standup'){
+    if(fail){const l=Math.min(S.pts*.07,M.base*velBuff()*900);S.pts-=l;msg=`Stand-up overran by an hour. Lost ${fmt(l)} points.`}
+    else{const g=Math.min(S.pts*.15,M.base*velBuff()*1800)+M.base*30+50;earn(g);msg=`Stand-up done in five minutes, somehow. +${fmt(g)} points.`}
+  }else if(s.id==='biscuits'){finishCard();msg='Biscuits appeared. The card got finished. Nobody knows how.'}
+  else if(s.id==='espresso'){addBuff({id:'espresso',name:'Espresso ×10 clicks',click:10,cls:'gold'},30*d);msg='Espresso shot. Clicks ×10 for 30 seconds.'}
+  else if(s.id==='breakfast'){
+    if(fail){addBuff({id:'kale',name:'Kale ×0.9',vel:.9,cls:'bad'},60);msg='Someone brought kale. Velocity ×0.9 for a minute.'}
+    else{addBuff({id:'breakfast',name:'Team breakfast ×1.5',vel:1.5,cls:'good'},120*d);msg='Team breakfast. Velocity ×1.5 for 2 minutes.'}
+  }else if(s.id==='flatwhite'){
+    if(fail)msg='Spilt the flat white. Nothing happens, except a stain.';
+    else{clearTimeout(winT);spawnWin();msg='Flat white ordered. A quick win appeared!'}
+  }else if(s.id==='mystery'){
+    const others=SPELLS.filter(x=>x.id!=='mystery'&&x.id!=='flatwhite');const o=others[Math.floor(Math.random()*others.length)];
+    klog(`Mystery brew turned out to be… ${o.n}.`);cast(o.id,.5);renderView();return;
+  }
+  klog(msg);toast(msg);checkAch();renderStats();save();if(view==='kitchen')renderKitchen();
+}
+function klog(m){const t=new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});S.klog.unshift(`<b>${t}</b> · ${m}`);S.klog=S.klog.slice(0,10)}
+
+/* ---------- trophies ---------- */
+function unlock(id){
+  if(S.ach.includes(id)||!ACHM[id])return;S.ach.push(id);recalc();
+  toast(`<b>Trophy unlocked:</b> ${ACHM[id].n}. Morale is up.`);renderViews();if(view==='trophies')renderTrophies();
+}
+function checkAch(){for(const a of ACH)if(!S.ach.includes(a.id)&&a.test(S))unlock(a.id)}
+
+/* ---------- rebrand ---------- */
+function rebrand(){
+  const p=pendingAwards();if(p<1)return;
+  S.sh.forEach(x=>earn(x.eaten*shReturn()));
+  const keep=['allTime','cardsAll','clicksAll','handAll','winsAll','awards','clout','perks','resets','spells','shPopped','sprintsWon','epics','escPresses','playTime','firstPlayed','ach','settings','kitchenSeen','klog'];
+  const k={};keep.forEach(x=>k[x]=S[x]);
+  S=Object.assign(fresh(),k);S.awards+=p;S.clout+=p;S.resets++;
+  if(perk('headstart')){S.own.intern=10;S.own.free=5}
+  if(perk('savings')){S.pts=1e5}
+  for(let i=0;i<5;i++)S.todo.push(pickTask());S.cur=pickTask();
+  recalc();S.coffee=Math.min(coffeeMax(),10);
+  document.querySelectorAll('.win').forEach(e=>e.remove());
+  nextSprintAt=Date.now()+4*60e3;upKey='';rbArmed=false;view='board';
+  renderAll();checkAch();save();
+  toast(`<b>Rebranded!</b> Welcome to ${boardName()}. You won ${p} award${p>1?'s':''}: +${p*(perk('legend')?1.5:1)}% velocity, forever.`);
+}
+const boardName=()=>BOARDS[Math.min(S.resets,BOARDS.length-1)]+(S.resets>=BOARDS.length?` ${S.resets-BOARDS.length+2}`:'');
+
+/* ---------- disguise ---------- */
+const DECOY=[
+ ['To do',[['Brand review prep',[4]],['Spring campaign — print specs',[1]],['Update email templates',[4]],['Photography shot list',[0]]]],
+ ['In progress',[['Social cut-downs (9:16, 1:1, 4:5)',[0,3]],['Retouch product shots — batch 2',[1]]]],
+ ['Review',[['Landing page hero v2',[4,2]],['Motion sting — logo reveal',[3]]]],
+ ['Done',[['Moodboard sign-off',[0]],['Font licences renewed',[1]],['Q2 asset archive',[4]]]],
+];
+$('decoy').innerHTML=DECOY.map(([n,cs])=>`<section class="list"><div class="list-h">${n} <span>${cs.length}</span></div><div class="cards">${cs.map(([t,l],i)=>`<div class="card">${labels(l)}<div class="ttl">${t}</div>${i===0?'<div class="meta"><span>Due Fri</span><span class="av" style="background:#a0376a">PS</span></div>':''}</div>`).join('')}</div></section>`).join('');
+function toggleBoss(){
+  boss=!boss;document.body.classList.toggle('boss',boss);document.querySelectorAll('.win,.float').forEach(e=>e.remove());$('toast').hidden=true;
+  $('boardName').textContent=boss?'Q3 Campaign Delivery':boardName();
+  if(boss){S.escPresses++;checkAch()}
+}
+
+/* ---------- input ---------- */
+$('filterBtn').onclick=toggleBoss;
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){e.preventDefault();toggleBoss()}});
+$('views').addEventListener('click',e=>{const b=e.target.closest('[data-view]');if(!b)return;view=b.dataset.view;rbArmed=false;wipeArmed=false;renderView();if(view==='stats')fillSave()});
+$('team').addEventListener('click',e=>{const b=e.target.closest('[data-h]');if(b)hire(b.dataset.h)});
+$('ups').addEventListener('click',e=>{const b=e.target.closest('[data-u]');if(b)buyUp(b.dataset.u)});
+$('modeSeg').addEventListener('click',e=>{const b=e.target.closest('[data-mode]');if(b){S.settings.mode=b.dataset.mode;renderTeam()}});
+$('amtSeg').addEventListener('click',e=>{const b=e.target.closest('[data-amt]');if(b){S.settings.amt=+b.dataset.amt;renderTeam()}});
+$('shs').addEventListener('click',e=>{const b=e.target.closest('[data-sh]');if(b)popSH(+b.dataset.sh)});
+$('sprintBox').addEventListener('click',e=>{const b=e.target.closest('[data-sp]');if(!b)return;if(b.dataset.sp==='go')startSprint();else{S.sprint=null;nextSprintAt=Date.now()+(8+Math.random()*4)*60e3;renderSprint();renderDoing()}});
+$('v-kitchen').addEventListener('click',e=>{const b=e.target.closest('[data-spell]');if(b)cast(b.dataset.spell)});
+$('v-portfolio').addEventListener('click',e=>{
+  const pb=e.target.closest('[data-perk]');
+  if(pb){const q=PERKS.find(x=>x.id===pb.dataset.perk);if(q&&S.clout>=q.cost&&!perk(q.id)){S.clout-=q.cost;S.perks.push(q.id);recalc();renderPortfolio();renderTeam();renderUps(true);renderStats();save();toast(`Perk unlocked: <b>${q.n}</b>.`)}return}
+  if(e.target.closest('#rbBtn')){if(!rbArmed){rbArmed=true;renderPortfolio();setTimeout(()=>{if(rbArmed){rbArmed=false;if(view==='portfolio')renderPortfolio()}},4000);return}rebrand()}
+});
+let wipeArmed=false;
+function fillSave(){const t=$('saveTxt');if(t){try{t.value=btoa(unescape(encodeURIComponent(JSON.stringify(S))))}catch(e){t.value=''}}}
+$('v-stats').addEventListener('click',e=>{
+  const f=e.target.closest('[data-fmt]');if(f){S.settings.fmt=FMT=f.dataset.fmt;upKey='';renderAll();fillSave();save();return}
+  const s=e.target.closest('[data-set]');if(s){S.settings[s.dataset.set]=s.dataset.val==='1';$('ticker').hidden=!S.settings.ticker;renderStatsView();fillSave();save();return}
+  const a=e.target.closest('[data-act]');if(!a)return;
+  if(a.dataset.act==='export'){fillSave();const t=$('saveTxt');t.select();const done=()=>toast('Save copied. Keep it somewhere safe, like a drafts folder you never open.');if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t.value).then(done,()=>{try{document.execCommand('copy');done()}catch(_){}});else{try{document.execCommand('copy');done()}catch(_){}}}
+  else if(a.dataset.act==='import'){
+    try{const h=hydrate(JSON.parse(decodeURIComponent(escape(atob($('saveTxt').value.trim())))));if(!h)throw 0;S=h;FMT=S.settings.fmt;recalc();upKey='';renderAll();save();toast('Save loaded. Welcome back.')}catch(err){toast('That doesn’t look like a Taskwall save. Paste the whole thing.')}
+  }else if(a.dataset.act==='wipe'){
+    if(!wipeArmed){wipeArmed=true;renderStatsView();fillSave();setTimeout(()=>{wipeArmed=false;if(view==='stats'){renderStatsView();fillSave()}},4000);return}
+    wipeArmed=false;try{localStorage.removeItem('tw-save')}catch(err){}S=fresh();FMT='short';for(let i=0;i<5;i++)S.todo.push(pickTask());S.cur=pickTask();recalc();upKey='';view='board';renderAll();toast('Board archived. Fresh start.');
+  }
+});
+
+/* ---------- ticker ---------- */
+let tickI=0;
+function nextTick(){
+  if(!S.settings.ticker)return;
+  const ok=TICK.filter(([c])=>c(S));const [,t]=ok[Math.floor(Math.random()*ok.length)];
+  const sp=$('tickTxt');sp.style.opacity=0;setTimeout(()=>{sp.textContent=t;sp.style.opacity=1},350);
+}
+
+/* ---------- loop ---------- */
+function renderAll(){renderViews();renderTodo();renderDoing();renderDone();renderTeam();renderUps(true);renderStats();renderBuffs();renderSH();renderSprint();renderView();$('boardName').textContent=boss?'Q3 Campaign Delivery':boardName();$('ticker').hidden=!S.settings.ticker}
+FMT=S.settings.fmt;recalc();
+const away=(Date.now()-(S.t||Date.now()))/1000;
+S.buffs=activeBuffs();
+if(S.sprint&&S.sprint.state==='active'&&Date.now()>S.sprint.until)S.sprint=null;
+if(S.sprint&&S.sprint.state==='offer')S.sprint=null;
+renderAll();
+if(away>60&&M.base>0){
+  const rate=perk('remote')?.9:.5,cap=perk('remote')?86400:28800,g=M.base*Math.min(away,cap)*rate;earn(g);
+  S.coffee=Math.min(coffeeMax(),S.coffee+coffeeRegen()*away);
+  unlock('away');toast(`While you were away the team closed <b>${fmt(g)}</b> points.`);renderStats();
+}
+nextTick();
+let last=performance.now(),acc=0,acc2=0,tickAcc=0;
+setInterval(()=>{
+  const t=performance.now(),dt=Math.min(3600,(t-last)/1000);last=t;
+  const v=vel();earn(v*dt);teamTick(dt);
+  if(S.sh.length){const each=M.base*velBuff()*.05*S.sh.length*dt;S.sh.forEach(p=>p.eaten+=each)}
+  if(kitchenOpen()){if(!S.kitchenSeen){S.kitchenSeen=true;renderViews();toast('<b>The interns found the kitchen.</b> Coffee orders are open. Check the Kitchen tab.')}S.coffee=Math.min(coffeeMax(),S.coffee+coffeeRegen()*dt)}
+  if(!document.hidden){S.playTime+=dt;S.runTime+=dt}
+  acc+=dt;acc2+=dt;tickAcc+=dt;renderStats();
+  if(acc>.5){
+    acc=0;refreshBuy();renderUps();if(S.total>0)renderTeamIfNew();renderSH();sprintTick();
+    const before=S.buffs.length;S.buffs=activeBuffs();renderBuffs();if(S.buffs.length!==before)renderStats();
+  }
+  if(acc2>1){acc2=0;checkAch();maybeStakeholder();renderViews();
+    if(!ptrDown){if(view==='kitchen')renderKitchen();else if(view==='portfolio'&&!rbArmed)renderPortfolio();else if(view==='stats'&&document.activeElement!==$('saveTxt')&&!wipeArmed){renderStatsView();fillSave()}}}
+  if(tickAcc>9){tickAcc=0;nextTick()}
+},100);
+function renderTeamIfNew(){const vis=teamVisible(),k=vis.length+'|'+(S.settings.mode==='sell')+S.settings.amt;if(k!==teamKey)renderTeam()}
+setInterval(save,5000);
+document.addEventListener('visibilitychange',save);
+schedWin();
+let first=false;try{first=!localStorage.getItem('tw-seen2');localStorage.setItem('tw-seen2','1')}catch(e){}
+if(first&&S.total<1)toast('Click the card in <b>Doing</b> to tick off subtasks, then spend points on hires. Esc hides the lot.');
+})();
+</script>
+
+</html>

@@ -1,0 +1,393 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Swatches – Brand colours</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=DM+Mono:wght@400;500&display=swap">
+<style>
+/* Neutral greys on purpose: tinted UI would throw off colour judgement. */
+:root{
+  --bg:#efefef; --panel:#ffffff; --panel2:#f6f6f6; --text:#1c1c1c; --muted:#6b6b6b; --line:#dedede; --top:#ffffff;
+  --accent:#1c1c1c; --accentText:#ffffff; --good:#2c9a5a; --shadow:0 1px 2px rgba(0,0,0,.06),0 8px 24px rgba(0,0,0,.06);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#1a1a1a; --panel:#242424; --panel2:#2c2c2c; --text:#ececec; --muted:#a0a0a0; --line:#363636; --top:#202020;
+    --accent:#ececec; --accentText:#1a1a1a; --good:#5cc88a; --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.3);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#1a1a1a; --panel:#242424; --panel2:#2c2c2c; --text:#ececec; --muted:#a0a0a0; --line:#363636; --top:#202020;
+  --accent:#ececec; --accentText:#1a1a1a; --good:#5cc88a; --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.3);
+}
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{background:var(--bg);color:var(--text);font-family:"DM Sans",system-ui,-apple-system,"Segoe UI",sans-serif;font-size:14px;font-variant-numeric:tabular-nums}
+button,input{font:inherit;color:inherit}
+button{background:none;border:0;cursor:pointer}
+button:focus-visible,input:focus-visible{outline:2px solid var(--text);outline-offset:2px}
+.mono{font-family:"DM Mono",ui-monospace,Menlo,Consolas,monospace}
+.app{display:flex;flex-direction:column;min-height:100%}
+
+.top{background:var(--top);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:18px;padding:0 16px;height:52px;flex:none}
+.logo{display:flex;align-items:center;gap:9px;font-weight:700;font-size:16px}
+.logo i{position:relative;width:26px;height:18px}
+.logo i b{position:absolute;top:0;width:18px;height:18px;border-radius:50%;mix-blend-mode:multiply}
+.logo i b:nth-child(1){left:0;background:#f2b544}.logo i b:nth-child(2){left:8px;background:#e5484d;opacity:.9}
+.tabs{display:flex;gap:4px;height:100%;min-width:0;overflow:hidden}
+.tab{padding:0 12px;font-weight:500;color:var(--muted);border-bottom:2px solid transparent;height:100%;display:flex;align-items:center;white-space:nowrap}
+.tab.on{color:var(--text);border-bottom-color:var(--text)}
+.top .right{margin-left:auto;display:flex;gap:10px;align-items:center}
+.me{width:30px;height:30px;border-radius:50%;background:#c77d3a;color:#fff;display:grid;place-items:center;font-weight:700;font-size:13px;flex:none}
+.btn{border-radius:8px;padding:8px 14px;font-weight:600;font-size:13px;background:var(--panel);border:1px solid var(--line);white-space:nowrap}
+.btn:hover{border-color:var(--muted)}
+.btn.pri{background:var(--accent);color:var(--accentText);border-color:var(--accent)}
+.btn:disabled{opacity:.45;cursor:default}
+
+.main{flex:1;width:100%;max-width:1160px;margin:0 auto;padding:18px 16px 32px;display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:18px;align-items:start}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow)}
+.brief{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;padding:14px 16px 12px}
+.brief h1{margin:0;font-size:20px;font-weight:700;letter-spacing:-.01em}
+.brief .q{color:var(--muted);font-size:13.5px;margin-top:2px}
+.rounds{display:flex;gap:6px}
+.rounds i{width:34px;height:34px;border-radius:8px;border:1px dashed var(--line);display:grid;place-items:center;font-style:normal;font-size:11px;font-weight:700;overflow:hidden;position:relative}
+.rounds i.cur{border:2px solid var(--text)}
+.rounds i.done{border:0}
+.rounds i.done::before{content:"";position:absolute;inset:0;background:linear-gradient(135deg,var(--a) 50%,var(--b) 50%)}
+.rounds i span{position:relative;background:rgba(0,0,0,.55);color:#fff;border-radius:4px;padding:0 3px;font-size:10.5px}
+
+.stage{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:0;margin:0 16px 16px;border-radius:12px;overflow:hidden;aspect-ratio:16/8.4;border:1px solid var(--line)}
+.sw{position:relative;display:flex;flex-direction:column;justify-content:space-between;padding:14px;transition:background-color .06s}
+.sw .lab{align-self:flex-start;background:rgba(255,255,255,.88);color:#1c1c1c;border-radius:6px;padding:4px 9px;font-size:12px;font-weight:600}
+.sw .hex{align-self:flex-start;background:rgba(0,0,0,.6);color:#fff;border-radius:6px;padding:4px 9px;font-size:12.5px}
+.sw.hide{background:repeating-linear-gradient(135deg,var(--panel2) 0 14px,var(--panel) 14px 28px)!important}
+.sw.hide .mem{position:absolute;inset:0;display:grid;place-items:center;color:var(--muted);font-weight:600;font-size:15px;text-align:center;padding:12px}
+.timer{position:absolute;left:0;right:0;top:0;height:5px;background:rgba(0,0,0,.12);z-index:2}
+.timer i{display:block;height:100%;background:var(--text);width:100%}
+.timer.low i{background:#e5484d}
+.count{position:absolute;right:14px;top:14px;background:rgba(0,0,0,.6);color:#fff;border-radius:999px;padding:4px 11px;font-weight:700;font-size:13px;z-index:2}
+.verdict{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:var(--panel);color:var(--text);border-radius:14px;padding:16px 20px;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,.3);width:min(320px,calc(100% - 32px));z-index:3;animation:pop .25s ease}
+.verdict .sc{font-size:44px;font-weight:700;line-height:1;letter-spacing:-.02em}
+.verdict .sc small{font-size:18px;color:var(--muted);font-weight:500}
+.verdict p{margin:6px 0 12px;color:var(--muted);line-height:1.4}
+.verdict .de{font-size:12px;color:var(--muted);margin-bottom:12px}
+@keyframes pop{from{transform:translate(-50%,-46%) scale(.94);opacity:0}to{transform:translate(-50%,-50%);opacity:1}}
+
+.panel{padding:16px}
+.panel h2{margin:0 0 12px;font-size:12px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);font-weight:700;display:flex;justify-content:space-between}
+.sl{margin-bottom:16px}
+.sl .row{display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px}
+.sl .row b{font-weight:600}
+.sl .row span{color:var(--muted)}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:22px;border-radius:11px;background:var(--track);outline:none;margin:0;border:1px solid rgba(0,0,0,.08);cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:24px;height:24px;border-radius:50%;background:var(--thumb,#fff);border:3px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.25),0 2px 6px rgba(0,0,0,.3)}
+input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:var(--thumb,#fff);border:3px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.25),0 2px 6px rgba(0,0,0,.3)}
+input[type=range]:disabled{cursor:default;opacity:.7}
+.readout{display:grid;grid-template-columns:44px 1fr;gap:12px;align-items:center;padding:10px;background:var(--panel2);border-radius:10px;margin-bottom:14px}
+.readout i{width:44px;height:44px;border-radius:9px;border:1px solid rgba(0,0,0,.1)}
+.readout b{display:block;font-size:17px}
+.readout span{font-size:12px;color:var(--muted)}
+.go{width:100%;padding:12px;font-size:15px}
+.keys{margin-top:10px;font-size:12px;color:var(--muted);line-height:1.5}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.stat{background:var(--panel2);border-radius:10px;padding:9px 11px}
+.stat span{display:block;font-size:11.5px;color:var(--muted)}
+.stat b{font-size:19px;font-weight:700}
+.side{display:flex;flex-direction:column;gap:16px}
+
+.summary{margin:0 16px 16px;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+.pair{border-radius:10px;overflow:hidden;border:1px solid var(--line);background:var(--panel2)}
+.pair .c{height:70px;display:grid;grid-template-columns:1fr 1fr}
+.pair .t{padding:7px 9px;font-size:12px}
+.pair .t b{font-size:15px}
+.pair .t span{display:block;color:var(--muted);font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.intro{margin:0 16px 16px;padding:24px;border-radius:12px;background:conic-gradient(from 200deg,#f2b544,#e5484d,#8e4ec6,#3e63dd,#12a594,#f2b544);display:grid;place-items:center;aspect-ratio:16/8.4}
+.intro .in{background:var(--panel);border-radius:14px;padding:20px 22px;max-width:380px;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,.25)}
+.intro h2{margin:0 0 6px;font-size:20px}
+.intro p{margin:0 0 14px;color:var(--muted);line-height:1.45}
+.modes{display:flex;gap:6px;justify-content:center;margin-bottom:14px;flex-wrap:wrap}
+.modes button{border:1px solid var(--line);border-radius:999px;padding:6px 13px;font-weight:600;font-size:13px}
+.modes button.on{background:var(--accent);color:var(--accentText);border-color:var(--accent)}
+
+/* decoy */
+.decoy{display:none}
+body.boss .decoy{display:block}
+body.boss .game{display:none!important}
+.pal{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:14px;padding:16px}
+.chip{border-radius:12px;overflow:hidden;border:1px solid var(--line);background:var(--panel)}
+.chip i{display:block;height:110px}
+.chip div{padding:10px 12px;font-size:12px;color:var(--muted);line-height:1.6}
+.chip b{display:block;color:var(--text);font-size:14px}
+.dnote{padding:0 16px 16px;color:var(--muted);font-size:13px}
+
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(18px + env(safe-area-inset-bottom,0px));background:var(--accent);color:var(--accentText);padding:10px 16px;border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.25);max-width:min(440px,calc(100vw - 32px));z-index:50;font-size:13.5px;line-height:1.45}
+
+@media (max-width:900px){
+  .main{grid-template-columns:minmax(0,1fr)}
+  .side{display:grid;grid-template-columns:1fr 1fr}
+  .summary{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media (max-width:600px){
+  .top{gap:10px}
+  .tabs .tab:not(.on){display:none}
+  .main{padding:10px 8px 24px}
+  .brief{padding:12px}
+  .stage,.intro{margin:0 10px 10px}
+  .stage{aspect-ratio:16/9}
+  .intro{aspect-ratio:auto}
+  .side{grid-template-columns:minmax(0,1fr)}
+  .rounds i{width:28px;height:28px}
+  .summary{margin:0 10px 10px;grid-template-columns:repeat(2,minmax(0,1fr))}
+  .intro{padding:14px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<div class="app">
+  <header class="top">
+    <div class="logo"><i><b></b><b></b></i>Swatches</div>
+    <nav class="tabs"><span class="tab on">Brand colours</span><span class="tab">Gradients</span><span class="tab">Contrast checker</span></nav>
+    <div class="right">
+      <button class="btn" id="viewBtn" title="Palette view (Esc)">Palette</button>
+      <span class="me">F</span>
+    </div>
+  </header>
+
+  <main class="main game">
+    <section class="card">
+      <div class="brief">
+        <div><h1 id="bTitle">Colour match</h1><div class="q" id="bQuote">Match the client’s reference by eye.</div></div>
+        <div class="rounds" id="rounds"></div>
+      </div>
+      <div id="view"></div>
+    </section>
+
+    <aside class="side">
+      <section class="card panel">
+        <h2><span>Your colour</span><span class="mono" id="hsbTxt">H 0 · S 0 · B 0</span></h2>
+        <div class="readout"><i id="prev"></i><div><b class="mono" id="hexTxt">#000000</b><span id="rgbTxt">rgb(0, 0, 0)</span></div></div>
+        <div class="sl"><div class="row"><b>Hue</b><span class="mono" id="hV">0°</span></div><input type="range" id="h" min="0" max="359" step="1" aria-label="Hue"></div>
+        <div class="sl"><div class="row"><b>Saturation</b><span class="mono" id="sV">0%</span></div><input type="range" id="s" min="0" max="100" step="1" aria-label="Saturation"></div>
+        <div class="sl"><div class="row"><b>Brightness</b><span class="mono" id="vV">0%</span></div><input type="range" id="v" min="0" max="100" step="1" aria-label="Brightness"></div>
+        <button class="btn pri go" id="goBtn">Match it</button>
+        <div class="keys">Keys: <b>Q/A</b> hue, <b>W/S</b> saturation, <b>E/D</b> brightness (hold Shift for big steps), <b>Enter</b> to match.</div>
+      </section>
+      <section class="card panel">
+        <h2><span>Your record</span><span id="modeTxt">Side by side</span></h2>
+        <div class="stats">
+          <div class="stat"><span>Best brief</span><b id="best">—</b></div>
+          <div class="stat"><span>Briefs done</span><b id="played">0</b></div>
+          <div class="stat"><span>Closest match</span><b id="closest">—</b></div>
+          <div class="stat"><span>Average</span><b id="avg">—</b></div>
+        </div>
+      </section>
+    </aside>
+  </main>
+
+  <!-- the disguise -->
+  <main class="main decoy" style="max-width:1160px">
+    <section class="card">
+      <div class="brief"><div><h1>Northwind brand palette v3</h1><div class="q">Approved 14 Aug · Use primary colours for 70% of any layout</div></div><button class="btn">Export ASE</button></div>
+      <div class="pal" id="decoy"></div>
+      <div class="dnote">Minimum contrast for body text is 4.5:1. Don’t tint the logo. Don’t ask about the old green.</div>
+    </section>
+  </main>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+(function(){
+const $=id=>document.getElementById(id);
+const ROUNDS=5;
+const MODES={side:{n:'Side by side',look:0,time:15},memory:{n:'From memory',look:3,time:12}};
+const QUOTES=['“It needs to feel like the old logo, but newer.”','“Can we get the colour from the photo I sent? The blurry one.”','“It’s like a blue, but warmer. You know?”','“My nephew made this in Paint, just match that.”','“The board want something bolder, but not louder.”','“Make it pop. But corporate pop.”','“It looked different on my phone.”','“Our competitor’s colour, but so it’s legally different.”','“Just a smidge more… you’ll know it when you see it.”','“We need it to match the carpet in reception.”'];
+const HUES=[[15,'Red'],[40,'Orange'],[60,'Amber'],[75,'Yellow'],[150,'Green'],[180,'Teal'],[200,'Cyan'],[250,'Blue'],[275,'Indigo'],[300,'Purple'],[335,'Magenta'],[360,'Red']];
+
+/* ---------- colour maths ---------- */
+function hsv2rgb(h,s,v){s/=100;v/=100;const f=n=>{const k=(n+h/60)%6;return v-v*s*Math.max(0,Math.min(k,4-k,1))};return [f(5),f(3),f(1)].map(x=>Math.round(x*255))}
+const hex=([r,g,b])=>'#'+[r,g,b].map(x=>x.toString(16).padStart(2,'0')).join('').toUpperCase();
+function rgb2lab([r,g,b]){
+  const lin=c=>{c/=255;return c<=.04045?c/12.92:Math.pow((c+.055)/1.055,2.4)};
+  const R=lin(r),G=lin(g),B=lin(b);
+  let x=(R*.4124564+G*.3575761+B*.1804375)/.95047,y=R*.2126729+G*.7151522+B*.072175,z=(R*.0193339+G*.119192+B*.9503041)/1.08883;
+  const f=t=>t>.008856?Math.cbrt(t):7.787*t+16/116;
+  x=f(x);y=f(y);z=f(z);return [116*y-16,500*(x-y),200*(y-z)];
+}
+function de2000(l1,l2){
+  const [L1,a1,b1]=l1,[L2,a2,b2]=l2,rad=Math.PI/180;
+  const C1=Math.hypot(a1,b1),C2=Math.hypot(a2,b2),Cb=(C1+C2)/2,G=.5*(1-Math.sqrt(Math.pow(Cb,7)/(Math.pow(Cb,7)+Math.pow(25,7))));
+  const a1p=(1+G)*a1,a2p=(1+G)*a2,C1p=Math.hypot(a1p,b1),C2p=Math.hypot(a2p,b2);
+  const hp=(a,b)=>{if(!a&&!b)return 0;const h=Math.atan2(b,a)/rad;return h<0?h+360:h};
+  const h1p=hp(a1p,b1),h2p=hp(a2p,b2);
+  const dLp=L2-L1,dCp=C2p-C1p;
+  let dhp=0;if(C1p*C2p){dhp=h2p-h1p;if(dhp>180)dhp-=360;else if(dhp<-180)dhp+=360}
+  const dHp=2*Math.sqrt(C1p*C2p)*Math.sin(dhp/2*rad);
+  const Lbp=(L1+L2)/2,Cbp=(C1p+C2p)/2;
+  let hbp=h1p+h2p;if(C1p*C2p){if(Math.abs(h1p-h2p)>180)hbp+=hbp<360?360:-360;hbp/=2}
+  const T=1-.17*Math.cos((hbp-30)*rad)+.24*Math.cos(2*hbp*rad)+.32*Math.cos((3*hbp+6)*rad)-.2*Math.cos((4*hbp-63)*rad);
+  const dTh=30*Math.exp(-Math.pow((hbp-275)/25,2)),Rc=2*Math.sqrt(Math.pow(Cbp,7)/(Math.pow(Cbp,7)+Math.pow(25,7)));
+  const Sl=1+.015*Math.pow(Lbp-50,2)/Math.sqrt(20+Math.pow(Lbp-50,2)),Sc=1+.045*Cbp,Sh=1+.015*Cbp*T,Rt=-Math.sin(2*dTh*rad)*Rc;
+  return Math.sqrt(Math.pow(dLp/Sl,2)+Math.pow(dCp/Sc,2)+Math.pow(dHp/Sh,2)+Rt*(dCp/Sc)*(dHp/Sh));
+}
+const scoreFor=d=>Math.round(100/(1+Math.pow(d/11,1.6)))/10;
+function nameFor(h,s,v){
+  let hn='Red';for(const [lim,n] of HUES){if(h<lim){hn=n;break}}
+  if(s<18)hn=v>70?'Grey':'Slate';
+  const adj=v<45?'Deep':s<40?(v>75?'Pale':'Dusty'):s>80&&v>80?'Electric':v>85?'Bright':'Muted';
+  return adj+' '+hn.toLowerCase();
+}
+
+/* ---------- state ---------- */
+let rec={};try{rec=JSON.parse(localStorage.getItem('sw-rec')||'{}')||{}}catch(e){}
+const rk=k=>rec[k]||(rec[k]={best:null,played:0,closest:null,sum:0,n:0});
+const saveRec=()=>{try{localStorage.setItem('sw-rec',JSON.stringify(rec))}catch(e){}};
+let mode='side';try{const m=localStorage.getItem('sw-mode');if(MODES[m])mode=m}catch(e){}
+let B=null,phase='intro',boss=false,tick=null,endAt=0,pausedLeft=0;
+const cur={h:200,s:50,v:70};
+
+function newBrief(){B={rounds:[],i:0,quote:QUOTES[Math.floor(Math.random()*QUOTES.length)]};nextRound()}
+function randTarget(){
+  const h=Math.floor(Math.random()*360),s=Math.floor(22+Math.random()*74),v=Math.floor(38+Math.random()*58);
+  return {h,s,v};
+}
+function nextRound(){
+  const t=randTarget();B.t=t;B.tr=hsv2rgb(t.h,t.s,t.v);
+  cur.h=Math.floor(Math.random()*360);cur.s=50;cur.v=65;syncSliders();
+  if(MODES[mode].look){phase='look';startTimer(MODES[mode].look,()=>{phase='play';startTimer(MODES[mode].time,submit);render()})}
+  else{phase='play';startTimer(MODES[mode].time,submit)}
+  render();
+}
+function startTimer(sec,done){
+  clearInterval(tick);endAt=performance.now()+sec*1000;const total=sec*1000;
+  const step=()=>{
+    if(boss)return;
+    const left=Math.max(0,endAt-performance.now());
+    const bar=document.querySelector('.timer i');if(bar)bar.style.width=(left/total*100)+'%';
+    const tm=document.querySelector('.timer');if(tm)tm.classList.toggle('low',left<3000&&phase==='play');
+    const ct=$('count');if(ct)ct.textContent=Math.ceil(left/1000)+'s';
+    if(left<=0){clearInterval(tick);done()}
+  };
+  tick=setInterval(step,50);step();
+}
+function submit(){
+  if(phase!=='play')return;clearInterval(tick);
+  const mine=hsv2rgb(cur.h,cur.s,cur.v),d=de2000(rgb2lab(B.tr),rgb2lab(mine)),sc=scoreFor(d);
+  B.rounds.push({t:B.tr,m:mine,d,sc});phase='result';render();
+  const r=rk(mode);if(rec[mode].closest==null||d<r.closest)r.closest=d;r.sum+=sc;r.n++;saveRec();
+}
+function advance(){
+  if(phase!=='result')return;
+  B.i++;if(B.i<ROUNDS)nextRound();else finish();
+}
+function finish(){
+  phase='done';const tot=Math.round(B.rounds.reduce((a,r)=>a+r.sc,0)*10)/10,r=rk(mode);r.played++;
+  const pb=r.best==null||tot>r.best;if(pb)r.best=tot;saveRec();B.total=tot;B.pb=pb;render();
+}
+
+/* ---------- render ---------- */
+function quip(sc){return sc>=9.5?'Pixel perfect. The client cried actual tears.':sc>=8.5?'Close enough for print. Nobody will ever know.':sc>=7?'“Love it. Can we see it a touch more… you know?”':sc>=5?'“It’s giving off-brand, but I can’t say why.”':sc>=3?'“Is that the same colour? Looks different on my screen.”':'That’s a different colour entirely. Legal are involved.'}
+function renderRounds(){
+  $('rounds').innerHTML=Array.from({length:ROUNDS},(_,i)=>{const r=B&&B.rounds[i];
+    if(r)return `<i class="done" style="--a:${hex(r.t)};--b:${hex(r.m)}"><span>${r.sc.toFixed(1)}</span></i>`;
+    return `<i class="${B&&phase!=='intro'&&phase!=='done'&&i===B.i?'cur':''}">${i+1}</i>`}).join('');
+}
+function render(){
+  renderRounds();renderRec();
+  const v=$('view');
+  ['h','s','v'].forEach(k=>$(k).disabled=!(phase==='play'||phase==='intro'));
+  $('goBtn').disabled=!(phase==='play'||phase==='result'||phase==='intro'||phase==='done');
+  $('goBtn').textContent=phase==='play'?'Match it':phase==='result'?(B.i+1<ROUNDS?'Next colour':'See results'):phase==='look'?'Memorise…':'Start a brief';
+  if(phase==='intro'){
+    $('bTitle').textContent='Colour match';$('bQuote').textContent='Five colours. Match each one by eye with the sliders.';
+    v.innerHTML=`<div class="intro"><div class="in"><h2>New brief in</h2><p>The client has sent five “reference colours”. Match each one using hue, saturation and brightness before time runs out.</p>
+      <div class="modes">${Object.entries(MODES).map(([k,m])=>`<button data-m="${k}" class="${k===mode?'on':''}">${m.n}</button>`).join('')}</div>
+      <p style="font-size:12.5px;margin-bottom:14px">${mode==='memory'?'You see each colour for 3 seconds, then it’s hidden. 12 seconds to recreate it.':'The reference stays on screen. 15 seconds per colour.'}</p>
+      <button class="btn pri" data-a="start">Start brief</button></div></div>`;
+    return;
+  }
+  if(phase==='done'){
+    $('bTitle').textContent=`Brief complete: ${B.total.toFixed(1)} / 50`;$('bQuote').textContent=B.pb?'A new personal best. Frame it.':B.total>=40?'The client is thrilled. Suspiciously thrilled.':B.total>=28?'The client says “it’s a start”.':'The client has asked for “another round of concepts”.';
+    v.innerHTML=`<div class="summary">${B.rounds.map((r,i)=>`<div class="pair"><div class="c"><i style="background:${hex(r.t)}"></i><i style="background:${hex(r.m)}"></i></div><div class="t"><b>${r.sc.toFixed(1)}</b> / 10<span class="mono">${hex(r.t)} → ${hex(r.m)}</span><span>ΔE ${r.d.toFixed(1)}</span></div></div>`).join('')}</div>
+      <div style="display:flex;gap:8px;justify-content:center;padding:0 16px 18px;flex-wrap:wrap"><button class="btn" data-a="modes">Change mode</button><button class="btn pri" data-a="again">New brief</button></div>`;
+    return;
+  }
+  const t=B.t,hideRef=phase==='play'&&MODES[mode].look;
+  $('bTitle').textContent=`Colour ${B.i+1} of ${ROUNDS}`+(hideRef?'':`: ${nameFor(t.h,t.s,t.v)}`);$('bQuote').textContent=B.quote;
+  const r=B.rounds[B.i];
+  v.innerHTML=`<div class="stage">
+    <div class="timer"><i></i></div>${phase!=='result'?'<span class="count" id="count"></span>':''}
+    <div class="sw${hideRef?' hide':''}" style="background:${hex(B.tr)}">${hideRef?'<div class="mem">From memory…<br>What was it again?</div>':''}<span class="lab">Reference</span>${phase==='result'?`<span class="hex mono">${hex(B.tr)}</span>`:''}</div>
+    <div class="sw" id="mine" style="background:${hex(hsv2rgb(cur.h,cur.s,cur.v))}"><span class="lab">${phase==='look'?'Get ready':'Yours'}</span>${phase==='result'?`<span class="hex mono">${hex(r.m)}</span>`:''}</div>
+    ${phase==='result'?`<div class="verdict"><div class="sc">${r.sc.toFixed(1)}<small> / 10</small></div><p>${quip(r.sc)}</p><div class="de">Difference ΔE2000 ${r.d.toFixed(1)}</div><button class="btn pri" data-a="next">${B.i+1<ROUNDS?'Next colour':'See results'}</button></div>`:''}
+  </div>`;
+  if(phase==='look'){$('mine').style.background='var(--panel2)'}
+}
+function renderRec(){
+  const r=rk(mode);$('modeTxt').textContent=MODES[mode].n;
+  $('best').textContent=r.best==null?'—':r.best.toFixed(1);$('played').textContent=r.played;
+  $('closest').textContent=r.closest==null?'—':'ΔE '+r.closest.toFixed(1);$('avg').textContent=r.n?(r.sum/r.n).toFixed(1):'—';
+}
+function syncSliders(){
+  $('h').value=cur.h;$('s').value=cur.s;$('v').value=cur.v;paintPicker();
+}
+function paintPicker(){
+  const rgb=hsv2rgb(cur.h,cur.s,cur.v),hx=hex(rgb);
+  $('prev').style.background=hx;$('hexTxt').textContent=hx;$('rgbTxt').textContent=`rgb(${rgb.join(', ')})`;
+  $('hV').textContent=cur.h+'°';$('sV').textContent=cur.s+'%';$('vV').textContent=cur.v+'%';
+  $('hsbTxt').textContent=`H ${cur.h} · S ${cur.s} · B ${cur.v}`;
+  const hues=[0,60,120,180,240,300,360].map(h=>hex(hsv2rgb(h%360,Math.max(cur.s,30),Math.max(cur.v,60)))).join(',');
+  $('h').style.setProperty('--track',`linear-gradient(90deg,${hues})`);
+  $('s').style.setProperty('--track',`linear-gradient(90deg,${hex(hsv2rgb(cur.h,0,cur.v))},${hex(hsv2rgb(cur.h,100,cur.v))})`);
+  $('v').style.setProperty('--track',`linear-gradient(90deg,#000,${hex(hsv2rgb(cur.h,cur.s,100))})`);
+  ['h','s','v'].forEach(k=>$(k).style.setProperty('--thumb',hx));
+  const m=$('mine');if(m&&phase==='play')m.style.background=hx;
+}
+
+/* ---------- disguise ---------- */
+const PAL=[['Northwind Navy','#1F2A44','Pantone 533 C','Primary'],['Harbour Blue','#2F6DB5','Pantone 2175 C','Primary'],['Sea Glass','#8FC7C1','Pantone 7464 C','Secondary'],['Signal Orange','#E8743B','Pantone 7578 C','Accent · max 10%'],['Sand','#E9DFCF','Pantone 7527 C','Background'],['Charcoal','#3A3D42','Pantone 432 C','Text'],['Fog','#F4F5F6','—','Background'],['Kelp','#3E7B5A','Pantone 7734 C','Secondary']];
+function rgbOf(h){return [1,3,5].map(i=>parseInt(h.slice(i,i+2),16))}
+$('decoy').innerHTML=PAL.map(([n,h,p,u])=>`<div class="chip"><i style="background:${h}"></i><div><b>${n}</b><span class="mono">${h}</span> · RGB ${rgbOf(h).join(' ')}<br>${p}<br>${u}</div></div>`).join('');
+function toggleBoss(){
+  boss=!boss;document.body.classList.toggle('boss',boss);$('toast').hidden=true;
+  $('viewBtn').textContent=boss?'Picker':'Palette';
+  if(boss){pausedLeft=Math.max(0,endAt-performance.now())}
+  else if(phase==='play'||phase==='look'){endAt=performance.now()+pausedLeft}
+}
+
+/* ---------- input ---------- */
+['h','s','v'].forEach(k=>$(k).addEventListener('input',()=>{cur[k]=+$(k).value;paintPicker()}));
+$('view').addEventListener('click',e=>{
+  const m=e.target.closest('[data-m]');if(m){mode=m.dataset.m;try{localStorage.setItem('sw-mode',mode)}catch(_){}render();return}
+  const a=e.target.closest('[data-a]');if(!a)return;
+  if(a.dataset.a==='start'||a.dataset.a==='again')newBrief();
+  else if(a.dataset.a==='next')advance();
+  else if(a.dataset.a==='modes'){phase='intro';B=null;render()}
+});
+$('goBtn').onclick=()=>{if(phase==='play')submit();else if(phase==='result')advance();else if(phase==='intro'||phase==='done')newBrief()};
+$('viewBtn').onclick=toggleBoss;
+const NUDGE={q:['h',1],a:['h',-1],w:['s',1],s:['s',-1],e:['v',1],d:['v',-1]};
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){e.preventDefault();toggleBoss();return}
+  if(boss||e.ctrlKey||e.metaKey||e.altKey)return;
+  const n=NUDGE[e.key.toLowerCase()];
+  if(n&&phase==='play'){
+    const [k,d]=n,step=e.shiftKey?10:1;
+    cur[k]=k==='h'?((cur.h+d*step)%360+360)%360:Math.max(0,Math.min(100,cur[k]+d*step));syncSliders();return;
+  }
+  if(e.key==='Enter'&&document.activeElement.tagName!=='BUTTON'){e.preventDefault();$('goBtn').onclick()}
+});
+
+let toastT;function toast(t){$('toast').textContent=t;$('toast').hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>$('toast').hidden=true,4200)}
+
+/* boot */
+syncSliders();render();
+let first=false;try{first=!localStorage.getItem('sw-seen');localStorage.setItem('sw-seen','1')}catch(e){}
+if(first)toast('Match five colours by eye with the sliders. Esc swaps to the brand palette.');
+})();
+</script>
+
+</html>

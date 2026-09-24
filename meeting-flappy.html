@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Weekly WIP sync | Meeting</title>
+<style>
+/* Deliberately single-theme: a dark video-call window. */
+:root{
+  --bg:#1f1f1f; --bar:#292929; --tile:#3a3a3a; --tile2:#333; --text:#f0f0f0; --muted:#b3b3b3; --line:#3d3d3d;
+  --brand:#6264c4; --brandHi:#7f82e0; --leave:#c4314b; --leaveHi:#d6405b;
+}
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{background:var(--bg);color:var(--text);font-family:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;font-size:14px;overflow:hidden;color-scheme:dark;user-select:none;-webkit-user-select:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+button:focus-visible{outline:2px solid var(--brandHi);outline-offset:2px}
+.app{display:grid;grid-template-rows:auto minmax(0,1fr) auto;grid-template-columns:minmax(0,1fr);height:100%}
+
+.top{display:flex;align-items:center;gap:6px;padding:8px 12px;background:var(--bar);border-bottom:1px solid #111;min-height:60px}
+.title{display:flex;align-items:center;gap:10px;min-width:0;margin-right:auto}
+.title .logo{width:28px;height:28px;border-radius:7px;background:var(--brand);display:grid;place-items:center;flex:none}
+.title b{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.timer{color:var(--muted);font-variant-numeric:tabular-nums;font-size:13px}
+.ctl{display:flex;flex-direction:column;align-items:center;gap:3px;padding:5px 9px;border-radius:6px;color:var(--text);font-size:11px;min-width:52px;position:relative}
+.ctl:hover{background:#3b3b3b}
+.ctl svg{width:20px;height:20px}
+.ctl .n{position:absolute;top:1px;right:6px;background:var(--brand);border-radius:8px;font-size:10px;padding:0 5px;font-weight:700;font-variant-numeric:tabular-nums}
+.vsep{width:1px;height:32px;background:var(--line);margin:0 4px}
+.leave{background:var(--leave);color:#fff;border-radius:6px;padding:8px 14px;font-weight:600;display:flex;align-items:center;gap:8px}
+.leave:hover{background:var(--leaveHi)}
+
+.stage{position:relative;min-height:0;background:#161616}
+canvas{display:block;width:100%;height:100%;touch-action:none;cursor:pointer}
+.card{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:var(--bar);border:1px solid #444;border-radius:10px;padding:22px 24px;width:min(380px,calc(100% - 32px));box-shadow:0 20px 50px rgba(0,0,0,.55);text-align:center}
+.card .big{width:72px;height:72px;border-radius:50%;background:#c77d3a;color:#fff;display:grid;place-items:center;font-size:28px;font-weight:600;margin:0 auto 12px}
+.card h2{margin:0 0 6px;font-size:19px;font-weight:600}
+.card p{margin:0 0 8px;color:var(--muted);line-height:1.5}
+.card .row{display:flex;justify-content:center;gap:8px;margin-top:14px;flex-wrap:wrap}
+.btn{background:var(--brand);color:#fff;border-radius:6px;padding:9px 20px;font-weight:600}
+.btn:hover{background:var(--brandHi)}
+.btn.sec{background:#3b3b3b}
+
+.caps{background:#111;color:#eee;padding:8px 16px;font-size:14px;min-height:38px;display:flex;align-items:center;gap:8px;border-top:1px solid #000}
+.caps b{color:var(--brandHi);font-weight:600;white-space:nowrap}
+.caps span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+
+/* decoy gallery */
+.gallery{position:absolute;inset:0;padding:10px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-auto-rows:minmax(0,1fr);gap:8px;background:#161616}
+.gt{background:var(--tile);border-radius:8px;position:relative;display:grid;place-items:center;min-height:0;overflow:hidden}
+.gt.spk{box-shadow:inset 0 0 0 2px var(--brandHi)}
+.gt .av{width:clamp(44px,9vh,84px);height:clamp(44px,9vh,84px);border-radius:50%;display:grid;place-items:center;font-weight:600;font-size:clamp(16px,3vh,28px);color:#fff}
+.gt .nm{position:absolute;left:8px;bottom:8px;background:rgba(0,0,0,.55);border-radius:4px;padding:2px 8px;font-size:12px;display:flex;gap:6px;align-items:center;max-width:calc(100% - 16px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+body:not(.boss) .gallery{display:none}
+body.boss canvas,body.boss .card{display:none}
+
+@media (max-width:900px){.ctl span.l{display:none}.ctl{min-width:38px;padding:6px}.hide-m{display:none}}
+@media (max-width:560px){.timer{display:none}.gallery{grid-template-columns:repeat(2,minmax(0,1fr))}.leave span{display:none}.ctl.opt{display:none}}
+</style>
+
+<div class="app">
+  <header class="top">
+    <div class="title">
+      <span class="logo"><svg width="16" height="16" viewBox="0 0 16 16" fill="#fff"><rect x="1" y="4" width="9" height="8" rx="1.5"/><path d="M11 7l4-2.5v7L11 9z"/></svg></span>
+      <b id="mtitle">Weekly WIP sync</b><span class="timer" id="timer">00:00</span>
+    </div>
+    <button class="ctl opt" tabindex="-1" aria-hidden="true"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 4h14v9H8l-4 3v-3H3z"/></svg><span class="l">Chat</span></button>
+    <button class="ctl" tabindex="-1" aria-hidden="true"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="7.5" cy="7" r="2.8"/><path d="M2.5 16c.4-3 2.4-4.6 5-4.6s4.6 1.6 5 4.6"/><circle cx="14" cy="7.5" r="2.2"/><path d="M13.5 11.6c2.1.1 3.6 1.5 4 4.4"/></svg><span class="l">People</span><span class="n" id="people">6</span></button>
+    <button class="ctl opt hide-m" tabindex="-1" aria-hidden="true"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M7 10V4.5a1.2 1.2 0 0 1 2.4 0V9m0-4.5V3.5a1.2 1.2 0 0 1 2.4 0V9m0-4a1.2 1.2 0 0 1 2.4 0v5M7 8.5a1.2 1.2 0 0 0-2.4 0V12c0 3 2 5 5.2 5 3 0 4.8-2.2 4.8-5V9"/></svg><span class="l">Raise</span></button>
+    <button class="ctl opt hide-m" tabindex="-1" aria-hidden="true"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="10" cy="10" r="7"/><circle cx="7.5" cy="8.5" r=".6" fill="currentColor"/><circle cx="12.5" cy="8.5" r=".6" fill="currentColor"/><path d="M7 12c.8 1.2 1.8 1.8 3 1.8s2.2-.6 3-1.8"/></svg><span class="l">React</span></button>
+    <button class="ctl" id="viewBtn" title="Change view (Esc)"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="3" y="3" width="6" height="6" rx="1"/><rect x="11" y="3" width="6" height="6" rx="1"/><rect x="3" y="11" width="6" height="6" rx="1"/><rect x="11" y="11" width="6" height="6" rx="1"/></svg><span class="l">View</span></button>
+    <span class="vsep hide-m"></span>
+    <button class="ctl opt" tabindex="-1" aria-hidden="true"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2.5" y="5.5" width="10" height="9" rx="1.5"/><path d="M12.5 9 17 6.5v7L12.5 11"/></svg><span class="l">Camera</span></button>
+    <button class="ctl" id="micBtn" title="Flap (Space)"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="7.5" y="2.5" width="5" height="9" rx="2.5"/><path d="M4.5 9.5a5.5 5.5 0 0 0 11 0M10 15v2.5"/></svg><span class="l">Mic</span></button>
+    <button class="ctl opt hide-m" tabindex="-1" aria-hidden="true"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2.5" y="4" width="15" height="10" rx="1.5"/><path d="M10 11.5V7M8 9l2-2 2 2M7 17h6"/></svg><span class="l">Share</span></button>
+    <button class="leave" id="leaveBtn"><svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor"><path d="M2.5 11.5c0-1.5 3.4-3.5 7.5-3.5s7.5 2 7.5 3.5v1.3c0 .6-.5 1-1.1.9l-2.6-.5a.9.9 0 0 1-.7-.9v-1.2C12 10.6 11 10.4 10 10.4s-2 .2-3.1.7v1.2c0 .4-.3.8-.7.9l-2.6.5c-.6.1-1.1-.3-1.1-.9z"/></svg><span>Leave</span></button>
+  </header>
+
+  <main class="stage" id="stage">
+    <canvas id="cv"></canvas>
+    <div class="card" id="card"></div>
+    <div class="gallery" id="gallery"></div>
+  </main>
+
+  <div class="caps"><b id="capWho">Priya Shah:</b><span id="capTxt">Morning all, let's give it a minute for people to join.</span></div>
+</div>
+
+<script>
+(function(){
+const $=id=>document.getElementById(id);
+const cv=$('cv'),ctx=cv.getContext('2d');
+const PEOPLE=[['Priya Shah','#a0376a'],['Tom Whitfield','#5a5fb0'],['Mark Delaney','#4f7d3a'],['Janet Cole','#b4552d'],['Helen Ward','#0f7c86'],['Sophie Grant (Guest)','#8a6d1f'],['Dan (Printwise)','#6b4f9e'],['Alex Morgan','#3a7ab8'],['Sam Patel','#9e4f4f'],['Chris Lane','#2f6f5f'],['Ruth Okafor','#7a5a2e'],['Jonah Reeves','#5b6b8a']];
+const CAPS=[
+ ['Priya Shah','Can everyone see my screen?'],['Tom Whitfield','Sorry, I was on mute.'],['Mark Delaney','Let’s take that offline.'],['Janet Cole','Is anyone else’s video frozen?'],
+ ['Helen Ward','Just to circle back on that…'],['Priya Shah','You’re breaking up a bit, Fin.'],['Sophie Grant (Guest)','Could we make the logo bigger?'],['Tom Whitfield','I’ve got a hard stop at quarter past.'],
+ ['Mark Delaney','Can we all go on mute, there’s some background noise.'],['Janet Cole','Sorry, go on. No, you go.'],['Helen Ward','I’ll share the deck after.'],['Priya Shah','Fin, did you want to add anything?'],
+];
+const ini=n=>n.replace(/\(.*?\)/g,'').trim().split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+
+/* ---------- sizing ---------- */
+let W=900,H=600,dpr=1,sc=1;
+function resize(){
+  const r=$('stage').getBoundingClientRect();dpr=Math.min(2,window.devicePixelRatio||1);
+  H=600;sc=r.height/H;W=Math.max(360,r.width/sc);
+  cv.width=Math.round(r.width*dpr);cv.height=Math.round(r.height*dpr);
+  if(!started)draw();
+}
+
+/* ---------- state ---------- */
+let best=0;try{best=+localStorage.getItem('mt-best')||0}catch(e){}
+let started=false,state='lobby',boss=false,me,cols,score,speed,dist,reacts,t,shake;
+const PW=150,TH=100,TG=8,R=24,GR=1500,FLAP=-440;
+function reset(){
+  me={x:W*.28,y:H*.45,v:0,rot:0,talk:0};cols=[];score=0;speed=190;dist=0;reacts=[];t=0;shake=0;
+  for(let i=0;i<4;i++)addCol(W+120+i*330);
+  updPeople();
+}
+function addCol(x){
+  const gap=Math.max(150,205-score*2.2);
+  const c=Math.max(90+gap/2,Math.min(H-40-gap/2,H/2+(Math.random()-.5)*(H-220)));
+  const seed=Math.floor(Math.random()*1000);
+  cols.push({x,top:c-gap/2,bot:c+gap/2,seed,passed:false,spk:Math.floor(Math.random()*6)});
+}
+function flap(){
+  if(boss)return;
+  if(state==='lobby'||state==='dead'){if(state==='dead'&&performance.now()-deadAt<500)return;start();return}
+  if(state==='play'){me.v=FLAP;me.talk=.35}
+}
+function start(){reset();state='play';$('card').hidden=true;last=performance.now()}
+let deadAt=0;
+function die(){
+  state='falling';deadAt=performance.now();shake=.25;
+}
+function over(){
+  state='dead';deadAt=performance.now();
+  const nb=score>best;if(nb){best=score;try{localStorage.setItem('mt-best',best)}catch(e){}}
+  const secs=Math.floor(t);
+  card(`<div class="big">F</div><h2>You left the meeting</h2><p>Your connection dropped after ${fmtT(secs)}. You made it past <b style="color:#fff">${score}</b> colleague${score===1?'':'s'}${nb&&score?', your best yet':''}.</p><p>Best: ${best}</p><div class="row"><button class="btn" id="goBtn">Rejoin</button></div>`);
+}
+const fmtT=s=>String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
+function updPeople(){$('people').textContent=6+score}
+function card(html){const c=$('card');c.innerHTML=html;c.hidden=false;const b=$('goBtn');if(b){b.onclick=e=>{e.stopPropagation();start()};}}
+
+/* ---------- update ---------- */
+function update(dt){
+  t+=dt;
+  if(state==='play'||state==='falling'){
+    me.v+=GR*dt;me.y+=me.v*dt;me.rot=Math.max(-.45,Math.min(1.2,me.v/600));
+    if(me.y<R){me.y=R;me.v=0}
+    if(me.talk>0)me.talk-=dt;
+  }
+  if(state==='play'){
+    speed=190+Math.min(120,score*4);
+    const dx=speed*dt;dist+=dx;
+    cols.forEach(c=>c.x-=dx);
+    if(cols.length&&cols[0].x<-PW-20){cols.shift();addCol(cols[cols.length-1].x+330)}
+    for(const c of cols){
+      if(!c.passed&&c.x+PW<me.x-R){c.passed=true;score++;updPeople();reacts.push({x:me.x,y:me.y,e:['👍','❤️','😂','👏','😮'][Math.floor(Math.random()*5)],l:1.4})}
+      // circle vs rects
+      const hit=(rx,ry,rw,rh)=>{const cx=Math.max(rx,Math.min(me.x,rx+rw)),cy=Math.max(ry,Math.min(me.y,ry+rh));return (me.x-cx)**2+(me.y-cy)**2<(R-3)**2};
+      if(hit(c.x,-50,PW,c.top+50)||hit(c.x,c.bot,PW,H-c.bot+50)){die();break}
+    }
+    if(me.y>H-R){me.y=H-R;die()}
+  }
+  if(state==='falling'&&me.y>=H-R){me.y=H-R;over()}
+  reacts.forEach(r=>{r.y-=60*dt;r.l-=dt});reacts=reacts.filter(r=>r.l>0);
+  if(shake>0)shake-=dt;
+}
+
+/* ---------- draw ---------- */
+function rr(x,y,w,h,r){ctx.beginPath();ctx.roundRect(x,y,w,h,r)}
+function tile(x,y,w,h,p,speaking,muted){
+  ctx.fillStyle='#3a3a3a';rr(x,y,w,h,8);ctx.fill();
+  if(speaking){ctx.strokeStyle='#7f82e0';ctx.lineWidth=3;rr(x+1.5,y+1.5,w-3,h-3,7);ctx.stroke()}
+  const cx=x+w/2,cy=y+h/2-6;
+  ctx.fillStyle=p[1];ctx.beginPath();ctx.arc(cx,cy,24,0,7);ctx.fill();
+  ctx.fillStyle='#fff';ctx.font='600 16px "Segoe UI",system-ui,sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(ini(p[0]),cx,cy+1);
+  ctx.font='12px "Segoe UI",system-ui,sans-serif';const nm=p[0].length>17?p[0].slice(0,16)+'…':p[0];const tw=ctx.measureText(nm).width+(muted?20:10);
+  ctx.fillStyle='rgba(0,0,0,.55)';rr(x+6,y+h-24,Math.min(tw,w-12),18,4);ctx.fill();
+  ctx.fillStyle='#eee';ctx.textAlign='left';ctx.fillText(nm,x+11+(muted?12:0),y+h-15);
+  if(muted){ctx.strokeStyle='#ddd';ctx.lineWidth=1.3;ctx.beginPath();ctx.moveTo(x+11,y+h-20);ctx.lineTo(x+19,y+h-10);ctx.stroke();ctx.strokeRect(x+13,y+h-21,4,7)}
+}
+function draw(){
+  ctx.setTransform(dpr*sc,0,0,dpr*sc,0,0);
+  if(shake>0)ctx.translate((Math.random()-.5)*8,(Math.random()-.5)*8);
+  ctx.fillStyle='#161616';ctx.fillRect(-10,-10,W+20,H+20);
+  if(!me)return;
+  // columns of video tiles
+  for(const c of cols){
+    let k=0;
+    for(let y=c.bot;y<H+TH;y+=TH+TG){const p=PEOPLE[(c.seed+k)%PEOPLE.length];tile(c.x,y,PW,TH,p,k===c.spk,(c.seed+k)%3===0);k++}
+    for(let y=c.top-TH;y>-TH-TG;y-=TH+TG){const p=PEOPLE[(c.seed+k+5)%PEOPLE.length];tile(c.x,y,PW,TH,p,k===c.spk,(c.seed+k)%3!==1);k++}
+  }
+  // you: the self-view bubble
+  ctx.save();ctx.translate(me.x,me.y);ctx.rotate(me.rot*.6);
+  if(me.talk>0||state==='lobby'){ctx.strokeStyle='rgba(127,130,224,'+(state==='lobby'?.6:Math.min(1,me.talk*4))+')';ctx.lineWidth=4;ctx.beginPath();ctx.arc(0,0,R+5,0,7);ctx.stroke()}
+  ctx.fillStyle='#c77d3a';ctx.beginPath();ctx.arc(0,0,R,0,7);ctx.fill();
+  ctx.fillStyle='#fff';ctx.font='600 20px "Segoe UI",system-ui,sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('F',0,1);
+  // tiny mic badge
+  ctx.fillStyle='#292929';ctx.beginPath();ctx.arc(R*.72,R*.72,9,0,7);ctx.fill();
+  ctx.strokeStyle=me.talk>0?'#7f82e0':'#bbb';ctx.lineWidth=1.4;ctx.strokeRect(R*.72-2,R*.72-5,4,7);
+  if(!(me.talk>0)){ctx.beginPath();ctx.moveTo(R*.72-5,R*.72-5);ctx.lineTo(R*.72+5,R*.72+5);ctx.stroke()}
+  ctx.restore();
+  // floating reactions
+  ctx.font='26px system-ui,"Segoe UI Emoji","Apple Color Emoji",sans-serif';ctx.textAlign='center';
+  reacts.forEach(r=>{ctx.globalAlpha=Math.min(1,r.l);ctx.fillText(r.e,r.x,r.y);ctx.globalAlpha=1});
+  // score as a subtle "people in call" badge
+  if(state!=='lobby'){ctx.font='600 44px "Segoe UI",system-ui,sans-serif';ctx.fillStyle='rgba(255,255,255,.85)';ctx.textAlign='center';ctx.textBaseline='top';ctx.fillText(score,W/2,18)}
+}
+
+/* ---------- gallery (disguise) ---------- */
+$('gallery').innerHTML=PEOPLE.slice(0,6).map((p,i)=>`<div class="gt${i===0?' spk':''}"><span class="av" style="background:${p[1]}">${ini(p[0])}</span><span class="nm">${i%2?'🔇 ':''}${p[0]}</span></div>`).join('');
+function toggleBoss(){
+  boss=!boss;document.body.classList.toggle('boss',boss);
+  if(boss&&state==='play'){state='held'}
+  else if(!boss&&state==='held'){state='paused';card(`<div class="big">F</div><h2>You’re back</h2><p>The meeting carried on without you. Nobody noticed.</p><div class="row"><button class="btn" id="goBtn2">Carry on</button></div>`);
+    $('goBtn2').onclick=e=>{e.stopPropagation();$('card').hidden=true;state='play';last=performance.now()}}
+}
+
+/* ---------- input ---------- */
+addEventListener('keydown',e=>{
+  if(e.key==='Escape'){e.preventDefault();toggleBoss();return}
+  if(boss)return;
+  if(e.key===' '||e.key==='ArrowUp'||e.key==='w'||e.key==='W'){e.preventDefault();if(state==='paused'){$('goBtn2').click();return}flap()}
+});
+$('stage').addEventListener('pointerdown',e=>{if(e.target.closest('button'))return;if(state==='paused')return;flap()});
+$('micBtn').onclick=e=>{e.stopPropagation();flap()};
+$('viewBtn').onclick=toggleBoss;
+$('leaveBtn').onclick=()=>{if(state==='play'){die()}};
+
+/* ---------- captions ---------- */
+let ci=0;setInterval(()=>{ci=(ci+1)%CAPS.length;$('capWho').textContent=CAPS[ci][0]+':';$('capTxt').textContent=CAPS[ci][1]},4200);
+
+/* ---------- loop ---------- */
+let last=performance.now(),secT=0;
+function frame(now){
+  const dt=Math.min(.033,(now-last)/1000);last=now;
+  if(!boss&&(state==='play'||state==='falling')&&!document.hidden){update(dt);secT+=dt;if(secT>.25){secT=0;$('timer').textContent=fmtT(Math.floor(t))}}
+  else if(state==='lobby'&&me){me.y=H*.45+Math.sin(now/300)*10;me.talk=0}
+  if(!boss)draw();
+  requestAnimationFrame(frame);
+}
+addEventListener('resize',resize);
+resize();reset();started=true;state='lobby';draw();
+card(`<div class="big">F</div><h2>Weekly WIP sync</h2><p>You’re about to squeeze through a meeting full of colleagues. Press Space, click, or tap to unmute and flap. Don’t bump into anyone’s video.</p><p>${best?'Best: '+best+' colleagues · ':''}Esc (or View) switches to gallery.</p><div class="row"><button class="btn" id="goBtn">Join now</button></div>`);
+requestAnimationFrame(frame);
+})();
+</script>
+
+</html>

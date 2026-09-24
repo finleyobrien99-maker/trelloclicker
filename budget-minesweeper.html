@@ -1,0 +1,382 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Q3 Budget Forecast</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap">
+<style>
+/* Deliberately single-theme: it has to look like a light spreadsheet app on any machine. */
+:root{
+  --bg:#ffffff; --chrome:#f9fbfd; --tool:#edf2fa; --text:#1f1f1f; --muted:#5f6368; --line:#e1e1e1; --hdr:#f8f9fa; --hdrLine:#c7c7c7;
+  --hdrSel:#d3e3fd; --blue:#0b57d0; --sel:#1a73e8; --green:#1e8e3e; --rev:#f1f4f2; --red:#d93025; --redSoft:#fce8e6;
+}
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{background:var(--bg);color:var(--text);font-family:Roboto,Arial,sans-serif;font-size:14px;overflow:hidden;color-scheme:light}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+button:focus-visible{outline:2px solid var(--sel);outline-offset:1px}
+.app{display:flex;flex-direction:column;height:100%;background:var(--chrome)}
+
+/* title bar */
+.head{display:flex;align-items:center;gap:10px;padding:8px 16px 0}
+.icon{width:30px;height:38px;border-radius:4px;background:#1e8e3e;display:grid;place-items:center;flex:none}
+.icon i{width:16px;height:14px;border:2px solid #fff;border-radius:1px;background:linear-gradient(#fff,#fff) 50% 0/2px 100% no-repeat,linear-gradient(#fff,#fff) 0 50%/100% 2px no-repeat}
+.titles{min-width:0}
+.doc{display:flex;align-items:center;gap:10px;font-size:18px;white-space:nowrap}
+.doc small{font-size:12px;color:var(--muted)}
+.menus{display:flex;gap:2px;font-size:14px;flex-wrap:wrap}
+.menus span,.menus button{padding:2px 7px;border-radius:4px}
+.menus button:hover{background:#e8eaed}
+.right{margin-left:auto;display:flex;align-items:center;gap:12px;flex:none}
+.share{background:#c2e7ff;color:#001d35;border-radius:20px;padding:9px 18px;font-weight:500;display:flex;gap:8px;align-items:center}
+.share:hover{background:#b3dcf5}
+.me{width:32px;height:32px;border-radius:50%;background:#c77d3a;color:#fff;display:grid;place-items:center;font-weight:500}
+
+/* toolbar */
+.tools{margin:8px 16px 6px;background:var(--tool);border-radius:24px;display:flex;align-items:center;gap:2px;padding:4px 10px;overflow-x:auto;scrollbar-width:none;min-height:40px}
+.tools::-webkit-scrollbar{display:none}
+.t{min-width:28px;height:28px;padding:0 6px;border-radius:4px;display:inline-grid;place-items:center;color:#444746;font-size:14px;white-space:nowrap;flex:none}
+button.t:hover{background:#dde3ea}
+button.t.on{background:#d3e3fd;color:var(--blue)}
+.sep{width:1px;height:20px;background:#c7c7c7;margin:0 6px;flex:none}
+.t b{font-weight:700}.t .it{font-style:italic;font-family:Georgia,serif}.t s{text-decoration:line-through}
+
+/* formula bar */
+.fbar{display:flex;align-items:center;border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--bg);height:30px;font-size:13px}
+.namebox{width:90px;padding:0 10px;border-right:1px solid var(--line);height:100%;display:flex;align-items:center;justify-content:space-between;color:var(--text)}
+.fx{padding:0 10px;color:#80868b;font-style:italic;font-family:Georgia,serif;border-right:1px solid var(--line);height:100%;display:flex;align-items:center}
+.fval{padding:0 10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:Arial,sans-serif}
+
+/* grid */
+.wrap{flex:1;overflow:auto;background:var(--bg);position:relative;min-height:0}
+table{border-collapse:separate;border-spacing:0;font-family:Arial,sans-serif;font-size:13px;table-layout:fixed}
+th,td{height:23px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:0 4px;white-space:nowrap;overflow:hidden}
+thead th{position:sticky;top:0;background:var(--hdr);color:var(--muted);font-weight:400;font-size:11px;text-align:center;border-color:var(--hdrLine);z-index:2}
+tbody th{position:sticky;left:0;background:var(--hdr);color:var(--muted);font-weight:400;font-size:11px;text-align:center;border-color:var(--hdrLine);z-index:1;width:46px}
+thead th.corner{left:0;z-index:3;width:46px}
+th.hs{background:var(--hdrSel);color:#0b57d0;font-weight:500}
+col.c{width:58px}
+.decoy col.c{width:110px}
+.decoy col.c1{width:170px}
+td{background:var(--bg);user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+td.g{cursor:cell;text-align:right}
+td.rv{background:var(--rev)}
+.decoy col.c:not(.c1){width:110px}
+td.n1{color:#1a55c4}td.n2{color:#1e7d34}td.n3{color:#c5221f}td.n4{color:#1f3a8a}td.n5{color:#8e2419}td.n6{color:#0f7c86}td.n7{color:#202124}td.n8{color:#80868b}
+td.fl{color:var(--red);text-align:left;font-weight:700}
+td.mine{color:var(--red);background:var(--redSoft);text-align:left;font-weight:700}
+td.boom{background:#f4b4ae}
+td.wrong{color:#80868b;text-align:left;text-decoration:line-through}
+td.ok{background:#e6f4ea}
+td.sel{box-shadow:inset 0 0 0 2px var(--sel)}
+td.b{font-weight:700}
+td.num{text-align:right}
+td.tot{border-top:2px solid #444;font-weight:700}
+td.hl{background:#e8f0fe}
+
+/* bottom */
+.foot{display:flex;align-items:center;gap:4px;height:40px;border-top:1px solid var(--line);background:var(--chrome);padding:0 8px}
+.foot .add{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font-size:20px;color:#444746}
+.tabs{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;min-width:0}
+.tab{padding:8px 16px;border-radius:6px 6px 0 0;font-size:13px;font-weight:500;color:#444746;white-space:nowrap}
+.tab:hover{background:#e8eaed}
+.tab.on{background:#e1e9f7;color:var(--blue)}
+.stat{margin-left:auto;border:1px solid var(--line);background:var(--bg);border-radius:4px;padding:4px 10px;font-size:12px;color:var(--text);white-space:nowrap;font-variant-numeric:tabular-nums}
+.stat b{font-weight:500}
+
+.snack{position:fixed;left:16px;bottom:calc(52px + env(safe-area-inset-bottom,0px));background:#303030;color:#f2f2f2;border-radius:6px;padding:12px 14px;display:flex;align-items:center;gap:14px;max-width:min(520px,calc(100vw - 32px));box-shadow:0 4px 16px rgba(0,0,0,.25);font-size:14px;line-height:1.4;z-index:20}
+.snack button{color:#a8c7fa;font-weight:500;white-space:nowrap}
+.snack .x{color:#bbb;font-size:18px}
+
+@media (max-width:700px){
+  .menus span:nth-child(n+4){display:none}
+  .doc small{display:none}
+  .share span{display:none}
+  .share{padding:9px 12px}
+  .head{padding:8px 12px 0}
+  .tools{margin:8px 12px 6px}
+  .stat .long{display:none}
+}
+</style>
+
+<div class="app" id="app">
+  <header class="head">
+    <div class="icon" aria-hidden="true"><i></i></div>
+    <div class="titles">
+      <div class="doc">Q3 Budget Forecast <span style="color:#80868b">☆</span> <small id="saved">All changes saved</small></div>
+      <nav class="menus"><span>File</span><span>Edit</span><span>View</span><span>Insert</span><span>Format</span><span>Data</span><span>Tools</span><span>Extensions</span><button id="helpBtn">Help</button></nav>
+    </div>
+    <div class="right">
+      <button class="share" id="shareBtn" title="Share (Esc)">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="7" width="10" height="7" rx="1.5"/><path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2"/></svg><span>Share</span>
+      </button>
+      <span class="me">F</span>
+    </div>
+  </header>
+
+  <div class="tools" role="toolbar" aria-label="Formatting">
+    <span class="t">↶</span><span class="t">↷</span><span class="t">⎙</span><span class="t">⌗</span>
+    <span class="t">100% ▾</span><span class="sep"></span>
+    <span class="t">£</span><span class="t">%</span><span class="t">.0</span><span class="t">.00</span><span class="t">123 ▾</span><span class="sep"></span>
+    <span class="t">Arial ▾</span><span class="sep"></span><span class="t">− 10 +</span><span class="sep"></span>
+    <span class="t"><b>B</b></span><span class="t"><span class="it">I</span></span><span class="t"><s>S</s></span><span class="t" style="text-decoration:underline;text-decoration-color:#000;text-decoration-thickness:3px">A</span>
+    <button class="t" id="flagBtn" title="Mark cell (F) — tap cells to mark instead of open">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3.5 14V2.5M3.5 3h8l-2 3 2 3h-8"/></svg>
+    </button>
+    <span class="t">⊞</span><span class="t">⇔</span><span class="sep"></span>
+    <span class="t">≡ ▾</span><span class="t">⊥ ▾</span><span class="sep"></span>
+    <button class="t" id="newBtn" title="New sheet (R)">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13 8a5 5 0 1 1-1.5-3.6M13 2.5v2.5h-2.5"/></svg>
+    </button>
+    <span class="t">Σ ▾</span>
+  </div>
+
+  <div class="fbar">
+    <div class="namebox"><span id="nameBox">A1</span><span style="color:#80868b">▾</span></div>
+    <div class="fx">fx</div>
+    <div class="fval" id="fval"></div>
+  </div>
+
+  <div class="wrap" id="wrap"><table id="grid"></table></div>
+
+  <footer class="foot">
+    <span class="add">+</span><span class="add" style="font-size:16px">≡</span>
+    <div class="tabs" id="tabs"></div>
+    <div class="stat" id="stat"></div>
+  </footer>
+</div>
+<div class="snack" id="snack" hidden><span id="snackTxt"></span><button id="snackAct" hidden></button><button class="x" id="snackX" aria-label="Dismiss">×</button></div>
+
+<script>
+(function(){
+const $=id=>document.getElementById(id);
+const LEVELS={q1:{r:9,c:9,m:10,n:'Q1',d:'Easy'},q2:{r:16,c:16,m:40,n:'Q2',d:'Medium'},q3:{r:16,c:30,m:99,n:'Q3',d:'Hard'}};
+const TABS=[['summary','Summary'],['q1','Q1'],['q2','Q2'],['q3','Q3']];
+const colName=i=>{let s='';i++;while(i>0){const m=(i-1)%26;s=String.fromCharCode(65+m)+s;i=Math.floor((i-1)/26)}return s};
+
+let stats={};try{stats=JSON.parse(localStorage.getItem('bs-stats')||'{}')||{}}catch(e){}
+const st=k=>stats[k]||(stats[k]={played:0,won:0,best:null});
+function saveStats(){try{localStorage.setItem('bs-stats',JSON.stringify(stats))}catch(e){}}
+
+let sheet='q1', G=null, boss=false, flagMode=false;
+try{const s=localStorage.getItem('bs-sheet');if(s&&(LEVELS[s]||s==='summary'))sheet=s}catch(e){}
+
+function newGame(){
+  const L=LEVELS[sheet];const n=L.r*L.c;
+  G={L,rows:L.r,cols:L.c,mines:L.m,mine:new Uint8Array(n),rev:new Uint8Array(n),flag:new Uint8Array(n),adj:new Uint8Array(n),
+     started:false,over:false,won:false,elapsed:0,sel:{r:0,c:0},boom:-1,revealed:0,flags:0};
+}
+const idx=(r,c)=>r*G.cols+c;
+function nbrs(r,c){const o=[];for(let dr=-1;dr<=1;dr++)for(let dc=-1;dc<=1;dc++){if(!dr&&!dc)continue;const a=r+dr,b=c+dc;if(a>=0&&b>=0&&a<G.rows&&b<G.cols)o.push([a,b])}return o}
+function plant(sr,sc){
+  const safe=new Set([idx(sr,sc),...nbrs(sr,sc).map(([a,b])=>idx(a,b))]);
+  let placed=0;const n=G.rows*G.cols;
+  while(placed<G.mines){const i=Math.floor(Math.random()*n);if(safe.has(i)||G.mine[i])continue;G.mine[i]=1;placed++}
+  for(let r=0;r<G.rows;r++)for(let c=0;c<G.cols;c++)G.adj[idx(r,c)]=nbrs(r,c).filter(([a,b])=>G.mine[idx(a,b)]).length;
+  G.started=true;st(sheet).played++;saveStats();
+}
+
+/* ---------- table building ---------- */
+function buildTable(rows,cols,opts={}){
+  const t=$('grid');t.className=opts.cls||'';
+  const cw=opts.cls?110:58;cols=Math.max(cols,Math.ceil(($('wrap').clientWidth-46)/cw)+1);
+  rows=Math.max(rows,Math.ceil($('wrap').clientHeight/24)+2);
+  let h='<colgroup><col style="width:46px">';
+  for(let c=0;c<cols;c++)h+=`<col class="c${c===0?' c1':''}">`;
+  h+='</colgroup><thead><tr><th class="corner"></th>';
+  for(let c=0;c<cols;c++)h+=`<th data-ch="${c}">${colName(c)}</th>`;
+  h+='</tr></thead><tbody>';
+  for(let r=0;r<rows;r++){h+=`<tr><th data-rh="${r}">${r+1}</th>`;for(let c=0;c<cols;c++)h+=`<td data-r="${r}" data-c="${c}"></td>`;h+='</tr>'}
+  t.innerHTML=h+'</tbody>';
+}
+const td=(r,c)=>$('grid').tBodies[0].rows[r].cells[c+1];
+
+function renderGame(){
+  buildTable(G.rows+18,G.cols+5);
+  for(let r=0;r<G.rows;r++)for(let c=0;c<G.cols;c++)paint(r,c);
+  setSel(G.sel.r,G.sel.c,true);updStat();
+}
+function paint(r,c){
+  const el=td(r,c),i=idx(r,c);let cls='g',txt='';
+  if(G.rev[i]){cls+=' rv';if(G.mine[i]){cls+=' mine';txt='#DIV/0!';if(i===G.boom)cls+=' boom'}else if(G.adj[i]){cls+=' n'+G.adj[i];txt=G.adj[i]}}
+  else if(G.flag[i]){ if(G.over&&!G.won&&!G.mine[i]){cls+=' wrong';txt='#N/A'} else {cls+=' fl'+(G.won?' ok':'');txt='#REF!'} }
+  if(G.sel.r===r&&G.sel.c===c)cls+=' sel';
+  el.className=cls;el.textContent=txt;
+}
+function formulaFor(r,c){
+  const i=idx(r,c);
+  if(G.rev[i]){if(G.mine[i])return '=Q3_TOTAL/0';if(G.adj[i])return '=COUNTIF(ADJACENT('+colName(c)+(r+1)+'),"variance")';return ''}
+  if(G.flag[i])return '=VLOOKUP('+colName(c)+(r+1)+',Budget!A:F,4,FALSE)';
+  return '';
+}
+function setSel(r,c,quiet){
+  const prev=G.sel;G.sel={r,c};
+  if(!quiet&&prev)paint(prev.r,prev.c);
+  paint(r,c);
+  document.querySelectorAll('th.hs').forEach(e=>e.classList.remove('hs'));
+  const ch=document.querySelector(`[data-ch="${c}"]`),rh=document.querySelector(`[data-rh="${r}"]`);
+  ch&&ch.classList.add('hs');rh&&rh.classList.add('hs');
+  $('nameBox').textContent=colName(c)+(r+1);
+  $('fval').textContent=formulaFor(r,c);
+  const el=td(r,c);if(el&&!quiet)el.scrollIntoView({block:'nearest',inline:'nearest'});
+}
+function updStat(){
+  if(sheet==='summary'||boss){$('stat').innerHTML='<b>Sum:</b> £1,284,960';return}
+  const left=G.mines-G.flags,s=G.elapsed,t=Math.floor(s/60)+':'+String(s%60).padStart(2,'0');
+  $('stat').innerHTML=`<b>Count:</b> ${left}<span class="long"> remaining</span> &nbsp;·&nbsp; <b>Time:</b> ${t}`;
+}
+
+/* ---------- game actions ---------- */
+function reveal(r,c){
+  if(G.over)return;const i=idx(r,c);
+  if(G.flag[i])return;
+  if(!G.started)plant(r,c);
+  if(G.rev[i]){return chord(r,c)}
+  if(G.mine[i]){G.rev[i]=1;G.boom=i;return lose()}
+  const stack=[[r,c]];
+  while(stack.length){
+    const [a,b]=stack.pop(),j=idx(a,b);
+    if(G.rev[j]||G.flag[j])continue;
+    G.rev[j]=1;G.revealed++;paint(a,b);
+    if(G.adj[j]===0)nbrs(a,b).forEach(p=>{if(!G.rev[idx(p[0],p[1])])stack.push(p)});
+  }
+  touchSaved();checkWin();
+}
+function chord(r,c){
+  const i=idx(r,c);if(!G.adj[i])return;
+  const ns=nbrs(r,c);
+  if(ns.filter(([a,b])=>G.flag[idx(a,b)]).length!==G.adj[i])return;
+  for(const [a,b] of ns){const j=idx(a,b);if(!G.rev[j]&&!G.flag[j]){if(G.mine[j]){G.rev[j]=1;G.boom=j;return lose()}reveal(a,b);if(G.over)return}}
+}
+function toggleFlag(r,c){
+  if(G.over)return;const i=idx(r,c);if(G.rev[i])return;
+  G.flag[i]^=1;G.flags+=G.flag[i]?1:-1;paint(r,c);$('fval').textContent=formulaFor(r,c);updStat();touchSaved();
+}
+function lose(){
+  G.over=true;
+  for(let r=0;r<G.rows;r++)for(let c=0;c<G.cols;c++){const i=idx(r,c);if(G.mine[i]&&!G.flag[i])G.rev[i]=1;paint(r,c)}
+  const b=G.boom;const cell=colName(b%G.cols)+(Math.floor(b/G.cols)+1);
+  snack(`Error: divide by zero in ${cell}. The whole forecast is ruined.`,'New sheet',()=>{newGame();renderGame();hideSnack()});
+  updStat();
+}
+function checkWin(){
+  if(G.revealed!==G.rows*G.cols-G.mines)return;
+  G.over=true;G.won=true;
+  for(let i=0;i<G.flag.length;i++)if(G.mine[i]&&!G.flag[i]){G.flag[i]=1}
+  G.flags=G.mines;
+  for(let r=0;r<G.rows;r++)for(let c=0;c<G.cols;c++)paint(r,c);
+  const s=st(sheet);s.won++;const best=s.best==null||G.elapsed<s.best;if(best)s.best=G.elapsed;saveStats();
+  snack(`Balanced. Every figure reconciled in ${G.elapsed}s${best?' — a new personal best':''}.`,'New sheet',()=>{newGame();renderGame();hideSnack()});
+  updStat();
+}
+let savedT;function touchSaved(){$('saved').textContent='Saving…';clearTimeout(savedT);savedT=setTimeout(()=>$('saved').textContent='All changes saved',700)}
+
+/* ---------- summary + decoy ---------- */
+function fill(rows,cls){rows.forEach((row,r)=>row.forEach((v,c)=>{if(v==null)return;const el=td(r,c);el.textContent=v;if(cls&&cls[r])el.className=cls[r][c]||''}))}
+function renderSummary(){
+  buildTable(28,10);
+  const rows=[['Sheet','Size','Variances','Opened','Balanced','Win rate','Best time (s)']];
+  const cl=[['b','b','b','b','b','b','b']];
+  Object.keys(LEVELS).forEach(k=>{const L=LEVELS[k],s=st(k);
+    rows.push([L.n+' ('+L.d+')',L.c+' × '+L.r,L.m,s.played,s.won,s.played?Math.round(s.won/s.played*100)+'%':'—',s.best??'—']);
+    cl.push(['','num','num','num','num','num','num'])});
+  rows.push([],['Notes'],['Click a cell to open it. Numbers show how many variances touch that cell.'],['Right-click, long-press or the flag button marks a cell as #REF!.'],['Click an opened number with all its neighbours marked to clear around it.'],['R starts a new sheet · arrows + Enter/F on keyboard · Esc hides everything.']);
+  cl.push([],['b']);
+  fill(rows,cl);$('nameBox').textContent='A1';$('fval').textContent='Sheet';
+}
+function renderDecoy(){
+  buildTable(30,9,{cls:'decoy'});
+  const d=[['Cost centre','Q1','Q2','Q3','Q4','Total','vs budget'],
+   ['Design & Creative','£48,200','£51,650','£49,900','£55,300','£205,050','-2.1%'],
+   ['Photography','£22,400','£19,800','£27,150','£24,000','£93,350','4.6%'],
+   ['Paid Social','£61,000','£66,500','£72,250','£80,000','£279,750','1.3%'],
+   ['Print & Point of Sale','£18,750','£14,200','£21,300','£26,900','£81,150','-6.8%'],
+   ['Web & Ecommerce','£39,900','£41,300','£44,800','£46,100','£172,100','0.4%'],
+   ['Events','£12,000','£8,500','£31,000','£15,500','£67,000','12.2%'],
+   ['Freelancers','£27,300','£29,850','£33,400','£30,100','£120,650','-1.9%'],
+   ['Software & Licences','£14,620','£14,620','£15,110','£15,110','£59,460','0.0%'],
+   ['Agency Retainers','£45,000','£45,000','£45,000','£45,000','£180,000','0.0%'],
+   ['Contingency','£6,000','£6,000','£6,000','£8,450','£26,450','-12.0%'],
+   ['Total','£295,170','£297,420','£345,910','£346,460','£1,284,960','0.7%']];
+  const cl=d.map((row,r)=>row.map((_,c)=>r===0?'b hl':(r===d.length-1?'tot'+(c?' num':''):(c?'num':''))));
+  fill(d,cl);$('nameBox').textContent='F12';$('fval').textContent='=SUM(F2:F11)';
+  td(11,5).classList.add('sel');
+}
+
+/* ---------- views ---------- */
+function renderTabs(){
+  $('tabs').innerHTML=TABS.map(([k,n])=>`<button class="tab${(boss?k==='summary':k===sheet)?' on':''}" data-tab="${k}">${boss&&k==='summary'?'Budget':n}</button>`).join('');
+}
+function show(){
+  hideSnack();
+  if(boss) renderDecoy();
+  else if(sheet==='summary') renderSummary();
+  else renderGame();
+  renderTabs();updStat();
+}
+function switchSheet(k){
+  if(boss) return;
+  sheet=k;try{localStorage.setItem('bs-sheet',k)}catch(e){}
+  if(LEVELS[k]&&(!G||G.L!==LEVELS[k]))newGame();
+  show();
+}
+function toggleBoss(){boss=!boss;show()}
+
+let snackFn=null;
+function snack(txt,act,fn){$('snackTxt').textContent=txt;const a=$('snackAct');if(act){a.hidden=false;a.textContent=act;snackFn=fn}else{a.hidden=true;snackFn=null}$('snack').hidden=false}
+function hideSnack(){$('snack').hidden=true}
+$('snackAct').onclick=()=>snackFn&&snackFn();
+$('snackX').onclick=hideSnack;
+
+/* ---------- input ---------- */
+const grid=$('grid');
+function cellFrom(e){const el=e.target.closest('td');if(!el)return null;const r=+el.dataset.r,c=+el.dataset.c;if(!G||r>=G.rows||c>=G.cols)return null;return [r,c]}
+const playing=()=>!boss&&LEVELS[sheet]&&G;
+let lpT=null,lpFired=false;
+grid.addEventListener('click',e=>{
+  if(!playing())return;if(lpFired){lpFired=false;return}
+  const p=cellFrom(e);if(!p)return;
+  setSel(p[0],p[1]);
+  if(flagMode&&!G.rev[idx(p[0],p[1])])toggleFlag(p[0],p[1]);else reveal(p[0],p[1]);
+  $('fval').textContent=formulaFor(p[0],p[1]);
+});
+grid.addEventListener('contextmenu',e=>{
+  if(!playing())return;const p=cellFrom(e);if(!p)return;
+  e.preventDefault();setSel(p[0],p[1]);toggleFlag(p[0],p[1]);
+});
+grid.addEventListener('touchstart',e=>{
+  if(!playing())return;const p=cellFrom(e);if(!p)return;lpFired=false;
+  lpT=setTimeout(()=>{lpFired=true;setSel(p[0],p[1]);toggleFlag(p[0],p[1]);if(navigator.vibrate)navigator.vibrate(20)},420);
+},{passive:true});
+['touchend','touchmove','touchcancel'].forEach(ev=>grid.addEventListener(ev,()=>clearTimeout(lpT),{passive:true}));
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){e.preventDefault();toggleBoss();return}
+  if(!playing()||e.ctrlKey||e.metaKey||e.altKey)return;
+  const {r,c}=G.sel;const mv={ArrowUp:[-1,0],ArrowDown:[1,0],ArrowLeft:[0,-1],ArrowRight:[0,1]}[e.key];
+  if(mv){e.preventDefault();setSel(Math.max(0,Math.min(G.rows-1,r+mv[0])),Math.max(0,Math.min(G.cols-1,c+mv[1])));return}
+  if(e.key==='Enter'||e.key===' '){e.preventDefault();reveal(r,c);$('fval').textContent=formulaFor(r,c);return}
+  if(e.key==='f'||e.key==='F'){toggleFlag(r,c);return}
+  if(e.key==='r'||e.key==='R'){newGame();renderGame();hideSnack()}
+});
+$('tabs').addEventListener('click',e=>{const b=e.target.closest('[data-tab]');if(b)switchSheet(b.dataset.tab)});
+$('flagBtn').onclick=()=>{flagMode=!flagMode;$('flagBtn').classList.toggle('on',flagMode)};
+$('newBtn').onclick=()=>{if(!LEVELS[sheet]||boss)return;newGame();renderGame();hideSnack()};
+$('shareBtn').onclick=toggleBoss;
+$('helpBtn').onclick=()=>snack('Click cells to open them without hitting a #DIV/0!. Numbers count the hidden variances touching that cell. Right-click, long-press or the flag button marks one. Esc (or Share) hides everything.');
+
+setInterval(()=>{if(playing()&&G.started&&!G.over&&!document.hidden){G.elapsed++;updStat()}},1000);
+
+/* boot */
+if(LEVELS[sheet])newGame();else G=null;
+show();
+let first=false;try{first=!localStorage.getItem('bs-seen');localStorage.setItem('bs-seen','1')}catch(e){}
+if(first&&!boss)snack('Click any cell to start. Right-click or long-press marks a cell. Q1–Q3 tabs are the difficulty. Esc hides it.');
+})();
+</script>
+
+</html>

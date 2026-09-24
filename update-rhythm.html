@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Working on updates</title>
+<style>
+/* Deliberately single-theme: a full-screen system update screen. */
+:root{--bg:#0a5fa8;--text:#ffffff;--soft:rgba(255,255,255,.72);--dim:rgba(255,255,255,.28)}
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{background:var(--bg);color:var(--text);font-family:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;overflow:hidden;user-select:none;-webkit-user-select:none;color-scheme:dark;cursor:default}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+button:focus-visible{outline:2px solid #fff;outline-offset:3px}
+canvas{position:fixed;inset:0;width:100%;height:100%;touch-action:none}
+.ui{position:fixed;left:0;right:0;bottom:calc(14vh + env(safe-area-inset-bottom,0px));text-align:center;padding:0 16px;pointer-events:none}
+.ui h1{margin:0;font-weight:300;font-size:clamp(20px,3.2vw,30px);letter-spacing:.01em}
+.ui p{margin:6px 0 0;font-weight:300;font-size:clamp(15px,2vw,20px);color:var(--text)}
+.ui .sub{margin-top:14px;font-size:14px;color:var(--soft);font-variant-numeric:tabular-nums;min-height:20px}
+.menu{position:fixed;inset:0;display:grid;place-items:center;padding:24px 16px;text-align:center}
+.menu .in{max-width:520px}
+.menu h1{margin:0 0 10px;font-weight:300;font-size:clamp(26px,4.5vw,40px)}
+.menu p{margin:0 0 8px;font-weight:300;font-size:16px;color:var(--soft);line-height:1.5}
+.opts{display:flex;flex-direction:column;gap:8px;margin:22px auto 16px;max-width:360px}
+.opt{border:2px solid rgba(255,255,255,.6);padding:12px 16px;text-align:left;font-size:16px;display:flex;justify-content:space-between;gap:12px;align-items:center}
+.opt:hover{background:rgba(255,255,255,.12);border-color:#fff}
+.opt small{color:var(--soft);font-size:13px;white-space:nowrap}
+.keys{font-size:13px;color:var(--soft)}
+.keys b{display:inline-block;border:1px solid rgba(255,255,255,.6);border-radius:4px;padding:0 7px;margin:0 2px;color:#fff;font-weight:600}
+.res{font-variant-numeric:tabular-nums;font-size:16px;color:#fff;margin:14px auto;display:grid;grid-template-columns:auto auto;gap:4px 24px;justify-content:center;text-align:left}
+.res span:nth-child(even){text-align:right;font-weight:600}
+.corner{position:fixed;right:16px;bottom:calc(12px + env(safe-area-inset-bottom,0px));font-size:12px;color:var(--dim)}
+body.boss .menu,body.boss .corner,body.boss #sub{visibility:hidden}
+</style>
+
+<canvas id="cv"></canvas>
+<div class="ui" id="ui">
+  <h1 id="pct">Working on updates  0% complete.</h1>
+  <p>Don't turn off your computer.</p>
+  <div class="sub" id="sub"></div>
+</div>
+<div class="menu" id="menu"></div>
+<div class="corner" id="corner">M to mute · Esc</div>
+
+<script>
+(function(){
+const $=id=>document.getElementById(id);
+const cv=$('cv'),ctx=cv.getContext('2d');
+let W,H,dpr,R1,R2,cx,cy;
+function size(){dpr=Math.min(2,devicePixelRatio||1);W=innerWidth;H=innerHeight;cv.width=W*dpr;cv.height=H*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);
+  const r=Math.min(W,H*.62)*.36;R1=r;R2=r*.66;cx=W/2;cy=Math.min(H*.36,H/2-40)}
+addEventListener('resize',size);size();
+
+/* ---------- songs ---------- */
+const SONGS=[
+ {id:'feature',n:'Feature update',d:'Easy',bpm:96,bars:24,dens:.35,dbl:0,key:0},
+ {id:'security',n:'Security update',d:'Normal',bpm:112,bars:28,dens:.62,dbl:.06,key:2},
+ {id:'driver',n:'Driver update',d:'Hard',bpm:128,bars:32,dens:.85,dbl:.16,key:-3},
+];
+function rng(seed){return()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296}}
+function chart(s){
+  const r=rng(s.bpm*7+s.bars),spb=60/s.bpm,notes=[];let lastRing=0;
+  const lead=2; // bars of intro
+  for(let bar=lead;bar<s.bars-1;bar++){
+    for(let e=0;e<8;e++){ // eighth notes
+      const t=(bar*4+e/2)*spb;const onBeat=e%2===0;
+      let p=onBeat?(e%4===0?.95:.75)*Math.min(1,s.dens+.35):s.dens*.55;
+      if(bar%8===7&&e>=4)p*=1.4; // fills
+      if(r()<p){
+        let ring=r()<.7?1-lastRing:lastRing;lastRing=ring;
+        notes.push({t,ring,st:0});
+        if(onBeat&&r()<s.dbl)notes.push({t,ring:1-ring,st:0});
+      }
+    }
+  }
+  return notes;
+}
+
+/* ---------- audio ---------- */
+let AC=null,master,muted=false;
+try{muted=localStorage.getItem('wu-mute')==='1'}catch(e){}
+function audio(){
+  if(AC)return;
+  try{AC=new (window.AudioContext||window.webkitAudioContext)();master=AC.createGain();master.gain.value=muted?0:.55;master.connect(AC.destination)}catch(e){AC=null}
+}
+let noiseBuf=null;
+function noise(){if(noiseBuf)return noiseBuf;noiseBuf=AC.createBuffer(1,AC.sampleRate*.3,AC.sampleRate);const d=noiseBuf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;return noiseBuf}
+function kick(t){const o=AC.createOscillator(),g=AC.createGain();o.frequency.setValueAtTime(140,t);o.frequency.exponentialRampToValueAtTime(40,t+.14);g.gain.setValueAtTime(.9,t);g.gain.exponentialRampToValueAtTime(.001,t+.22);o.connect(g).connect(master);o.start(t);o.stop(t+.25)}
+function hat(t,v=.12){const s=AC.createBufferSource(),f=AC.createBiquadFilter(),g=AC.createGain();s.buffer=noise();f.type='highpass';f.frequency.value=7000;g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.001,t+.05);s.connect(f).connect(g).connect(master);s.start(t);s.stop(t+.06)}
+function clap(t){const s=AC.createBufferSource(),f=AC.createBiquadFilter(),g=AC.createGain();s.buffer=noise();f.type='bandpass';f.frequency.value=1500;g.gain.setValueAtTime(.35,t);g.gain.exponentialRampToValueAtTime(.001,t+.16);s.connect(f).connect(g).connect(master);s.start(t);s.stop(t+.18)}
+function tone(t,freq,dur,type='triangle',v=.12){const o=AC.createOscillator(),g=AC.createGain(),f=AC.createBiquadFilter();o.type=type;o.frequency.value=freq;f.type='lowpass';f.frequency.value=1800;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(v,t+.01);g.gain.exponentialRampToValueAtTime(.001,t+dur);o.connect(f).connect(g).connect(master);o.start(t);o.stop(t+dur+.02)}
+function blip(good){if(!AC||muted)return;const t=AC.currentTime;tone(t,good?1320:220,.08,'sine',good?.08:.1)}
+const mid=n=>440*Math.pow(2,(n-69)/12);
+const PROG=[[57,60,64],[53,57,60],[48,52,55],[55,59,62]]; // Am F C G
+let sched=null;
+function startMusic(s,t0){
+  const spb=60/s.bpm;let beat=0;const total=s.bars*4;
+  sched=setInterval(()=>{
+    if(!AC)return;
+    while(beat<total&&t0+beat*spb<AC.currentTime+.25){
+      const t=t0+beat*spb,bar=Math.floor(beat/4),b=beat%4,ch=PROG[bar%4].map(n=>n+s.key);
+      if(bar>=1)kick(t);
+      if(bar>=1&&(b===1||b===3))clap(t);
+      hat(t+spb/2,.1);if(bar>=2)hat(t,.06);
+      tone(t,mid(ch[0]-24),spb*.9,'sawtooth',.07);
+      if(b===0&&bar>=2)ch.forEach(n=>tone(t,mid(n),spb*1.8,'triangle',.05));
+      if(bar>=4&&(b===1||b===3))tone(t+spb/2,mid(ch[(bar+b)%3]+12),spb*.4,'square',.03);
+      beat++;
+    }
+  },50);
+}
+function stopMusic(){clearInterval(sched);sched=null}
+function setMute(m){muted=m;try{localStorage.setItem('wu-mute',m?'1':'0')}catch(e){}if(master)master.gain.value=m||boss?0:.55;$('corner').textContent=(muted?'Sound off (M)':'M to mute')+' · Esc'}
+
+/* ---------- game ---------- */
+let state='menu',boss=false,song,notes,t0,perf0,stats,stability,judge,flashes=[],pausedAt=0,bossPct=27;
+const LEAD=1.9,WIN_P=.05,WIN_G=.1,WIN_M=.15;
+function now(){return AC?AC.currentTime:performance.now()/1000}
+function songTime(){return now()-t0}
+function start(i){
+  audio();if(AC&&AC.state==='suspended')AC.resume();
+  song=SONGS[i];notes=chart(song);stats={p:0,g:0,m:0,combo:0,max:0,score:0};stability=100;judge=null;flashes=[];
+  t0=now()+.6;startMusic(song,t0);state='play';$('menu').hidden=true;$('ui').hidden=false;
+}
+function hit(ring){
+  if(state!=='play'||boss)return;
+  const t=songTime();let best=null,bd=1e9;
+  for(const n of notes){if(n.st||n.ring!==ring)continue;const d=Math.abs(n.t-t);if(d<bd){bd=d;best=n}if(n.t-t>WIN_M)break}
+  flashes.push({ring,l:.18});
+  if(!best||bd>WIN_M){return}
+  if(bd<=WIN_P){best.st='p';stats.p++;stats.score+=300+stats.combo*2;judge={t:'Perfect',l:.5}}
+  else if(bd<=WIN_G){best.st='g';stats.g++;stats.score+=120+stats.combo;judge={t:'Good',l:.5}}
+  else{best.st='m';miss();return}
+  stats.combo++;stats.max=Math.max(stats.max,stats.combo);stability=Math.min(100,stability+2);blip(true);
+}
+function miss(){stats.m++;stats.combo=0;stability-=9;judge={t:'Miss',l:.5};blip(false);if(stability<=0)fail()}
+function fail(){state='fail';stopMusic();menuFail()}
+function finish(){state='done';stopMusic();menuDone()}
+
+/* ---------- input ---------- */
+addEventListener('keydown',e=>{
+  if(e.key==='Escape'){e.preventDefault();toggleBoss();return}
+  if(e.key==='m'||e.key==='M'){setMute(!muted);return}
+  if(boss||e.repeat)return;
+  const k=e.key.toLowerCase();
+  if(['f','d','arrowleft','z'].includes(k)){e.preventDefault();hit(0)}
+  else if(['j','k','arrowright','x'].includes(k)){e.preventDefault();hit(1)}
+  else if(k===' '&&state==='play'){e.preventDefault()}
+});
+cv.addEventListener('pointerdown',e=>{if(state==='play'&&!boss)hit(e.clientX<W/2?0:1)});
+
+/* ---------- boss ---------- */
+function toggleBoss(){
+  boss=!boss;document.body.classList.toggle('boss',boss);
+  if(master)master.gain.value=boss||muted?0:.55;
+  if(AC){boss?AC.suspend():AC.resume()}
+  if(!AC&&state==='play'){if(boss)pausedAt=performance.now();else t0+=(performance.now()-pausedAt)/1000}
+  bossPct=state==='play'?Math.floor(progress()*100):bossPct;
+  $('ui').hidden=!(boss||state==='play');
+}
+const progress=()=>song?Math.max(0,Math.min(1,songTime()/(song.bars*4*60/song.bpm))):0;
+
+/* ---------- draw ---------- */
+let spin=0;
+function draw(dt){
+  ctx.clearRect(0,0,W,H);
+  spin+=dt*3.2;
+  // the famous little spinner, always turning
+  const sr=Math.min(W,H)*.035+10;
+  for(let i=0;i<5;i++){const a=spin-i*.35-(i*i*.02);ctx.globalAlpha=1-i*.12;ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(cx+Math.cos(a)*sr,cy+Math.sin(a)*sr,3.2,0,7);ctx.fill()}
+  ctx.globalAlpha=1;
+  const playing=state==='play'&&!boss;
+  let pct=boss?bossPct:song?Math.floor(progress()*100):0;
+  $('pct').textContent=`Working on updates  ${pct}% complete.`;
+  if(!playing&&!(state==='play'&&boss)){$('sub').textContent='';return}
+  if(boss){$('sub').textContent='';return}
+  const t=songTime();
+  // rings (very faint, like the update screen could have them)
+  [R1,R2].forEach((r,i)=>{ctx.strokeStyle='rgba(255,255,255,.1)';ctx.lineWidth=2;ctx.beginPath();ctx.arc(cx,cy,r,0,7);ctx.stroke();
+    const fl=flashes.find(f=>f.ring===i);
+    ctx.strokeStyle=fl?`rgba(255,255,255,${.4+fl.l*3})`:'rgba(255,255,255,.55)';ctx.lineWidth=fl?5:3;ctx.beginPath();ctx.arc(cx,cy,r,-Math.PI/2-.09,-Math.PI/2+.09);ctx.stroke()});
+  // notes
+  for(const n of notes){
+    const dtn=n.t-t;
+    if(!n.st&&dtn<-WIN_M){n.st='m';miss();if(state!=='play')return}
+    if(dtn>LEAD||dtn<-.3)continue;
+    if(n.st==='p'||n.st==='g')continue;
+    const r=n.ring?R2:R1,f=Math.max(0,dtn)/LEAD;
+    const a=n.ring?-Math.PI/2+f*Math.PI:-Math.PI/2-f*Math.PI;
+    const x=cx+Math.cos(a)*r,y=cy+Math.sin(a)*r;
+    ctx.globalAlpha=n.st==='m'?.3:Math.min(1,(1-f)*2.2);
+    ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(x,y,n.ring?5.5:7,0,7);ctx.fill();
+  }
+  ctx.globalAlpha=1;
+  // judgement, whispered in the update font
+  if(judge){ctx.globalAlpha=Math.min(1,judge.l*3);ctx.fillStyle='#fff';ctx.font='300 18px "Segoe UI",system-ui,sans-serif';ctx.textAlign='center';ctx.fillText(judge.t,cx,cy+R1+34);ctx.globalAlpha=1;judge.l-=dt;if(judge.l<=0)judge=null}
+  flashes.forEach(f=>f.l-=dt);flashes=flashes.filter(f=>f.l>0);
+  const acc=stats.p+stats.g+stats.m?Math.round((stats.p+stats.g*.6)/(stats.p+stats.g+stats.m)*100):100;
+  $('sub').textContent=`${song.n} · Combo ${stats.combo} · Accuracy ${acc}% · Stability ${Math.max(0,stability)}%`;
+  if(t>song.bars*4*60/song.bpm+.3)finish();
+}
+
+/* ---------- menus ---------- */
+const bestOf=id=>{try{return JSON.parse(localStorage.getItem('wu-best')||'{}')[id]}catch(e){return null}};
+function saveBest(id,v){try{const b=JSON.parse(localStorage.getItem('wu-best')||'{}');if(!b[id]||v>b[id]){b[id]=v;localStorage.setItem('wu-best',JSON.stringify(b));return true}}catch(e){}return false}
+function menuMain(){
+  state='menu';$('ui').hidden=true;const m=$('menu');m.hidden=false;
+  m.innerHTML=`<div class="in"><h1>Hi. We’ve got some updates for your PC.</h1>
+   <p>Dots travel round the spinner. Hit them as they reach the top: outer ring with <b style="font-weight:600">F</b>, inner ring with <b style="font-weight:600">J</b>. On a phone, tap the left or right half of the screen.</p>
+   <div class="opts">${SONGS.map((s,i)=>`<button class="opt" data-i="${i}"><span>${s.n}</span><small>${s.d} · ${s.bpm} BPM${bestOf(s.id)?' · best '+bestOf(s.id).toLocaleString('en-GB'):''}</small></button>`).join('')}</div>
+   <p class="keys"><b>F</b><b>J</b> hit · <b>M</b> mute · <b>Esc</b> hide. It has music, so headphones are a good idea.</p></div>`;
+  m.querySelectorAll('[data-i]').forEach(b=>b.onclick=()=>start(+b.dataset.i));
+}
+function results(title,lead){
+  const tot=stats.p+stats.g+stats.m,acc=tot?Math.round((stats.p+stats.g*.6)/tot*100):0;
+  const grade=acc>=95?'S':acc>=88?'A':acc>=78?'B':acc>=65?'C':'D';
+  const nb=state==='done'&&saveBest(song.id,stats.score);
+  $('ui').hidden=true;const m=$('menu');m.hidden=false;
+  m.innerHTML=`<div class="in"><h1>${title}</h1><p>${lead}</p>
+   <div class="res"><span>Perfect</span><span>${stats.p}</span><span>Good</span><span>${stats.g}</span><span>Missed</span><span>${stats.m}</span><span>Best combo</span><span>${stats.max}</span><span>Accuracy</span><span>${acc}% (${grade})</span><span>Score</span><span>${stats.score.toLocaleString('en-GB')}${nb?' · new best':''}</span></div>
+   <div class="opts"><button class="opt" id="again"><span>Try that update again</span><small>${song.d}</small></button><button class="opt" id="back"><span>Choose another update</span><small>Menu</small></button></div></div>`;
+  $('again').onclick=()=>start(SONGS.indexOf(song));$('back').onclick=menuMain;
+}
+function menuDone(){results('All done. Your PC is up to date.','Thanks for your patience. Nothing seems to have changed, as usual.')}
+function menuFail(){results('Something didn’t go as planned.',`Undoing changes made to your computer. The update stopped at ${Math.floor(progress()*100)}%.`)}
+
+/* ---------- loop ---------- */
+let last=performance.now();
+function frame(ts){const dt=Math.min(.05,(ts-last)/1000);last=ts;draw(dt);requestAnimationFrame(frame)}
+setMute(muted);menuMain();requestAnimationFrame(frame);
+})();
+</script>
+
+</html>

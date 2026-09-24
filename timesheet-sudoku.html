@@ -1,0 +1,504 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Timesheet – Punchclock</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#f3f4f7; --panel:#ffffff; --panel2:#f7f8fa; --text:#1b1f2a; --muted:#646b7a; --line:#dfe2e8; --lineHard:#9aa1b0;
+  --nav:#1d2433; --navText:#e9ecf2; --brand:#5b5bd6; --brandSoft:#e9e9fb; --brandInk:#4545b8;
+  --sel:#5b5bd6; --band:#eef0f6; --same:#dcdcf7; --clash:#d93b3b; --clashSoft:#fde8e8; --good:#1f8a5b; --goodSoft:#e2f4ea;
+  --given:#eceef3; --shadow:0 1px 2px rgba(20,25,40,.08),0 4px 14px rgba(20,25,40,.06);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#12151c; --panel:#1a1e27; --panel2:#1f2430; --text:#e4e7ee; --muted:#9aa2b3; --line:#2c3240; --lineHard:#5b6376;
+    --nav:#0c0f15; --navText:#dfe3eb; --brand:#8b8bf0; --brandSoft:#272a4a; --brandInk:#a9a9f7;
+    --sel:#8b8bf0; --band:#21263a; --same:#2f3363; --clash:#f06b6b; --clashSoft:#3d1f22; --good:#4fc48c; --goodSoft:#173628;
+    --given:#232836; --shadow:0 1px 2px rgba(0,0,0,.4),0 4px 14px rgba(0,0,0,.3);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#12151c; --panel:#1a1e27; --panel2:#1f2430; --text:#e4e7ee; --muted:#9aa2b3; --line:#2c3240; --lineHard:#5b6376;
+  --nav:#0c0f15; --navText:#dfe3eb; --brand:#8b8bf0; --brandSoft:#272a4a; --brandInk:#a9a9f7;
+  --sel:#8b8bf0; --band:#21263a; --same:#2f3363; --clash:#f06b6b; --clashSoft:#3d1f22; --good:#4fc48c; --goodSoft:#173628;
+  --given:#232836; --shadow:0 1px 2px rgba(0,0,0,.4),0 4px 14px rgba(0,0,0,.3);
+}
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{background:var(--bg);color:var(--text);font-family:Figtree,system-ui,-apple-system,"Segoe UI",sans-serif;font-size:14px;font-variant-numeric:tabular-nums;user-select:none;-webkit-user-select:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+button:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+.app{display:flex;flex-direction:column;min-height:100%}
+
+/* nav */
+.nav{background:var(--nav);color:var(--navText);display:flex;align-items:center;gap:18px;padding:0 16px;height:50px;flex:none}
+.logo{display:flex;align-items:center;gap:8px;font-weight:700;font-size:16px;white-space:nowrap}
+.logo i{width:24px;height:24px;border-radius:50%;border:2.5px solid currentColor;position:relative}
+.logo i::before{content:"";position:absolute;left:8.5px;top:3px;width:2.5px;height:8px;background:currentColor;border-radius:2px}
+.logo i::after{content:"";position:absolute;left:9px;top:9px;width:6px;height:2.5px;background:currentColor;border-radius:2px}
+.nav .lnk{font-size:14px;opacity:.72;white-space:nowrap}
+.nav .lnk.on{opacity:1;font-weight:600;box-shadow:inset 0 -2px 0 var(--brand);padding:15px 0 13px}
+.nav .me{margin-left:auto;width:30px;height:30px;border-radius:50%;background:#c77d3a;color:#fff;display:grid;place-items:center;font-weight:700;font-size:13px;flex:none}
+
+/* page head */
+.head{max-width:1120px;width:100%;margin:0 auto;padding:18px 16px 10px;display:flex;flex-wrap:wrap;align-items:flex-end;gap:10px 18px}
+.head h1{margin:0;font-size:22px;font-weight:700;letter-spacing:-.01em}
+.head .sub{color:var(--muted);font-size:13px;margin-top:2px}
+.status{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;border-radius:999px;padding:3px 10px;background:var(--panel2);border:1px solid var(--line);color:var(--muted);vertical-align:3px;margin-left:8px}
+.status i{width:7px;height:7px;border-radius:50%;background:currentColor}
+.status.ok{background:var(--goodSoft);color:var(--good);border-color:transparent}
+.hbtns{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+.btn{border-radius:8px;padding:8px 14px;font-weight:600;font-size:13px;background:var(--panel);border:1px solid var(--line);box-shadow:var(--shadow);white-space:nowrap}
+.btn:hover{border-color:var(--lineHard)}
+.btn.pri{background:var(--brand);border-color:var(--brand);color:#fff}
+.btn.pri:hover{filter:brightness(1.07)}
+.btn.on{background:var(--brandSoft);border-color:var(--brand);color:var(--brandInk)}
+
+.tabs{max-width:1120px;width:100%;margin:0 auto;padding:0 16px;display:flex;gap:4px;border-bottom:1px solid var(--line);overflow-x:auto;scrollbar-width:none}
+.tab{padding:9px 12px;font-weight:600;font-size:13px;color:var(--muted);white-space:nowrap;border-bottom:2px solid transparent;margin-bottom:-1px}
+.tab small{font-weight:500;opacity:.8;margin-left:4px}
+.tab.on{color:var(--text);border-bottom-color:var(--brand)}
+.tab:hover{color:var(--text)}
+
+/* main */
+.main{max-width:1120px;width:100%;margin:0 auto;padding:16px;display:grid;grid-template-columns:auto minmax(240px,300px);gap:20px;align-items:start;justify-content:center}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow)}
+.sheet{padding:10px 12px 12px}
+.sheet-h{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:12px;color:var(--muted);padding:2px 2px 8px}
+.sheet-h b{color:var(--text);font-weight:600}
+
+:root{--cs:clamp(32px,min(calc((100vw - 110px) / 9.4),calc((100vh - 280px) / 10)),58px)}
+.grid{display:grid;grid-template-columns:48px repeat(9,var(--cs));grid-auto-rows:var(--cs);position:relative}
+.grid .dh{display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:11px;color:var(--muted);line-height:1.15;height:var(--cs)}
+.grid .dh b{font-size:13px;color:var(--text);font-weight:600}
+.grid .dh.today b{color:var(--brandInk)}
+.grid .th{display:flex;align-items:center;justify-content:flex-end;padding-right:8px;font-size:12px;color:var(--muted)}
+.cell{position:relative;border-right:1px solid var(--line);border-bottom:1px solid var(--line);display:grid;place-items:center;cursor:pointer;background:var(--panel)}
+.cell.c0{border-left:2px solid var(--lineHard)}
+.cell.r0{border-top:2px solid var(--lineHard)}
+.cell.bl{border-left:2px solid var(--lineHard)}
+.cell.bt{border-top:2px solid var(--lineHard)}
+.cell.c8{border-right:2px solid var(--lineHard)}
+.cell.r8{border-bottom:2px solid var(--lineHard)}
+.cell.band{background:var(--band)}
+.cell.same{background:var(--same)}
+.cell.sel{box-shadow:inset 0 0 0 2.5px var(--sel);z-index:1}
+.cell.given{background:var(--given)}
+.cell.given.same{background:var(--same)}
+.chip{width:calc(var(--cs) - 8px);height:calc(var(--cs) - 10px);border-radius:6px;display:grid;place-items:center;font-weight:700;font-size:clamp(10px,calc(var(--cs) * .24),14px);letter-spacing:.02em;color:#fff}
+.cell.given .chip{box-shadow:inset 0 0 0 2px rgba(0,0,0,.18)}
+.cell.given .chip::after{content:"";position:absolute;right:3px;top:3px;width:5px;height:5px;border-radius:50%;background:var(--muted);opacity:.7}
+.cell.clash .chip{box-shadow:0 0 0 2px var(--clash);background-image:repeating-linear-gradient(135deg,rgba(255,255,255,.22) 0 4px,transparent 4px 8px)}
+.cell.clash{background:var(--clashSoft)}
+.notes{position:absolute;inset:4px;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);place-items:center}
+.notes i{width:clamp(4px,calc(var(--cs) * .16),8px);height:clamp(4px,calc(var(--cs) * .16),8px);border-radius:50%}
+.pop{animation:pop .25s ease}
+@keyframes pop{from{transform:scale(.6);opacity:.2}to{transform:none;opacity:1}}
+.won .cell .chip{animation:wave .6s ease both}
+@keyframes wave{50%{transform:translateY(-4px) scale(1.06)}}
+
+/* side */
+.side{display:flex;flex-direction:column;gap:14px}
+.side .card{padding:12px}
+.side h2{margin:0 0 8px;font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;display:flex;justify-content:space-between}
+.proj{display:grid;grid-template-columns:22px 38px minmax(0,1fr) auto;align-items:center;gap:8px;width:100%;text-align:left;padding:6px 6px;border-radius:8px}
+.proj:hover{background:var(--panel2)}
+.proj.cur{background:var(--brandSoft)}
+.proj kbd{font:inherit;font-size:11px;color:var(--muted);border:1px solid var(--line);border-radius:4px;text-align:center;padding:1px 0;background:var(--panel2)}
+.proj .sw{height:22px;border-radius:5px;font-size:10.5px;font-weight:700;display:grid;place-items:center;color:#fff}
+.proj .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.proj .hrs{font-size:12px;color:var(--muted);white-space:nowrap}
+.proj.full .hrs{color:var(--good);font-weight:600}
+.proj.full .nm{color:var(--muted)}
+.tools{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:10px}
+.tools .btn{padding:8px 6px;box-shadow:none}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.stat{background:var(--panel2);border-radius:8px;padding:8px 10px}
+.stat span{display:block;font-size:11.5px;color:var(--muted)}
+.stat b{font-size:18px;font-weight:700}
+.rules{margin:0;padding-left:18px;color:var(--muted);font-size:13px;line-height:1.5}
+.rules li+li{margin-top:4px}
+
+/* decoy */
+.decoy{display:none}
+body.boss .decoy{display:block}
+.main.decoy{max-width:1120px}
+body.boss .game{display:none!important}
+.dt{width:100%;border-collapse:collapse;font-size:13px}
+.dt th,.dt td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+.dt th{font-size:11.5px;color:var(--muted);font-weight:600}
+.dt th:first-child,.dt td:first-child{text-align:left}
+.dt td:first-child i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:8px;vertical-align:-1px}
+.dt tr.tot td{font-weight:700;border-bottom:0;border-top:2px solid var(--lineHard)}
+.dt td.z{color:var(--muted)}
+.dwrap{overflow-x:auto;padding:4px 14px 10px}
+.dnote{padding:12px 14px;color:var(--muted);font-size:13px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(18px + env(safe-area-inset-bottom,0px));background:var(--nav);color:var(--navText);padding:11px 16px;border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.3);max-width:min(460px,calc(100vw - 32px));z-index:50;font-size:13.5px;line-height:1.45;display:flex;gap:14px;align-items:center}
+.toast button{color:#a9a9f7;font-weight:700;white-space:nowrap}
+
+@media (max-width:900px){
+  .main{grid-template-columns:minmax(0,1fr);justify-items:center}
+  .side{width:100%;max-width:560px}
+  .nav .lnk:not(.on){display:none}
+  :root{--cs:clamp(30px,calc((100vw - 90px) / 9),52px)}
+}
+@media (max-width:560px){
+  .head h1{font-size:19px}
+  .hbtns{margin-left:0;width:100%}
+  .hbtns .btn{flex:1}
+  .main{padding:10px 8px}
+  .sheet{padding:6px 6px 8px}
+  .grid{grid-template-columns:40px repeat(9,var(--cs))}
+  .grid .th{padding-right:5px;font-size:11px}
+  .projs{display:grid;grid-template-columns:1fr 1fr}
+  .proj{grid-template-columns:34px minmax(0,1fr) auto}
+  .proj kbd{display:none}
+  .proj .nm{font-size:12.5px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<div class="app">
+  <nav class="nav">
+    <div class="logo"><i></i>Punchclock</div>
+    <span class="lnk on">Timesheet</span><span class="lnk">Expenses</span><span class="lnk">Reports</span><span class="lnk">Approvals</span>
+    <span class="me">F</span>
+  </nav>
+
+  <div class="head">
+    <div>
+      <h1>My timesheet <span class="status" id="status"><i></i><span id="statusTxt">Draft</span></span></h1>
+      <div class="sub" id="period"></div>
+    </div>
+    <div class="hbtns">
+      <button class="btn game" id="newBtn" title="New period (R)">New period</button>
+      <button class="btn" id="viewBtn" title="Summary view (Esc)">Summary</button>
+      <button class="btn pri" id="submitBtn">Submit for approval</button>
+    </div>
+  </div>
+
+  <div class="tabs game" id="tabs"></div>
+
+  <main class="main game" id="main">
+    <section class="card sheet">
+      <div class="sheet-h"><span>Hourly allocation · <b>9-day fortnight</b></span><span>Every project: <b>9h</b></span></div>
+      <div class="grid" id="grid" role="grid" aria-label="Timesheet grid"></div>
+    </section>
+
+    <aside class="side">
+      <div class="card">
+        <h2>Projects <span id="filled">0 / 81h</span></h2>
+        <div class="projs" id="projs"></div>
+        <div class="tools">
+          <button class="btn" id="undoBtn" title="Undo (Z)">Undo</button>
+          <button class="btn" id="draftBtn" title="Draft notes (N)">Draft</button>
+          <button class="btn" id="clearBtn" title="Clear hour (Backspace)">Clear</button>
+        </div>
+      </div>
+      <div class="card">
+        <h2>This period</h2>
+        <div class="stats">
+          <div class="stat"><span>Time on timesheet</span><b id="time">0:00</b></div>
+          <div class="stat"><span>Best</span><b id="best">—</b></div>
+          <div class="stat"><span>Submitted</span><b id="won">0</b></div>
+          <div class="stat"><span>Asked PM</span><b id="hints">0</b></div>
+        </div>
+        <div class="tools" style="grid-template-columns:1fr"><button class="btn" id="hintBtn" title="Fill one hour (H), costs 30 seconds">Ask your PM to fill an hour</button></div>
+      </div>
+      <div class="card">
+        <h2>Timesheet policy</h2>
+        <ol class="rules">
+          <li>Every project gets exactly one hour <b>each day</b>.</li>
+          <li>Every project gets exactly one <b>each hour</b> of the day across the fortnight.</li>
+          <li>Every project gets one hour in each <b>3-day × 3-hour block</b>.</li>
+          <li>Grey-dotted hours were booked by your PM. You can’t move them.</li>
+        </ol>
+      </div>
+    </aside>
+  </main>
+
+  <!-- the disguise -->
+  <main class="main decoy">
+    <section class="card" style="margin:0 auto">
+      <div class="dwrap"><table class="dt" id="decoy"></table></div>
+      <div class="dnote"><span>Submitted Friday 16:52 · Approved by Priya Shah</span><span>Utilisation 92% · Target 85%</span></div>
+    </section>
+  </main>
+</div>
+<div class="toast" id="toast" hidden><span id="toastTxt"></span><button id="toastAct" hidden></button></div>
+
+<script>
+(function(){
+const $=id=>document.getElementById(id);
+const P=[
+ {c:'BRD',n:'Brand refresh',bg:'#d9572b'},
+ {c:'WEB',n:'Website rebuild',bg:'#2f6fd0'},
+ {c:'SOC',n:'Social content',bg:'#b0368a'},
+ {c:'PRT',n:'Print & POS',bg:'#2f8f5b'},
+ {c:'MOT',n:'Motion',bg:'#7a4fc8'},
+ {c:'PHO',n:'Photography',bg:'#b07d00'},
+ {c:'PCH',n:'Pitch deck',bg:'#1f8a94'},
+ {c:'ADM',n:'Admin',bg:'#5f6675'},
+ {c:'MTG',n:'Meetings',bg:'#c43d4b'},
+];
+const LEVELS=[
+ {id:'now',n:'This fortnight',d:'Easy',keep:40,off:0},
+ {id:'next',n:'Next fortnight',d:'Medium',keep:31,off:14},
+ {id:'end',n:'Month end',d:'Hard',keep:25,off:28},
+];
+const HOURS=['09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00'];
+const row=i=>Math.floor(i/9), col=i=>i%9, box=i=>Math.floor(row(i)/3)*3+Math.floor(col(i)/3);
+const PEERS=[];for(let i=0;i<81;i++){const s=new Set();for(let j=0;j<81;j++)if(j!==i&&(row(j)===row(i)||col(j)===col(i)||box(j)===box(i)))s.add(j);PEERS.push([...s])}
+
+/* ---------- generator ---------- */
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function solveCount(g,limit){
+  // g: Int8Array(81), 0 empty, 1..9 values. Counts solutions up to limit.
+  let best=-1,bestMask=0,bestN=10;
+  for(let i=0;i<81;i++){
+    if(g[i])continue;
+    let m=0;for(const j of PEERS[i])if(g[j])m|=1<<g[j];
+    const free=(~m)&0x3fe;let n=0;for(let v=free;v;v&=v-1)n++;
+    if(n===0)return 0;
+    if(n<bestN){bestN=n;best=i;bestMask=free;if(n===1)break}
+  }
+  if(best<0)return 1;
+  let count=0;
+  for(let v=1;v<=9;v++){
+    if(!(bestMask&(1<<v)))continue;
+    g[best]=v;count+=solveCount(g,limit-count);g[best]=0;
+    if(count>=limit)break;
+  }
+  return count;
+}
+function fillFull(g,i=0){
+  if(i===81)return true;
+  if(g[i])return fillFull(g,i+1);
+  for(const v of shuffle([1,2,3,4,5,6,7,8,9])){
+    if(PEERS[i].some(j=>g[j]===v))continue;
+    g[i]=v;if(fillFull(g,i+1))return true;g[i]=0;
+  }
+  return false;
+}
+function generate(keep){
+  const sol=new Int8Array(81);fillFull(sol);
+  const puz=Int8Array.from(sol);let left=81;
+  // remove in symmetric pairs where we can, keep uniqueness
+  for(const i of shuffle([...Array(81).keys()])){
+    if(left<=keep)break;
+    const j=80-i;if(!puz[i])continue;
+    const a=puz[i],b=puz[j];puz[i]=0;if(j!==i)puz[j]=0;
+    if(solveCount(Int8Array.from(puz),2)!==1){puz[i]=a;puz[j]=b}else left-=(j!==i&&b?2:1);
+  }
+  return {sol:[...sol],puz:[...puz]};
+}
+
+/* ---------- state ---------- */
+let stats={};try{stats=JSON.parse(localStorage.getItem('ts-stats')||'{}')||{}}catch(e){}
+const st=k=>stats[k]||(stats[k]={won:0,best:null});
+const saveStats=()=>{try{localStorage.setItem('ts-stats',JSON.stringify(stats))}catch(e){}};
+let lvl='now';try{const s=localStorage.getItem('ts-lvl');if(LEVELS.some(l=>l.id===s))lvl=s}catch(e){}
+let G=null,sel=40,draft=false,boss=false,cur=0;
+
+function newGame(){
+  const L=LEVELS.find(l=>l.id===lvl);const {sol,puz}=generate(L.keep);
+  G={lvl,sol,giv:puz.map(v=>v?1:0),val:puz.slice(),notes:Array(81).fill(0),elapsed:0,done:false,hints:0,undo:[]};
+  sel=G.giv.indexOf(0);save();
+}
+function load(){
+  try{const s=JSON.parse(localStorage.getItem('ts-game-'+lvl)||'null');if(s&&s.sol&&s.sol.length===81){G=Object.assign({undo:[]},s);G.undo=[];sel=Math.max(0,G.val.indexOf(0));return true}}catch(e){}
+  return false;
+}
+function save(){if(!G)return;try{const {undo,...rest}=G;localStorage.setItem('ts-game-'+lvl,JSON.stringify(rest))}catch(e){}}
+
+/* ---------- dates ---------- */
+function monday(off){const d=new Date();d.setHours(12,0,0,0);d.setDate(d.getDate()-((d.getDay()+6)%7)+off);return d}
+function days(){
+  const L=LEVELS.find(l=>l.id===lvl),m=monday(L.off),out=[];
+  for(let k=0;k<9;k++){const d=new Date(m);d.setDate(m.getDate()+(k<5?k:k+2));out.push(d)}
+  return out;
+}
+const DN=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const fmtD=d=>d.getDate()+' '+d.toLocaleString('en-GB',{month:'short'});
+
+/* ---------- render ---------- */
+function renderTabs(){
+  $('tabs').innerHTML=LEVELS.map(l=>`<button class="tab${l.id===lvl?' on':''}" data-l="${l.id}">${l.n}<small>${l.d}</small></button>`).join('');
+}
+function renderGrid(){
+  const ds=days(),today=new Date().toDateString();
+  let h='<div></div>'+ds.map(d=>`<div class="dh${d.toDateString()===today?' today':''}"><span>${DN[d.getDay()]}</span><b>${d.getDate()}</b></div>`).join('');
+  for(let r=0;r<9;r++){
+    h+=`<div class="th">${HOURS[r]}</div>`;
+    for(let c=0;c<9;c++){const i=r*9+c;h+=`<div class="cell${c===0?' c0':''}${r===0?' r0':''}${c===3||c===6?' bl':''}${r===3||r===6?' bt':''}${c===8?' c8':''}${r===8?' r8':''}" data-i="${i}" role="gridcell"></div>`}
+  }
+  $('grid').innerHTML=h;
+  const L=LEVELS.find(l=>l.id===lvl);
+  $('period').textContent=`${L.n} · ${fmtD(ds[0])} – ${fmtD(ds[8])} · Fridays off on the second week`;
+  paintAll();
+}
+const cellEl=i=>$('grid').querySelector(`[data-i="${i}"]`);
+function clashes(){
+  const bad=new Set();
+  for(let i=0;i<81;i++){const v=G.val[i];if(!v)continue;for(const j of PEERS[i])if(G.val[j]===v){bad.add(i);bad.add(j)}}
+  return bad;
+}
+function paintAll(popAt){
+  const bad=clashes(),sv=G.val[sel];
+  for(let i=0;i<81;i++){
+    const el=cellEl(i);if(!el)continue;
+    const v=G.val[i];
+    el.classList.toggle('given',!!G.giv[i]);
+    el.classList.toggle('sel',i===sel);
+    el.classList.toggle('band',i!==sel&&(row(i)===row(sel)||col(i)===col(sel)||box(i)===box(sel)));
+    el.classList.toggle('same',i!==sel&&!!sv&&v===sv);
+    el.classList.toggle('clash',bad.has(i));
+    let inner='';
+    if(v){const p=P[v-1];inner=`<span class="chip${i===popAt?' pop':''}" style="background:${p.bg}">${p.c}</span>`}
+    else if(G.notes[i]){inner='<span class="notes">';for(let k=1;k<=9;k++)inner+=G.notes[i]&(1<<k)?`<i style="background:${P[k-1].bg};grid-area:${Math.ceil(k/3)}/${(k-1)%3+1}"></i>`:'';inner+='</span>'}
+    el.innerHTML=inner;
+    el.setAttribute('aria-label',`${HOURS[row(i)]}, day ${col(i)+1}: ${v?P[v-1].n:'empty'}`);
+  }
+  renderProjs();
+}
+function renderProjs(){
+  const cnt=Array(10).fill(0);G.val.forEach(v=>cnt[v]++);
+  $('projs').innerHTML=P.map((p,k)=>`<button class="proj${cnt[k+1]>=9?' full':''}${cur===k+1?' cur':''}" data-p="${k+1}"><kbd>${k+1}</kbd><span class="sw" style="background:${p.bg}">${p.c}</span><span class="nm">${p.n}</span><span class="hrs">${cnt[k+1]}/9h</span></button>`).join('');
+  const f=81-cnt[0];$('filled').textContent=f+' / 81h';
+  const bad=clashes().size;
+  setStatus(G.done?'ok':bad?'clash':'draft');
+}
+function setStatus(k){
+  const s=$('status');s.classList.toggle('ok',k==='ok');
+  $('statusTxt').textContent=k==='ok'?'Approved':k==='clash'?'Draft · clashes':'Draft';
+}
+function renderStats(){
+  const s=G.elapsed;$('time').textContent=Math.floor(s/60)+':'+String(s%60).padStart(2,'0');
+  const b=st(lvl).best;$('best').textContent=b==null?'—':Math.floor(b/60)+':'+String(b%60).padStart(2,'0');
+  $('won').textContent=st(lvl).won;$('hints').textContent=G.hints;
+}
+
+/* ---------- actions ---------- */
+function place(v){
+  if(G.done||boss||G.giv[sel])return;
+  if(draft&&v){
+    if(G.val[sel])return;
+    G.undo.push({i:sel,v:G.val[sel],n:G.notes[sel]});
+    G.notes[sel]^=(1<<v);paintAll();save();return;
+  }
+  if(G.val[sel]===v&&v){v=0}
+  G.undo.push({i:sel,v:G.val[sel],n:G.notes[sel]});
+  G.val[sel]=v;G.notes[sel]=0;
+  if(v)for(const j of PEERS[sel])G.notes[j]&=~(1<<v);
+  cur=v||cur;
+  paintAll(v?sel:-1);save();checkWin();
+}
+function undo(){
+  if(G.done||!G.undo.length)return;const u=G.undo.pop();
+  G.val[u.i]=u.v;G.notes[u.i]=u.n;sel=u.i;paintAll();save();
+}
+function hint(){
+  if(G.done||boss)return;
+  let targets=[];for(let i=0;i<81;i++)if(G.val[i]!==G.sol[i])targets.push(i);
+  if(!targets.length)return;
+  const i=targets.includes(sel)?sel:targets[Math.floor(Math.random()*targets.length)];
+  G.undo.push({i,v:G.val[i],n:G.notes[i]});
+  G.val[i]=G.sol[i];G.notes[i]=0;for(const j of PEERS[i])G.notes[j]&=~(1<<G.val[i]);
+  sel=i;G.hints++;G.elapsed+=30;paintAll(i);renderStats();save();
+  toast(`Priya filled ${HOURS[row(i)]} on day ${col(i)+1} with ${P[G.val[i]-1].n}. +30s for the awkward chat.`);
+  checkWin();
+}
+function checkWin(){
+  if(G.val.some(v=>!v)||clashes().size)return;
+  G.done=true;const s=st(lvl);s.won++;const best=s.best==null||G.elapsed<s.best;if(best)s.best=G.elapsed;saveStats();save();
+  $('grid').classList.add('won');paintAll();renderStats();
+  const t=Math.floor(G.elapsed/60)+':'+String(G.elapsed%60).padStart(2,'0');
+  toast(`Timesheet approved in ${t}${best?' — your fastest yet':''}. Finance have no questions, which is a first.`,'Next period',()=>{newGame();show()});
+}
+function submit(){
+  if(boss){toast('Exported timesheet_summary.csv');return}
+  if(G.done){toast('Already approved. Start a new period when you’re ready.','New period',()=>{newGame();show()});return}
+  const empty=G.val.filter(v=>!v).length,bad=clashes().size;
+  if(bad)toast(`Can’t submit: ${bad} hours clash with the policy. They’re the stripy ones.`);
+  else toast(`Can’t submit: ${empty} hour${empty===1?'':'s'} still unallocated.`);
+}
+
+let toastT,toastFn=null;
+function toast(t,act,fn){$('toastTxt').textContent=t;const a=$('toastAct');if(act){a.hidden=false;a.textContent=act;toastFn=fn}else{a.hidden=true;toastFn=null}$('toast').hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>$('toast').hidden=true,act?9000:4500)}
+$('toastAct').onclick=()=>{$('toast').hidden=true;toastFn&&toastFn()};
+
+/* ---------- disguise ---------- */
+function renderDecoy(){
+  const ds=days().slice(0,5);
+  const H=[[2,1.5,3,0,2.5],[1.5,2,1,2.5,0],[0,1.5,1,1,1.5],[2,0,0,1.5,1],[0,1,.5,0,1],[1,0,0,1,0],[0,0,1,0,.5],[.5,1,.5,.5,.5],[.5,.5,.5,1,.5]];
+  const f=n=>n?n.toFixed(1):'–';
+  let h=`<thead><tr><th>Project</th>${ds.map(d=>`<th>${DN[d.getDay()]} ${d.getDate()}</th>`).join('')}<th>Total</th></tr></thead><tbody>`;
+  const tot=[0,0,0,0,0];
+  H.forEach((r,k)=>{r.forEach((v,j)=>tot[j]+=v);h+=`<tr><td><i style="background:${P[k].bg}"></i>${P[k].n}</td>${r.map(v=>`<td${v?'':' class="z"'}>${f(v)}</td>`).join('')}<td>${f(r.reduce((a,b)=>a+b,0))}</td></tr>`});
+  h+=`<tr class="tot"><td>Total</td>${tot.map(v=>`<td>${f(v)}</td>`).join('')}<td>${f(tot.reduce((a,b)=>a+b,0))}</td></tr></tbody>`;
+  $('decoy').innerHTML=h;
+}
+
+/* ---------- views ---------- */
+function show(){
+  $('grid').classList.remove('won');
+  renderTabs();renderGrid();renderStats();
+  $('draftBtn').classList.toggle('on',draft);
+}
+function switchLevel(id){
+  if(id===lvl||boss)return;save();lvl=id;try{localStorage.setItem('ts-lvl',id)}catch(e){}
+  if(!load())newGame();show();
+}
+function toggleBoss(){
+  boss=!boss;document.body.classList.toggle('boss',boss);$('toast').hidden=true;
+  if(boss){renderDecoy();setStatus('ok');$('statusTxt').textContent='Approved';$('viewBtn').textContent='Hourly view';$('submitBtn').textContent='Export CSV'}
+  else{$('viewBtn').textContent='Summary';$('submitBtn').textContent='Submit for approval';renderProjs()}
+}
+
+/* ---------- input ---------- */
+$('grid').addEventListener('click',e=>{const c=e.target.closest('.cell');if(!c||boss)return;sel=+c.dataset.i;paintAll()});
+$('projs').addEventListener('click',e=>{const b=e.target.closest('[data-p]');if(!b)return;cur=+b.dataset.p;place(cur)});
+$('tabs').addEventListener('click',e=>{const b=e.target.closest('[data-l]');if(b)switchLevel(b.dataset.l)});
+$('undoBtn').onclick=undo;
+$('clearBtn').onclick=()=>{if(draft&&!G.val[sel]&&G.notes[sel]&&!G.giv[sel]){G.undo.push({i:sel,v:0,n:G.notes[sel]});G.notes[sel]=0;paintAll();save()}else place(0)};
+$('draftBtn').onclick=()=>{draft=!draft;$('draftBtn').classList.toggle('on',draft)};
+$('hintBtn').onclick=hint;
+$('newBtn').onclick=()=>{if(boss)return;newGame();show();toast('New period started. Fresh timesheet, same you.')};
+$('viewBtn').onclick=toggleBoss;
+$('submitBtn').onclick=submit;
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){e.preventDefault();toggleBoss();return}
+  if(boss||e.altKey||((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()!=='z'))return;
+  const mv={ArrowUp:-9,ArrowDown:9,ArrowLeft:-1,ArrowRight:1}[e.key];
+  if(mv){e.preventDefault();
+    let r=row(sel),c=col(sel);
+    if(mv===-9)r=(r+8)%9;else if(mv===9)r=(r+1)%9;else if(mv===-1)c=(c+8)%9;else c=(c+1)%9;
+    sel=r*9+c;paintAll();return}
+  if(/^[1-9]$/.test(e.key)){e.preventDefault();place(+e.key);return}
+  if(e.key==='Backspace'||e.key==='Delete'||e.key==='0'){e.preventDefault();$('clearBtn').onclick();return}
+  if(e.key==='n'||e.key==='N'){draft=!draft;$('draftBtn').classList.toggle('on',draft);return}
+  if(e.key==='z'||e.key==='Z'||e.key==='u'||e.key==='U'){e.preventDefault();undo();return}
+  if(e.key==='h'||e.key==='H'){hint();return}
+  if(e.key==='r'||e.key==='R'){$('newBtn').onclick()}
+});
+
+setInterval(()=>{if(G&&!G.done&&!boss&&!document.hidden){G.elapsed++;renderStats();if(G.elapsed%10===0)save()}},1000);
+document.addEventListener('visibilitychange',save);
+
+/* boot */
+if(!load())newGame();
+show();
+let first=false;try{first=!localStorage.getItem('ts-seen');localStorage.setItem('ts-seen','1')}catch(e){}
+if(first)toast('Fill every hour so each project appears once per day, once per hour slot and once per block. Pick an hour, then a project (or type 1–9). Esc hides it all.');
+})();
+</script>
+
+</html>

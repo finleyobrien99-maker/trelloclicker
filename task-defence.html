@@ -1,0 +1,397 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Task Manager</title>
+<style>
+:root{
+  --bg:#f3f3f3; --surface:#fafafa; --card:#ffffff; --text:#1b1b1b; --muted:#5f5f5f; --line:#e3e3e3; --hover:#eaeaea;
+  --accent:#0f6cbd; --accentSoft:#e3eef9; --cpu:#1b75d0; --mem:#8a3fbf; --good:#107c10; --bad:#c42b1c; --warn:#b7791f;
+  --grid:#dfe9f5; --path:#1b75d0; --pathFill:rgba(27,117,208,.10);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#1f1f1f; --surface:#272727; --card:#2d2d2d; --text:#f3f3f3; --muted:#b9b9b9; --line:#3a3a3a; --hover:#353535;
+    --accent:#4cc2ff; --accentSoft:#1d3a4d; --cpu:#4aa3f0; --mem:#c58af0; --good:#6ccb5f; --bad:#ff99a4; --warn:#f2c661;
+    --grid:#2f3a45; --path:#4aa3f0; --pathFill:rgba(74,163,240,.12);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#1f1f1f; --surface:#272727; --card:#2d2d2d; --text:#f3f3f3; --muted:#b9b9b9; --line:#3a3a3a; --hover:#353535;
+  --accent:#4cc2ff; --accentSoft:#1d3a4d; --cpu:#4aa3f0; --mem:#c58af0; --good:#6ccb5f; --bad:#ff99a4; --warn:#f2c661;
+  --grid:#2f3a45; --path:#4aa3f0; --pathFill:rgba(74,163,240,.12);
+}
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--text);font-family:"Segoe UI Variable","Segoe UI",system-ui,-apple-system,sans-serif;font-size:13px;overflow:hidden;user-select:none;-webkit-user-select:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.app{display:grid;grid-template-rows:44px minmax(0,1fr);height:100%}
+
+.title{display:flex;align-items:center;gap:10px;padding:0 0 0 14px}
+.tico{width:16px;height:16px;border-radius:3px;background:linear-gradient(135deg,#2ea043,#1b75d0);display:grid;place-items:center}
+.tico i{width:9px;height:6px;border-left:2px solid #fff;border-bottom:2px solid #fff;transform:skewX(-20deg)}
+.search{margin:0 auto;width:min(420px,40vw);background:var(--card);border:1px solid var(--line);border-radius:6px;padding:5px 10px;color:var(--muted);white-space:nowrap;overflow:hidden}
+.winctl{display:flex;height:100%}
+.winctl span{width:46px;display:grid;place-items:center;color:var(--muted);font-size:14px}
+
+.body{display:grid;grid-template-columns:200px minmax(0,1fr);min-height:0}
+.nav{padding:4px 6px;display:flex;flex-direction:column;gap:2px}
+.nav div{display:flex;align-items:center;gap:12px;padding:8px 10px;border-radius:5px;color:var(--text);position:relative}
+.nav div svg{width:16px;height:16px;flex:none}
+.nav div.on{background:var(--hover)}
+.nav div.on::before{content:"";position:absolute;left:0;top:9px;bottom:9px;width:3px;border-radius:2px;background:var(--accent)}
+.nav .sp{flex:1}
+
+.main{background:var(--surface);border-top-left-radius:8px;border:1px solid var(--line);border-right:0;border-bottom:0;display:flex;flex-direction:column;min-height:0;min-width:0}
+.mh{display:flex;align-items:center;gap:8px;padding:14px 18px 10px;flex-wrap:wrap}
+.mh h1{margin:0 auto 0 0;font-size:20px;font-weight:600}
+.btn{display:inline-flex;align-items:center;gap:7px;padding:6px 12px;border-radius:5px;border:1px solid var(--line);background:var(--card);white-space:nowrap}
+.btn:hover:not(:disabled){background:var(--hover)}
+.btn:disabled{opacity:.45;cursor:default}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.pri:hover:not(:disabled){filter:brightness(1.08)}
+.btn.on{border-color:var(--accent);color:var(--accent)}
+.btn kbd{font:11px ui-monospace,Menlo,monospace;opacity:.6}
+
+.tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;padding:0 18px 10px}
+.tile{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:8px 10px;display:grid;grid-template-columns:40px 1fr;gap:2px 10px;align-items:center;min-width:0}
+.spark{grid-row:span 2;width:40px;height:30px;border:1px solid var(--line);border-radius:3px;position:relative;overflow:hidden}
+.spark i{position:absolute;left:0;right:0;bottom:0;background:currentColor;opacity:.25}
+.tile b{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tile span{color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+.work{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 250px;gap:10px;padding:0 18px 14px}
+.stage{position:relative;min-height:0;background:var(--card);border:1px solid var(--line);border-radius:6px;display:flex;flex-direction:column;overflow:hidden}
+.sh{display:flex;justify-content:space-between;padding:8px 12px;color:var(--muted);font-size:12px;border-bottom:1px solid var(--line)}
+.sh b{color:var(--text);font-size:14px;font-weight:600}
+.cvwrap{flex:1;min-height:0;display:grid;place-items:center;padding:8px}
+canvas{display:block;touch-action:none;cursor:crosshair}
+.dlg{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:var(--card);border:1px solid var(--line);border-radius:8px;box-shadow:0 16px 40px rgba(0,0,0,.28);width:min(380px,calc(100% - 24px));padding:18px 20px;z-index:5}
+.dlg h2{margin:0 0 8px;font-size:18px;font-weight:600}
+.dlg p{margin:0 0 8px;line-height:1.5;color:var(--text)}
+.dlg .acts{display:flex;justify-content:flex-end;gap:8px;margin-top:12px}
+
+.side{display:flex;flex-direction:column;gap:10px;min-height:0;overflow-y:auto}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:6px}
+.panel h3{margin:0;padding:8px 12px;font-size:12px;font-weight:600;color:var(--muted);border-bottom:1px solid var(--line);display:flex;justify-content:space-between}
+.svc{display:grid;grid-template-columns:28px 1fr auto;gap:2px 10px;align-items:center;padding:8px 12px;width:100%;text-align:left;border-bottom:1px solid var(--line)}
+.svc:last-child{border-bottom:0}
+.svc:hover:not(:disabled){background:var(--hover)}
+.svc.on{background:var(--accentSoft);box-shadow:inset 3px 0 0 var(--accent)}
+.svc:disabled{opacity:.45;cursor:default}
+.svc .ic{grid-row:span 2;width:28px;height:28px;border-radius:6px;display:grid;place-items:center;color:#fff;font-weight:700}
+.svc b{font-weight:600}
+.svc small{color:var(--muted);grid-column:2/4;line-height:1.35}
+.svc .cost{font-variant-numeric:tabular-nums;color:var(--muted);font-size:12px}
+.sel{padding:10px 12px;display:flex;flex-direction:column;gap:8px}
+.sel .row{display:flex;gap:6px;flex-wrap:wrap}
+.sel p{margin:0;color:var(--muted);line-height:1.45}
+table.pt{width:100%;border-collapse:collapse;font-size:12px;font-variant-numeric:tabular-nums}
+.pt th{text-align:right;font-weight:400;color:var(--muted);padding:6px 10px;border-bottom:1px solid var(--line)}
+.pt th:first-child,.pt td:first-child{text-align:left}
+.pt td{padding:5px 10px;text-align:right;white-space:nowrap}
+.pt td:first-child{max-width:120px;overflow:hidden;text-overflow:ellipsis}
+.heat{background:rgba(255,196,0,.18)}
+
+/* decoy processes page */
+.decoy{display:none;flex:1;min-height:0;overflow:auto;padding:0 18px 14px}
+body.boss .decoy{display:block}
+body.boss .game{display:none!important}
+.decoy table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:6px;font-variant-numeric:tabular-nums;min-width:640px}
+.decoy th{text-align:right;font-weight:400;color:var(--muted);padding:8px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
+.decoy th:first-child,.decoy td:first-child{text-align:left}
+.decoy th b{display:block;font-size:15px;font-weight:600;color:var(--text)}
+.decoy td{padding:6px 12px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+.decoy td.h1{background:rgba(255,196,0,.10)}.decoy td.h2{background:rgba(255,196,0,.22)}
+.decoy .grp td{font-weight:600;background:transparent;color:var(--muted);text-align:left}
+
+@media (max-width:1000px){.body{grid-template-columns:minmax(0,1fr)}.nav{display:none}.main{border-radius:0;border-left:0}}
+@media (max-width:760px){
+  .work{grid-template-columns:minmax(0,1fr);overflow-y:auto}.stage{min-height:62vh}
+  .tiles{grid-template-columns:repeat(2,minmax(0,1fr))}.search{display:none}.title{justify-content:space-between}
+  .btn kbd{display:none}.mh{padding:12px}.tiles,.work,.decoy{padding-left:12px;padding-right:12px}
+}
+</style>
+
+<div class="app">
+  <header class="title">
+    <span class="tico"><i></i></span><span>Task Manager</span>
+    <div class="search">Type a name, publisher, or PID to search</div>
+    <div class="winctl" aria-hidden="true"><span>–</span><span>□</span><span>✕</span></div>
+  </header>
+  <div class="body">
+    <nav class="nav" aria-hidden="true">
+      <div id="navProc"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="2" y="2" width="5" height="5"/><rect x="9" y="2" width="5" height="5"/><rect x="2" y="9" width="5" height="5"/><rect x="9" y="9" width="5" height="5"/></svg>Processes</div>
+      <div class="on" id="navPerf"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M1.5 12 5 7l3 3 6-7"/></svg>Performance</div>
+      <div><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="8" cy="8" r="6"/><path d="M8 4v4l3 2"/></svg>App history</div>
+      <div><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M8 2v6M4.5 4.5a5 5 0 1 0 7 0"/></svg>Startup apps</div>
+      <div><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="8" cy="5.5" r="2.5"/><path d="M3 14c.5-3 2.5-4.5 5-4.5s4.5 1.5 5 4.5"/></svg>Users</div>
+      <div><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M3 4h10M3 8h10M3 12h10"/></svg>Details</div>
+      <div><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="8" cy="8" r="2.5"/><path d="M8 1.5v2M8 12.5v2M1.5 8h2M12.5 8h2M3.4 3.4l1.4 1.4M11.2 11.2l1.4 1.4M3.4 12.6l1.4-1.4M11.2 4.8l1.4-1.4"/></svg>Services</div>
+    </nav>
+
+    <main class="main">
+      <div class="mh">
+        <h1 id="pageTitle">Performance</h1>
+        <button class="btn pri game" id="runBtn" title="Run new task (Space)">▶ Run new task <kbd>Space</kbd></button>
+        <button class="btn game" id="endBtn" title="End task: uninstall the selected service (E)">End task <kbd>E</kbd></button>
+        <button class="btn game" id="effBtn" title="Efficiency mode: double speed (F)">🍃 Efficiency mode</button>
+        <button class="btn" id="viewBtn" title="View (Esc)">View ▾</button>
+      </div>
+
+      <div class="tiles game">
+        <div class="tile" style="color:var(--cpu)"><span class="spark"><i id="spCpu" style="height:40%"></i></span><b style="color:var(--text)">CPU cycles</b><span id="tMoney">150 available</span></div>
+        <div class="tile" style="color:var(--mem)"><span class="spark"><i id="spMem" style="height:40%"></i></span><b style="color:var(--text)">Memory</b><span id="tMem">40% in use</span></div>
+        <div class="tile" style="color:var(--good)"><span class="spark"><i id="spWave" style="height:10%"></i></span><b style="color:var(--text)">Startup batch</b><span id="tWave">0 of ∞</span></div>
+        <div class="tile" style="color:var(--warn)"><span class="spark"><i id="spProc" style="height:5%"></i></span><b style="color:var(--text)">Processes</b><span id="tProc">0 running</span></div>
+      </div>
+
+      <div class="work game">
+        <section class="stage">
+          <div class="sh"><span><b>CPU</b> &nbsp;% utilisation over 60 seconds</span><span id="shRight">100%</span></div>
+          <div class="cvwrap" id="cvwrap"><canvas id="cv"></canvas></div>
+          <div class="dlg" id="dlg" hidden></div>
+        </section>
+        <aside class="side">
+          <div class="panel"><h3><span>Services</span><span>1–4</span></h3><div id="shop"></div></div>
+          <div class="panel"><h3><span id="selTitle">Selected</span></h3><div class="sel" id="selPanel"><p>Pick a service, then click an empty spot next to the graph line.</p></div></div>
+          <div class="panel"><h3><span>Processes</span><span>CPU</span></h3><table class="pt" id="ptable"></table></div>
+        </aside>
+      </div>
+
+      <div class="decoy" id="decoy"></div>
+    </main>
+  </div>
+</div>
+
+<script>
+(function(){
+const $=id=>document.getElementById(id);
+const cv=$('cv'),ctx=cv.getContext('2d');
+const COLS=22,ROWS=12;
+const WAY=[[-1,8],[4,8],[4,3],[8,3],[8,9],[12,9],[12,2],[16,2],[16,7],[22,7]];
+let C={};function readC(){const s=getComputedStyle(document.documentElement);['text','muted','line','card','accent','cpu','mem','good','bad','warn','grid','path','pathFill','surface'].forEach(k=>C[k]=s.getPropertyValue('--'+k).trim())}
+readC();setInterval(readC,800);
+
+/* ---------- path ---------- */
+const pts=WAY.map(([x,y])=>({x:x+.5,y:y+.5}));
+const segs=[];let total=0;
+for(let i=0;i<pts.length-1;i++){const a=pts[i],b=pts[i+1],l=Math.hypot(b.x-a.x,b.y-a.y);segs.push({a,b,l,s:total});total+=l}
+function posAt(d){for(const s of segs){if(d<=s.s+s.l){const t=(d-s.s)/s.l;return {x:s.a.x+(s.b.x-s.a.x)*t,y:s.a.y+(s.b.y-s.a.y)*t}}}return {...pts[pts.length-1]}}
+const onPath=new Set();
+for(let d=0;d<=total;d+=.25){const p=posAt(d);onPath.add(Math.floor(p.x)+','+Math.floor(p.y))}
+
+/* ---------- defs ---------- */
+const T={
+ av:{n:'Antivirus',k:'1',col:'#1b75d0',ico:'A',cost:50,range:2.5,dmg:9,rate:.55,d:'Scans one process at a time. Cheap and steady.'},
+ fw:{n:'Firewall',k:'2',col:'#c46b00',ico:'F',cost:70,range:2,dmg:3,rate:.9,slow:.45,d:'Pulses every process in range and slows them down.'},
+ gc:{n:'Garbage Collector',k:'3',col:'#2e8540',ico:'G',cost:110,range:2.2,dmg:16,rate:1.35,splash:1.1,d:'Sweeps a whole area. Great on crowds.'},
+ et:{n:'End Task',k:'4',col:'#a4262c',ico:'E',cost:160,range:4.6,dmg:60,rate:2.2,snipe:1,d:'Long range, huge hits. Always targets the heaviest process.'},
+};
+const E={
+ upd:{n:'Updater.exe',hp:30,sp:1.25,rw:6,col:'#5a7fa6',ico:'U'},
+ brw:{n:'Browser Helper (Renderer)',hp:18,sp:2.1,rw:5,col:'#c2862b',ico:'B'},
+ chat:{n:'Chat.exe',hp:62,sp:1,rw:9,col:'#6264c4',ico:'C'},
+ sync:{n:'Cloud Sync',hp:130,sp:.68,rw:15,col:'#2b8a8a',ico:'S'},
+ crash:{n:'Crash Reporter',hp:44,sp:1.5,rw:8,col:'#b0413e',ico:'!'},
+ leak:{n:'Memory Leak',hp:650,sp:.48,rw:70,col:'#8a3fbf',ico:'M',boss:1,mem:25},
+};
+
+/* ---------- state ---------- */
+let best=0;try{best=+localStorage.getItem('td-best')||0}catch(e){}
+let S,boss=false,cell=30,dpr=1,hover=null;
+function fresh(){return {money:150,mem:40,wave:0,towers:[],foes:[],fx:[],queue:[],active:false,speed:1,selType:null,selTower:null,over:false,kills:0,t:0,cpuHist:Array(60).fill(0)}}
+S=fresh();
+
+/* ---------- waves ---------- */
+function runWave(){
+  if(S.active||S.over||boss)return;
+  S.wave++;S.active=true;const n=S.wave,q=[];
+  const add=(k,c)=>{for(let i=0;i<c;i++)q.push(k)};
+  if(n%5===0){add('leak',1+Math.floor(n/10));add('brw',4+n);add('upd',3)}
+  else{add('upd',4+n);if(n>=2)add('brw',2+Math.floor(n*1.2));if(n>=3)add('chat',1+Math.floor(n*.8));if(n>=4)add('sync',Math.floor(n/2));if(n>=6)add('crash',Math.floor(n/2))}
+  q.sort(()=>Math.random()-.5);
+  if(n%5===0){const i=q.indexOf('leak');q.splice(i,1);q.push('leak')}
+  const gap=Math.max(.32,.9-n*.04);
+  S.queue=q.map((k,i)=>({k,t:i*gap}));S.qt=0;
+  toast(`Startup batch ${n}: ${q.length} processes launching${n%5===0?' (including a Memory Leak)':''}.`);
+  ui();
+}
+function spawn(k){const e=E[k],hm=1+.2*(S.wave-1)+(S.wave>10?.1*(S.wave-10)**1.3:0);S.foes.push({k,d:0,hp:e.hp*hm,max:e.hp*hm,slow:0,id:Math.random()})}
+
+/* ---------- update ---------- */
+function update(dt){
+  S.t+=dt;
+  if(S.active){S.qt+=dt;while(S.queue.length&&S.queue[0].t<=S.qt)spawn(S.queue.shift().k)}
+  for(const f of S.foes){
+    const e=E[f.k];const sp=e.sp*(f.slow>0?.55:1);f.slow=Math.max(0,f.slow-dt);f.d+=sp*dt;
+    if(f.d>=total){f.gone=1;S.mem+=e.mem||5;flashMem=1;if(S.mem>=100){S.mem=100;return gameOver()}}
+  }
+  for(const t of S.towers){
+    const d=T[t.k],lv=1+(t.lv-1)*.55;t.cd-=dt;if(t.cd>0)continue;
+    const rng=d.range+(t.lv-1)*.3;
+    const inR=S.foes.filter(f=>!f.gone&&f.hp>0&&dist(posAt(f.d),t)<=rng);
+    if(!inR.length)continue;
+    t.cd=d.rate;
+    if(d.slow){inR.forEach(f=>{hit(f,d.dmg*lv);f.slow=1.3});S.fx.push({k:'ring',x:t.x+.5,y:t.y+.5,r:rng,l:.3,col:d.col})}
+    else{
+      const tg=d.snipe?inR.reduce((a,b)=>a.hp>b.hp?a:b):inR.reduce((a,b)=>a.d>b.d?a:b);
+      const p=posAt(tg.d);
+      if(d.splash){S.foes.forEach(f=>{if(!f.gone&&dist(posAt(f.d),p)<=d.splash)hit(f,d.dmg*lv)});S.fx.push({k:'boom',x:p.x,y:p.y,r:d.splash,l:.3,col:d.col})}
+      else hit(tg,d.dmg*lv);
+      S.fx.push({k:'line',x:t.x+.5,y:t.y+.5,x2:p.x,y2:p.y,l:d.snipe?.22:.1,col:d.col,w:d.snipe?3:1.6});
+    }
+  }
+  S.foes=S.foes.filter(f=>{if(f.hp<=0&&!f.paid){f.paid=1;S.money+=E[f.k].rw;S.kills++;S.fx.push({k:'txt',x:posAt(f.d).x,y:posAt(f.d).y,t:'+'+E[f.k].rw,l:.7});return false}return !f.gone&&f.hp>0});
+  S.fx.forEach(f=>f.l-=dt);S.fx=S.fx.filter(f=>f.l>0);
+  if(S.active&&!S.queue.length&&!S.foes.length){
+    S.active=false;const bonus=20+S.wave*4;S.money+=bonus;S.mem=Math.max(20,S.mem-3);
+    if(S.wave>best){best=S.wave;try{localStorage.setItem('td-best',best)}catch(e){}}
+    toast(`Batch ${S.wave} cleared. +${bonus} cycles, and a little memory freed up.`);
+  }
+  // cpu graph history
+  cpuAcc+=dt;if(cpuAcc>.5){cpuAcc=0;S.cpuHist.push(Math.min(100,S.foes.length*7+Math.random()*6));S.cpuHist.shift()}
+}
+let cpuAcc=0,flashMem=0;
+const dist=(p,t)=>Math.hypot(p.x-(t.x+.5),p.y-(t.y+.5));
+function hit(f,dmg){f.hp-=dmg}
+function gameOver(){
+  S.over=true;S.active=false;
+  dlg('Your PC ran out of memory',`Too many processes got through. You held out for <b>${S.wave-1}</b> startup batch${S.wave-1===1?'':'es'} and ended ${S.kills} tasks. Best: ${best} batches.`,[['Restart',()=>{S=fresh();closeDlg();ui()},1]]);
+}
+
+/* ---------- input ---------- */
+function cellAt(e){const r=cv.getBoundingClientRect();return {x:Math.floor((e.clientX-r.left)/cell),y:Math.floor((e.clientY-r.top)/cell)}}
+cv.addEventListener('pointermove',e=>{hover=cellAt(e)});
+cv.addEventListener('pointerleave',()=>hover=null);
+cv.addEventListener('pointerdown',e=>{
+  if(boss||S.over)return;const c=cellAt(e);if(c.x<0||c.y<0||c.x>=COLS||c.y>=ROWS)return;
+  const tw=S.towers.find(t=>t.x===c.x&&t.y===c.y);
+  if(tw){S.selTower=tw;S.selType=null;ui();return}
+  if(!S.selType){S.selTower=null;ui();return}
+  if(onPath.has(c.x+','+c.y)){toast('That spot is on the graph line. Place services beside it.');return}
+  const d=T[S.selType];if(S.money<d.cost){toast('Not enough CPU cycles yet.');return}
+  S.money-=d.cost;const t={k:S.selType,x:c.x,y:c.y,lv:1,cd:0,spent:d.cost};S.towers.push(t);ui();
+});
+function upgrade(){const t=S.selTower;if(!t||t.lv>=3)return;const c=upCost(t);if(S.money<c)return;S.money-=c;t.spent+=c;t.lv++;ui()}
+function sell(){const t=S.selTower;if(!t)return;S.money+=Math.floor(t.spent*.7);S.towers=S.towers.filter(x=>x!==t);S.selTower=null;ui()}
+const upCost=t=>Math.round(T[t.k].cost*(t.lv===1?.8:1.2));
+addEventListener('keydown',e=>{
+  if(e.key==='Escape'){e.preventDefault();toggleBoss();return}
+  if(boss||!$('dlg').hidden&&e.key!=='Enter'||e.ctrlKey||e.metaKey)return;
+  const k=e.key.toLowerCase();
+  const m={'1':'av','2':'fw','3':'gc','4':'et'}[k];
+  if(m){S.selType=S.selType===m?null:m;S.selTower=null;ui()}
+  else if(k===' '){e.preventDefault();runWave()}
+  else if(k==='e'){sell()}
+  else if(k==='u'){upgrade()}
+  else if(k==='f'){toggleSpeed()}
+});
+function toggleSpeed(){S.speed=S.speed===1?2:1;ui()}
+$('runBtn').onclick=runWave;$('endBtn').onclick=sell;$('effBtn').onclick=toggleSpeed;$('viewBtn').onclick=()=>toggleBoss();
+
+/* ---------- ui ---------- */
+function ui(){
+  $('shop').innerHTML=Object.entries(T).map(([k,d])=>`<button class="svc${S.selType===k?' on':''}" data-k="${k}" ${S.money<d.cost?'disabled':''}><span class="ic" style="background:${d.col}">${d.ico}</span><b>${d.n}</b><span class="cost">${d.cost}</span><small>${d.d}</small></button>`).join('');
+  $('shop').querySelectorAll('[data-k]').forEach(b=>b.onclick=()=>{S.selType=S.selType===b.dataset.k?null:b.dataset.k;S.selTower=null;ui()});
+  const t=S.selTower;
+  if(t){const d=T[t.k];$('selTitle').textContent=d.n+' · level '+t.lv;
+    $('selPanel').innerHTML=`<p>Damage ${Math.round(d.dmg*(1+(t.lv-1)*.55))} · range ${(d.range+(t.lv-1)*.3).toFixed(1)}${d.slow?' · slows':''}${d.splash?' · area':''}</p><div class="row">${t.lv<3?`<button class="btn pri" id="upBtn" ${S.money<upCost(t)?'disabled':''}>Upgrade · ${upCost(t)} <kbd>U</kbd></button>`:'<span class="btn" style="cursor:default">Max level</span>'}<button class="btn" id="sellBtn">End task · +${Math.floor(t.spent*.7)}</button></div>`;
+    const u=$('upBtn');if(u)u.onclick=upgrade;$('sellBtn').onclick=sell}
+  else if(S.selType){$('selTitle').textContent=T[S.selType].n;$('selPanel').innerHTML=`<p>${T[S.selType].d} Click an empty square beside the graph line to start it. Press ${T[S.selType].k} again to cancel.</p>`}
+  else{$('selTitle').textContent='Selected';$('selPanel').innerHTML='<p>Pick a service, then click an empty spot beside the graph line. Click a placed service to upgrade or end it.</p>'}
+  $('runBtn').disabled=S.active||S.over;$('endBtn').disabled=!S.selTower;$('effBtn').classList.toggle('on',S.speed===2);
+  hud();
+}
+function hud(){
+  $('tMoney').textContent=`${S.money} available`;$('spCpu').style.height=Math.min(100,S.money/4)+'%';
+  $('tMem').textContent=`${Math.round(S.mem)}% in use`;$('spMem').style.height=S.mem+'%';
+  $('tWave').textContent=S.active?`Batch ${S.wave} running`:S.wave?`${S.wave} cleared · best ${best}`:`Ready · best ${best}`;$('spWave').style.height=Math.min(100,S.wave*6)+'%';
+  $('tProc').textContent=`${S.foes.length} running`;$('spProc').style.height=Math.min(100,S.foes.length*6)+'%';
+  const rows=S.foes.slice().sort((a,b)=>b.d-a.d).slice(0,6);
+  $('ptable').innerHTML='<tr><th>Name</th><th>CPU</th><th>Memory</th></tr>'+(rows.length?rows.map(f=>`<tr><td>${E[f.k].n}</td><td class="${f.hp/f.max>.6?'heat':''}">${Math.max(1,Math.round(f.hp/f.max*100))}%</td><td>${Math.round(E[f.k].hp*1.7)} MB</td></tr>`).join(''):'<tr><td colspan="3" style="color:var(--muted);text-align:left">Nothing running. Press Run new task.</td></tr>');
+  $('shRight').textContent=Math.round(S.cpuHist[S.cpuHist.length-1])+'%';
+}
+let tT;function toast(t){const el=$('selPanel');if(S.selTower)return;$('selTitle').textContent='Notification';el.innerHTML=`<p>${t}</p>`;clearTimeout(tT);tT=setTimeout(()=>{if(!S.selTower&&!S.selType)ui()},3500)}
+function dlg(title,html,btns){const d=$('dlg');d.hidden=false;d.innerHTML=`<h2>${title}</h2><p>${html}</p><div class="acts">${btns.map((b,i)=>`<button class="btn${b[2]?' pri':''}" data-i="${i}">${b[0]}</button>`).join('')}</div>`;d.querySelectorAll('[data-i]').forEach(b=>b.onclick=()=>btns[+b.dataset.i][1]());const p=d.querySelector('.pri');p&&p.focus()}
+const closeDlg=()=>$('dlg').hidden=true;
+
+/* ---------- draw ---------- */
+function fit(){
+  const r=$('cvwrap').getBoundingClientRect();dpr=Math.min(2,devicePixelRatio||1);
+  cell=Math.max(12,Math.floor(Math.min((r.width-16)/COLS,(r.height-16)/ROWS)));
+  cv.style.width=cell*COLS+'px';cv.style.height=cell*ROWS+'px';cv.width=cell*COLS*dpr;cv.height=cell*ROWS*dpr;
+}
+function draw(){
+  ctx.setTransform(dpr,0,0,dpr,0,0);const W=cell*COLS,H=cell*ROWS;
+  ctx.fillStyle=C.card;ctx.fillRect(0,0,W,H);
+  ctx.strokeStyle=C.grid;ctx.lineWidth=1;ctx.beginPath();
+  for(let x=0;x<=COLS;x++){ctx.moveTo(x*cell+.5,0);ctx.lineTo(x*cell+.5,H)}
+  for(let y=0;y<=ROWS;y++){ctx.moveTo(0,y*cell+.5);ctx.lineTo(W,y*cell+.5)}ctx.stroke();
+  // live "cpu history" faintly in the background, like the real graph
+  ctx.globalAlpha=.35;ctx.strokeStyle=C.cpu;ctx.lineWidth=1;ctx.beginPath();S.cpuHist.forEach((v,i)=>{const x=i/(S.cpuHist.length-1)*W,y=H-v/100*H;i?ctx.lineTo(x,y):ctx.moveTo(x,y)});ctx.stroke();ctx.globalAlpha=1;
+  // the path: a big CPU graph line with area fill
+  ctx.beginPath();pts.forEach((p,i)=>{const x=p.x*cell,y=p.y*cell;i?ctx.lineTo(x,y):ctx.moveTo(x,y)});
+  ctx.save();ctx.lineTo(W,H);ctx.lineTo(0,H);ctx.closePath();ctx.fillStyle=C.pathFill;ctx.fill();ctx.restore();
+  ctx.beginPath();pts.forEach((p,i)=>{const x=p.x*cell,y=p.y*cell;i?ctx.lineTo(x,y):ctx.moveTo(x,y)});
+  ctx.strokeStyle=C.path;ctx.lineWidth=Math.max(3,cell*.18);ctx.lineJoin='round';ctx.stroke();
+  // placement hover
+  if(hover&&S.selType&&!boss){const ok=!onPath.has(hover.x+','+hover.y)&&!S.towers.some(t=>t.x===hover.x&&t.y===hover.y);
+    const d=T[S.selType];ctx.fillStyle=ok?'rgba(16,124,16,.15)':'rgba(196,43,28,.15)';ctx.fillRect(hover.x*cell,hover.y*cell,cell,cell);
+    if(ok){ctx.strokeStyle=d.col;ctx.setLineDash([4,4]);ctx.beginPath();ctx.arc((hover.x+.5)*cell,(hover.y+.5)*cell,d.range*cell,0,7);ctx.stroke();ctx.setLineDash([])}}
+  // towers
+  for(const t of S.towers){const d=T[t.k],x=t.x*cell,y=t.y*cell,m=cell*.12;
+    if(t===S.selTower){ctx.strokeStyle=d.col;ctx.setLineDash([4,4]);ctx.beginPath();ctx.arc(x+cell/2,y+cell/2,(d.range+(t.lv-1)*.3)*cell,0,7);ctx.stroke();ctx.setLineDash([])}
+    ctx.fillStyle=d.col;ctx.beginPath();ctx.roundRect(x+m,y+m,cell-2*m,cell-2*m,cell*.18);ctx.fill();
+    ctx.fillStyle='#fff';ctx.font=`700 ${cell*.42}px "Segoe UI",system-ui,sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(d.ico,x+cell/2,y+cell/2+1);
+    for(let i=0;i<t.lv;i++){ctx.fillStyle=C.text;ctx.fillRect(x+m+i*cell*.18,y+cell-m*.9,cell*.12,cell*.07)}
+    if(t===S.selTower){ctx.strokeStyle=C.text;ctx.lineWidth=2;ctx.strokeRect(x+1,y+1,cell-2,cell-2)}}
+  // foes
+  for(const f of S.foes){const e=E[f.k],p=posAt(f.d),r=cell*(e.boss?.42:.28);
+    ctx.fillStyle=e.col;ctx.beginPath();ctx.arc(p.x*cell,p.y*cell,r,0,7);ctx.fill();
+    if(f.slow>0){ctx.strokeStyle='#4cc2ff';ctx.lineWidth=2;ctx.stroke()}
+    ctx.fillStyle='#fff';ctx.font=`700 ${r*1.05}px "Segoe UI",system-ui,sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(e.ico,p.x*cell,p.y*cell+1);
+    if(f.hp<f.max){const w=cell*.7;ctx.fillStyle=C.line;ctx.fillRect(p.x*cell-w/2,p.y*cell-r-7,w,3);ctx.fillStyle=f.hp/f.max>.4?C.good:C.bad;ctx.fillRect(p.x*cell-w/2,p.y*cell-r-7,w*Math.max(0,f.hp/f.max),3)}}
+  // fx
+  for(const f of S.fx){ctx.globalAlpha=Math.min(1,f.l*4);
+    if(f.k==='line'){ctx.strokeStyle=f.col;ctx.lineWidth=f.w;ctx.beginPath();ctx.moveTo(f.x*cell,f.y*cell);ctx.lineTo(f.x2*cell,f.y2*cell);ctx.stroke()}
+    else if(f.k==='ring'){ctx.strokeStyle=f.col;ctx.lineWidth=2;ctx.beginPath();ctx.arc(f.x*cell,f.y*cell,f.r*cell*(1-f.l),0,7);ctx.stroke()}
+    else if(f.k==='boom'){ctx.fillStyle=f.col;ctx.globalAlpha*=.3;ctx.beginPath();ctx.arc(f.x*cell,f.y*cell,f.r*cell,0,7);ctx.fill()}
+    else if(f.k==='txt'){ctx.fillStyle=C.good;ctx.font=`600 ${cell*.36}px "Segoe UI",system-ui`;ctx.textAlign='center';ctx.fillText(f.t,f.x*cell,(f.y-.5-(.7-f.l))*cell)}
+    ctx.globalAlpha=1}
+  // exit marker: the memory ceiling
+  ctx.fillStyle=flashMem>0?C.bad:C.mem;ctx.globalAlpha=.8;ctx.fillRect(W-4,0,4,H);ctx.globalAlpha=1;
+}
+
+/* ---------- decoy ---------- */
+const PROC=[['Apps (5)'],['Studio Mail','0%','182.4 MB','0.1 MB/s','0 Mbps',0],['Web Browser (12)','3.1%','1,204.6 MB','0.2 MB/s','0.4 Mbps',2],['Team Chat','1.2%','412.7 MB','0 MB/s','0.1 Mbps',1],['Image Editor','0.4%','2,318.9 MB','0.4 MB/s','0 Mbps',2],['Task Manager','0.8%','58.2 MB','0 MB/s','0 Mbps',0],['Background processes (46)'],['Antimalware Service Executable','0.2%','221.3 MB','0.1 MB/s','0 Mbps',1],['Cloud Sync','0%','96.1 MB','0 MB/s','0 Mbps',0],['Font Service','0%','12.4 MB','0 MB/s','0 Mbps',0],['Print Spooler','0%','8.9 MB','0 MB/s','0 Mbps',0],['Runtime Broker','0%','6.2 MB','0 MB/s','0 Mbps',0],['Search Indexer','0.1%','34.7 MB','0 MB/s','0 Mbps',0]];
+$('decoy').innerHTML=`<table><tr><th>Name</th><th><b>6%</b>CPU</th><th><b>48%</b>Memory</th><th><b>1%</b>Disk</th><th><b>0%</b>Network</th></tr>${PROC.map(r=>r.length===1?`<tr class="grp"><td colspan="5">${r[0]}</td></tr>`:`<tr><td>${r[0]}</td><td class="h${r[5]}">${r[1]}</td><td class="h${r[5]}">${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td></tr>`).join('')}</table>`;
+let wasDlg=false;
+function toggleBoss(){
+  boss=!boss;document.body.classList.toggle('boss',boss);
+  $('pageTitle').textContent=boss?'Processes':'Performance';$('navPerf').classList.toggle('on',!boss);$('navProc').classList.toggle('on',boss);
+  window.LookBusy&&queueMicrotask(()=>window.LookBusy.sync());
+  if(!boss)requestAnimationFrame(()=>{fit();draw()});
+}
+
+/* ---------- loop ---------- */
+let last=performance.now();
+function frame(t){
+  const dt=Math.min(.05,(t-last)/1000)*S.speed;last=t;
+  if(!boss&&!S.over&&!document.hidden&&$('dlg').hidden){update(dt);if(flashMem>0)flashMem-=dt}
+  if(!boss){draw();if(Math.floor(t/200)!==Math.floor((t-16)/200))hud()}
+  requestAnimationFrame(frame);
+}
+addEventListener('resize',()=>{fit();draw()});
+fit();ui();requestAnimationFrame(frame);
+dlg('Performance',`Processes are launching along the CPU graph. Every one that reaches the end eats 5% of your memory. Hit 100% and your PC falls over.<br><br>Start <b>services</b> beside the line to end them: Antivirus, Firewall (slows), Garbage Collector (area) and End Task (sniper). Earn CPU cycles for every process you end. <b>Run new task</b> sends the next batch. Every fifth batch brings a Memory Leak.`,[['Got it',()=>{closeDlg()},1]]);
+
+window.LookBusy&&window.LookBusy.register({name:'Task Manager',goal:'Start services beside the CPU graph to end processes before your memory hits 100%.',controls:[['1–4','Pick a service'],['Click','Place or select a service'],['Space','Run the next startup batch'],['U / E','Upgrade / end the selected service'],['F','Efficiency mode (double speed)']],file:'task-defence.html',toggle:toggleBoss,isHidden:()=>boss});
+})();
+</script>
+
+</html>
