@@ -20,7 +20,7 @@ To host it, turn on GitHub Pages for the repo (Settings → Pages → deploy fro
 | --- | --- | --- | --- |
 | Threadline | Slack | Dungeon crawler | `threadline-chat.html` |
 | Hubbub | Slack | Text adventure RPG | `hubbub-rpg.html` |
-| Taskwall | Trello | Idle clicker | `taskwall-clicker.html` |
+| Taskwall | Trello | Idle clicker (the deep one) | `taskwall-clicker.html` |
 | Q3 Delivery Sprint | Trello | Deck-builder roguelite | `taskwall-deckbuilder.html` |
 | Q3 Budget Forecast | Google Sheets | Minesweeper | `budget-minesweeper.html` |
 | Team Calendar | Google Calendar | Tetris | `calendar-tetris.html` |
@@ -40,6 +40,21 @@ To host it, turn on GitHub Pages for the repo (Settings → Pages → deploy fro
 | Swatches | Coolors | Colour matching | `swatch-match.html` |
 | Password Reset | Okta | Rules puzzle | `password-rules.html` |
 
+### Taskwall, the deep version
+
+The original Trello clicker has been rebuilt as a proper idle game. Old saves carry over.
+
+- **14 roles to hire.** They run from Interns up to Multiverse Studios. Hire or let go in batches of 1, 10 or 100.
+- **148 requests to approve.** Every role has seven upgrade tiers. There are also click upgrades, an intern buddy scheme, cross-team synergies, office perks and morale boosters.
+- **106 trophies,** some of them secret. Each one adds 4% morale, and team socials turn morale into velocity.
+- **Quick wins** come in five flavours: a lucky payout, "In the zone" (×7 velocity), "Deadline rush" (×777 clicks), a team surge and a free request.
+- **Stakeholders** turn up and watch your board, siphoning velocity as they go. Click one to address its feedback and get back more than it took. The longer you leave them, the bigger the payout.
+- **Epic cards** arrive every 25 cards, with 50 subtasks and a big payout.
+- **Sprints** are timed challenges: 150 ticks in a minute, 12 cards in two minutes, or a points target.
+- **The Kitchen** opens once you have 10 Interns. Coffee brews over time and you spend it on orders: stand-ups, biscuits, espresso, team breakfast, flat whites and a risky mystery brew.
+- **Rebranding** is the prestige system. Once you've earned 1B points all time, rebrand the studio to win awards (+1% velocity each, for good) and spend them as clout on 15 permanent perks.
+- **Also:** an activity ticker, a full stats page, number format settings, save export and import, and offline earnings.
+
 ### New in this version
 
 - **Timesheets.** A 9-day fortnight timesheet. Every project gets one hour a day, one per time slot and one per 3-day × 3-hour block. It's Sudoku, with three difficulties, draft notes, undo and a "ask your PM" hint that costs you 30 seconds.
@@ -52,6 +67,7 @@ To host it, turn on GitHub Pages for the repo (Settings → Pages → deploy fro
 
 - Weekly WIP sync no longer spills off the side of the screen on phones.
 - The home page lists all 21 apps now that the roadmap has been built.
+- Taskwall has been rebuilt from a simple clicker into a full idle game (see above).
 
 ## Screenshots
 
