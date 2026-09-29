@@ -176,6 +176,31 @@ button.chip:hover{background:rgba(255,255,255,.26)}
 @keyframes wag{50%{transform:scaleX(var(--dir,1)) rotate(-8deg) translateY(-3px)}}
 .heart{position:fixed;pointer-events:none;z-index:40;color:#e0567a;font-size:18px;animation:up .9s ease-out forwards}
 
+.list.xwide{flex-basis:560px}
+/* office scene */
+.scene{position:relative;height:270px;border-radius:10px;overflow:hidden;background:var(--wall);box-shadow:inset 0 0 0 1px rgba(0,0,0,.1)}
+.scene .window{position:absolute;left:6%;top:9%;width:40%;height:42%;border:6px solid rgba(255,255,255,.75);border-radius:6px;display:flex;align-items:center;justify-content:space-around;font-size:30px;box-shadow:inset 0 0 0 2px rgba(0,0,0,.12),0 2px 6px rgba(0,0,0,.2);overflow:hidden}
+.scene .floor{position:absolute;left:0;right:0;bottom:0;height:34%;background:var(--floor);box-shadow:inset 0 6px 10px rgba(0,0,0,.15)}
+.scene .it{position:absolute;transform:translate(-50%,-50%);font-size:26px;line-height:1;filter:drop-shadow(0 2px 2px rgba(0,0,0,.25))}
+.scene .it.big{font-size:32px}
+.scene .desks{position:absolute;left:52%;right:4%;bottom:27%;font-size:21px;line-height:1.1;text-align:center;letter-spacing:-2px}
+.scene .sdog{position:absolute;bottom:3%;transform:translateX(-50%)}
+.scene .light{position:absolute;inset:0;pointer-events:none;mix-blend-mode:multiply}
+.scene .oname{position:absolute;left:8px;bottom:8px;background:rgba(0,0,0,.6);color:#fff;border-radius:6px;padding:3px 9px;font-size:12px;font-weight:600;z-index:2}
+.scene .bed{position:absolute;left:14%;bottom:5%;width:64px;height:18px;border-radius:50%;background:#8e5a9e;box-shadow:inset 0 -5px 0 rgba(0,0,0,.2)}
+.sw{display:inline-block;width:26px;height:26px;border-radius:6px;border:2px solid transparent;box-shadow:0 0 0 1px rgba(0,0,0,.15);margin:2px;vertical-align:middle}
+.sw.on{border-color:var(--accent)}
+.opts{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.opt{border:1px solid var(--line);border-radius:6px;padding:3px 8px;font-size:12px;font-weight:600;background:var(--card)}
+.opt.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.emo{font-size:30px;line-height:1;margin-right:8px;vertical-align:middle}
+.row2{display:flex;gap:6px}.row2 .buy{margin-top:8px}
+.portrait{display:flex;align-items:flex-end;justify-content:center;height:84px;background:linear-gradient(var(--accentSoft),transparent);border-radius:8px;margin-bottom:6px}
+.name-in{width:100%;border:1px solid var(--line);border-radius:6px;padding:5px 8px;background:var(--cardHover)}
+.spark{display:block;width:100%;height:42px;margin-top:6px}
+.up-g{color:var(--good);font-weight:700}.dn-r{color:var(--hot);font-weight:700}
+.dog .b svg{display:block;transform:scaleX(var(--dir,1));filter:drop-shadow(0 3px 2px rgba(0,0,0,.25))}
+.dog .pups{position:absolute;left:-26px;bottom:14px;display:flex;gap:2px}
 .decoy{display:none}
 body.boss .decoy{display:flex}
 body.boss .game{display:none!important}
@@ -185,6 +210,8 @@ body.boss .game{display:none!important}
   .bar h1{font-size:16px}
   .members .faces{display:none}
   .list,.list.wide{flex-basis:80vw}
+  .list.xwide{flex-basis:92vw}
+  .scene{height:220px}
   #v-board .list:nth-child(2){order:-2}
   #v-board .list:nth-child(4){order:-1}
   .bar{padding:6px 10px}
@@ -229,7 +256,11 @@ body.boss .game{display:none!important}
       <div class="cards" id="team"></div></section>
     <section class="list"><div class="list-h">Requests <span id="upN">0</span></div><div class="cards" id="ups"></div></section>
   </div>
+  <div class="board game" id="v-office" hidden></div>
+  <div class="board game" id="v-dogs" hidden></div>
+  <div class="board game" id="v-stocks" hidden></div>
   <div class="board game" id="v-kitchen" hidden></div>
+  <div class="board game" id="v-clients" hidden></div>
   <div class="board game" id="v-trophies" hidden></div>
   <div class="board game" id="v-portfolio" hidden></div>
   <div class="board game" id="v-stats" hidden></div>
@@ -269,6 +300,12 @@ const HIRES=[
  {id:'consult',n:'Brand Consultancy',pl:'Brand Consultancies',ini:'BC',c:'#9a3b3b',cost:1.4e13,rate:6.5e7,d:'Bills by the syllable',t:['Rebrand of the rebrand','A 200-slide deck','Framework with a 2×2','Workshop sticky notes','Brand onion','Brand pyramid','Brand tesseract']},
  {id:'relay',n:'Time-zone Relay',pl:'Time-zone Relays',ini:'TZ',c:'#1f5f8f',cost:1.7e14,rate:4.3e8,d:'The sun never sets on your backlog',t:['Follow-the-sun rota','Shared calendar','Handover emojis','Always-on stand-up','Timezone converter','Crossing the date line','Tomorrow’s work, today']},
  {id:'multi',n:'Multiverse Studio',pl:'Multiverse Studios',ini:'MV',c:'#444a8f',cost:2.1e15,rate:2.9e9,d:'Hires versions of you who said yes to everything',t:['Portal licence','Variant naming convention','Yourself as a reference','Parallel sign-off','Merge conflicts resolved','Infinite interns','Everything, everywhere, approved']},
+ {id:'galaxy',n:'Galactic Agency',pl:'Galactic Agencies',ini:'GA',c:'#2b3a8f',cost:2.6e16,rate:2.1e10,d:'Offices in every spiral arm',t:['Warp-drive couriers','Nebula moodboards','Zero-g crits','Light-speed sign-off','Alien focus groups','Wormhole handovers','Galaxy-brain strategy']},
+ {id:'fractal',n:'Fractal Design Engine',pl:'Fractal Design Engines',ini:'FE',c:'#8f2b6f',cost:3.1e17,rate:1.5e11,d:'Designs that contain smaller designs',t:['Self-similar grids','Recursive kerning','Infinite-zoom artboards','Mandelbrot moodboards','Koch-curve logos','Fractal colour theory','Turtles all the way down']},
+ {id:'console',n:'Dev Console',pl:'Dev Consoles',ini:'DC',c:'#1f6f3f',cost:7.1e19,rate:1.1e12,d:'Types points straight into existence',t:['Keyboard macros','Autocomplete','God-mode flag','Dark theme','Tab-complete reality','sudo make sandwich','rm -rf backlog']},
+ {id:'idleverse',n:'Idleverse Franchise',pl:'Idleverse Franchises',ini:'IV',c:'#6f5f1f',cost:1.2e22,rate:8.3e12,d:'Entire universes playing this exact game',t:['Franchise fee','Cross-universe loyalty cards','Idling within idling','Meta-leaderboards','Save-file tourism','Clicker cartel','The one true clicker']},
+ {id:'cortex',n:'Cortex Studio',pl:'Cortex Studios',ini:'CS',c:'#b04a7a',cost:1.9e24,rate:6.4e13,d:'A brain the size of a planet, doing banners',t:['Frontal lobe fit-out','Synapse Slack','Neuron naming convention','Dream-time rendering','Hive-mind stand-ups','Brainstorm (literal)','Galaxy brain']},
+ {id:'you',n:'Clone of You',pl:'Clones of You',ini:'YOU',c:'#c77d3a',cost:5.4e26,rate:5.1e14,d:'Finally, someone who does it properly',t:['Matching lanyards','Shared memories','Arguing with yourself','Clone of a clone','Self-appraisal','The You-nion','One of you is the real you']},
 ];
 const H={};HIRES.forEach(h=>H[h.id]=h);
 const TIER_REQ=[1,5,25,50,100,150,200],TIER_COST=[10,50,500,5e4,5e6,5e8,5e10];
@@ -283,12 +320,12 @@ up({id:'mech',n:'Clacky mechanical keyboard',d:'Clicking is twice as good',cost:
 [['buddy','Intern buddy scheme','Every Intern earns +0.1/s for each non-intern hire. So do your clicks.',1e5,25,0],['sitin','Interns sit in on everything','Intern buddy bonus ×5',1e7,50,5],['socials','Interns run the socials','Intern buddy bonus ×10',1e8,100,10],['company','The interns are the company now','Intern buddy bonus ×20',1e9,150,20]]
  .forEach(([id,n,d,cost,own,f])=>up({id,n,d,cost,k:'Team',req:s=>s.own.intern>=own,fx:{fingers:f}}));
 HIRES.forEach(h=>h.t.forEach((n,t)=>up({id:`h_${h.id}_${t}`,n,d:`${h.pl} are twice as productive`,cost:h.cost*TIER_COST[t],k:'Team',hire:h.id,req:s=>s.own[h.id]>=TIER_REQ[t],fx:{h:h.id,m:2}})));
-[['jr','ad','Juniors shadow the Art Directors'],['free','agency','Freelancers subcontract the agency'],['mid','farm','Mid-weights learn Blender'],['intern','studio','Interns do the night shift'],['sr','consult','Seniors ghost-write the brand onion'],['ad','relay','Art Directors fly everywhere'],['farm','ai','The pipeline renders itself'],['cd','multi','The Creative Director meets themselves']]
+[['jr','ad','Juniors shadow the Art Directors'],['free','agency','Freelancers subcontract the agency'],['mid','farm','Mid-weights learn Blender'],['intern','studio','Interns do the night shift'],['sr','consult','Seniors ghost-write the brand onion'],['ad','relay','Art Directors fly everywhere'],['farm','ai','The pipeline renders itself'],['cd','multi','The Creative Director meets themselves'],['studio','galaxy','Night studios go interstellar'],['console','fractal','Fractal code reviews'],['multi','you','Every version of you, at once']]
  .forEach(([a,b,n])=>up({id:`syn_${a}_${b}`,n,d:`${H[a].pl} +5% for each ${H[b].n}. ${H[b].pl} +0.1% for each ${H[a].n}.`,cost:Math.max(H[a].cost,H[b].cost)*30,k:'Synergy',req:s=>s.own[a]>=15&&s.own[b]>=15,fx:{syn:[a,b]}}));
 [['coffee','Proper coffee machine',1.1,2e4],['plants','Office plants',1.1,2e5],['desks','Standing desks',1.1,2e6],['week','Four-day week',1.15,2e7],['dog','Office dog',1.15,2e8],['beans','Bean bags',1.2,2e9],['roof','Rooftop terrace',1.2,2e10],['nap','Nap pods',1.25,2e11],['hols','Unlimited holiday',1.25,2e12],['chef','In-house chef',1.3,2e13],['sabb','Sabbatical scheme',1.3,2e14],['bonus','Christmas bonus',2,2e15],['equity','Everyone gets equity',2,2e17]]
  .forEach(([id,n,m,cost])=>up({id,n,d:m>=2?'Whole team ×2':`Whole team +${Math.round((m-1)*100)}%`,cost,k:'Office',req:s=>s.total>=cost/2,fx:{all:m}}));
 [['drinks','Friday drinks',.1,5e5,10],['pizza','Pizza Friday',.125,5e7,20],['awayday','Team away day',.15,5e9,32],['pingpong','Ping-pong table',.175,5e11,45],['xmasparty','Christmas party',.2,5e13,60],['retreat','Company retreat in Portugal',.2,5e15,75]]
- .forEach(([id,n,f,cost,ach])=>up({id,achReq:ach,n,d:()=>`Velocity +${Math.round(f*100)}% of your morale (${Math.round(morale()*100)}% right now, from trophies)`,cost,k:'Morale',req:s=>s.ach.length>=ach,fx:{kit:f}}));
+ .forEach(([id,n,f,cost,ach])=>up({id,achReq:ach,n,d:()=>`Velocity +${Math.round(f*100)}% of your morale (${Math.round(morale()*100)}% right now, from trophies)`,cost,k:'Morale',req:s=>trophyCount(s)>=ach,fx:{kit:f}}));
 up({id:'lucky',n:'Lucky lanyard',d:'Quick wins turn up twice as often',cost:7.77e6,k:'Luck',req:s=>s.winsAll>=7,fx:{winFreq:2}});
 up({id:'seren',n:'Serendipity',d:'Quick wins turn up twice as often',cost:7.77e9,k:'Luck',req:s=>s.winsAll>=27,fx:{winFreq:2}});
 up({id:'fourleaf',n:'Four-leaf lanyard',d:'Quick win effects last twice as long',cost:7.77e12,k:'Luck',req:s=>s.winsAll>=77,fx:{winDur:2}});
@@ -298,13 +335,35 @@ up({id:'mugs',n:'Bigger mugs',d:'The coffee machine holds 10 more cups',cost:5e6
 up({id:'barista',n:'Barista course',d:'Coffee brews 50% faster',cost:5e9,k:'Kitchen',req:s=>s.spells>=25,fx:{cRegen:1.5}});
 up({id:'map',n:'Stakeholder mapping',d:'Addressed feedback returns 5% more',cost:1e8,k:'People',req:s=>s.shPopped>=5,fx:{shRet:.05}});
 up({id:'sla',n:'Feedback SLAs',d:'Addressed feedback returns another 5% more',cost:1e11,k:'People',req:s=>s.shPopped>=25,fx:{shRet:.05}});
-const hasDog=s=>s.ups.includes('dog');
+const hasDog=s=>s.ups.includes('dog')||(s.dogs&&s.dogs.length>0);
 up({id:'treats',n:'Dog treats in the drawer',d:'Petting the office dog earns three times as much',cost:5e8,k:'Dog',req:s=>hasDog(s)&&s.pets>=25,fx:{dogPts:3}});
 up({id:'bed',n:'A proper dog bed',d:'The office dog cheers up twice as fast',cost:5e9,k:'Dog',req:s=>hasDog(s)&&s.pets>=75,fx:{dogHappy:2}});
 up({id:'walkies',n:'Lunchtime walkies',d:'Zoomies last twice as long',cost:5e10,k:'Dog',req:s=>hasDog(s)&&s.zoomies>=3,fx:{zoomDur:2}});
 up({id:'ball',n:'Tennis ball',d:'The office dog fetches quick wins twice as often',cost:5e11,k:'Dog',req:s=>hasDog(s)&&s.fetches>=3,fx:{fetch:2}});
 up({id:'pups',n:'The office dog has puppies',d:'Whole team +20%. Productivity drops for a week, then soars.',cost:5e13,k:'Dog',req:s=>hasDog(s)&&s.pets>=500,fx:{all:1.2}});
 const UP={};U.forEach(u=>UP[u.id]=u);
+const CAP=1e303;
+const U_SHORT=(()=>{const u=['','U','D','T','Qa','Qi','Sx','Sp','Oc','No'],t=['','Dc','Vg','Tg','Qag','Qig','Sxg','Spg','Ocg','Nog'],o=['K','M','B','T','Qa','Qi','Sx','Sp','Oc','No'];for(let i=10;i<100;i++)o.push(u[i%10]+t[Math.floor(i/10)]);o.push('Ce');return o})();
+const W1=['thousand','million','billion','trillion','quadrillion','quintillion','sextillion','septillion','octillion','nonillion'];
+const WU=['','un','duo','tre','quattuor','quin','sex','septen','octo','novem'],WT=['','dec','vigint','trigint','quadragint','quinquagint','sexagint','septuagint','octogint','nonagint'];
+const illion=i=>i<10?W1[i]:i>=100?'centillion':WU[i%10]+WT[Math.floor(i/10)]+'illion';
+const ROMAN=n=>{const r=[[1000,'M'],[900,'CM'],[500,'D'],[400,'CD'],[100,'C'],[90,'XC'],[50,'L'],[40,'XL'],[10,'X'],[9,'IX'],[5,'V'],[4,'IV'],[1,'I']];let o='';for(const [v,k] of r)while(n>=v){o+=k;n-=v}return o};
+const OP_A=['Heated','Ergonomic','Artisanal','Smart','Bespoke','Sustainable','Premium','Holographic','Quantum','Zero-gravity','Sentient','Interdimensional'];
+const OP_B=['coffee bar','sofas','meeting pods','nap rooms','roof garden','slide between floors','ball pit','cinema room','sauna','aquarium','helipad','moon office'];
+function genUp(id){
+  let m;
+  if((m=/^h_(\w+)_(\d+)$/.exec(id))&&H[m[1]]&&+m[2]>=7){const h=H[m[1]],t=+m[2],k=t-6;
+    return {id,n:`${h.t[t%7]} ${ROMAN(Math.floor(t/7)+1)}`,d:`${h.pl} are twice as productive`,cost:h.cost*5e10*Math.pow(1e3,k),k:'Team',hire:h.id,req:s=>s.own[h.id]>=200+50*k,fx:{h:h.id,m:2},gen:1}}
+  if((m=/^op_(\d+)$/.exec(id))){const n=+m[1],cost=2e18*Math.pow(10,n),cyc=OP_A.length*OP_B.length;
+    return {id,n:`${OP_A[n%OP_A.length]} ${OP_B[Math.floor(n/OP_A.length)%OP_B.length]}${n>=cyc?' '+ROMAN(Math.floor(n/cyc)+1):''}`,d:'Whole team +15%',cost,k:'Office',req:s=>s.total>=cost/2,fx:{all:1.15},gen:1}}
+  if((m=/^ck_(\d+)$/.exec(id))){const n=+m[1],cost=5e18*Math.pow(100,n);
+    return {id,n:`Click technique ${ROMAN(n+8)}`,d:'Each click also earns 1% of your velocity',cost,k:'Click',req:s=>s.hand>=cost/50,fx:{pct:.01},gen:1}}
+  if((m=/^ms_(\d+)$/.exec(id))){const n=+m[1],need=100+25*n,cost=5e17*Math.pow(1e3,n);
+    return {id,achReq:need,n:`Team social ${ROMAN(n+1)}`,d:()=>`Velocity +20% of your morale (${Math.round(morale()*100)}% right now)`,cost,k:'Morale',req:s=>trophyCount(s)>=need,fx:{kit:.2},gen:1}}
+  return null;
+}
+function getUp(id){if(UP[id])return UP[id];const u=genUp(id);if(u)UP[id]=u;return u}
+function nextGen(prefix,start){let n=start;while(S.ups.includes(prefix+n))n++;return prefix+n}
 const KIND_C={Click:'var(--l5)',Team:'var(--l1)',Synergy:'var(--l4)',Office:'var(--l2)',Morale:'#c2477f',Luck:'#b7860b',Process:'var(--l3)',Kitchen:'#8a5a36',People:'#5b6f80',Dog:'#b0703a'};
 
 /* ---------- perks (bought with clout after rebranding) ---------- */
@@ -324,7 +383,13 @@ const PERKS=[
  {id:'legend',n:'Industry legend',d:'Each award is worth +1.5% instead of +1%',cost:50},
  {id:'cat',n:'Studio cat',d:'Whole team +25%. It sits on keyboards, but it’s worth it.',cost:100},
  {id:'dynasty',n:'Studio dynasty',d:'Velocity and clicks +50%',cost:250},
+ {id:'insider',n:'Market analyst',d:'See what mood every stock is in before you trade',cost:15},
+ {id:'broker',n:'Retained broker',d:'Hold 50% more shares of every stock',cost:20},
+ {id:'kennel',n:'Bigger kennel',d:'Walk one more dog at a time',cost:25},
+ {id:'interior',n:'Interior designer',d:'Office decor gives twice the bonus',cost:35},
+ {id:'architect',n:'Friendly architect',d:'Moving office costs 25% less',cost:40},
 ];
+PERKS.sort((a,b)=>a.cost-b.cost);
 const perk=id=>S.perks.includes(id);
 
 /* ---------- kitchen (coffee minigame) ---------- */
@@ -335,15 +400,166 @@ const SPELLS=[
  {id:'breakfast',n:'Team breakfast',d:'Velocity ×1.5 for 2 minutes. Occasionally someone brings kale.',base:8,pct:.25,fail:.1},
  {id:'flatwhite',n:'Flat white',d:'A quick win turns up right now.',base:10,pct:.4,fail:.15},
  {id:'mystery',n:'Mystery brew',d:'Makes a random order at a discount. What could go wrong?',base:4,pct:.1,fail:.25},
+ {id:'doughnuts',n:'Box of doughnuts',d:'The dogs go wild: pack mood to full and instant zoomies. No dogs? You eat them all. Clicks ×5.',base:6,pct:.2,fail:0},
+ {id:'energy',n:'Energy drink',d:'Velocity ×3 for 20 seconds, then a crash: ×0.8 for 40 seconds.',base:5,pct:.15,fail:0},
 ];
-const coffeeMax=()=>Math.floor(10+2*Math.sqrt(S.own.intern))+M.cMax+(perk('coffeesub')?20:0);
+const coffeeMax=()=>Math.floor(10+2*Math.sqrt(S.own.intern))+M.cMax+(perk('coffeesub')?20:0)+5*flv('kext');
 const coffeeRegen=()=>.05*M.cRegen*(perk('coffeesub')?1.2:1);
 const spellCost=s=>Math.floor(s.base+s.pct*coffeeMax());
 const kitchenOpen=()=>S.own.intern>=10||S.kitchenSeen;
 
+/* ---------- clients, floors, legacy ---------- */
+const CLIENTS=['Northwind','Acme Oat Milk','Brightside Bank','Pebble & Co','Hollow Oak Gin','Velo Bikes','MegaMart','Greenleaf Energy','Lighthouse Insurance','Tiny Tea','Stellar Airlines','Bramble Books','Cloudnine Mattresses','Quokka Games','Old Harbour Brewery','Pixel Pets','Sunny Side Eggs','Glacier Water','Nimbus Phones','Crumb Bakery'];
+const CL_TIERS=['Local cafés','Regional chains','National brands','Global brands','Megacorps','Planetary conglomerates','Galactic empires','Multiversal entities','Concepts','The Universe itself'];
+const clTierName=t=>CL_TIERS[Math.min(Math.floor(t/10),CL_TIERS.length-1)];
+const clientsOpen=()=>S.clientsSeen||S.total>=1e5;
+const FLOORS=[
+ {id:'floor',n:'Build another floor',d:l=>`Whole team +10% per floor. ${l} built: +${l*10}%.`,base:2,g:1.35},
+ {id:'chairs',n:'Ergonomic chairs',d:l=>`Clicks +15% per level. +${l*15}% now.`,base:1,g:1.3},
+ {id:'snacks',n:'Snack budget',d:l=>`Quick wins 5% more often per level. ×${Math.pow(1.05,l).toFixed(2)} now.`,base:3,g:1.5},
+ {id:'pipeline',n:'Talent pipeline',d:l=>`Hires 2% cheaper per level. ${Math.round((1-Math.pow(.98,l))*100)}% off now.`,base:3,g:1.45},
+ {id:'kext',n:'Kitchen extension',d:l=>`5 more coffee cups per level. +${l*5} now.`,base:2,g:1.4},
+ {id:'pr',n:'PR agency on retainer',d:l=>`5% more awards every rebrand, per level. +${l*5}% now.`,base:5,g:1.5},
+ {id:'lounge',n:'Client lounge',d:l=>`Contracts pay 20% more points per level, and 1 more kudos every 3 levels.`,base:4,g:1.45},
+];
+const flv=id=>S.floors[id]||0;
+const floorCost=f=>Math.ceil(f.base*Math.pow(f.g,flv(f.id)));
+const LEGACY=[
+ {id:'rep',n:'Industry reputation',d:l=>`Velocity +10% per level. +${l*10}% now.`,base:10,g:1.5},
+ {id:'alumni',n:'Alumni network',d:l=>`5% more awards every rebrand, per level. +${l*5}% now.`,base:25,g:1.6},
+ {id:'heads',n:'Head-hunters',d:l=>`Start every rebrand with ${l*5} each of Interns, Freelancers and Junior Designers.`,base:15,g:1.7},
+];
+const lgv=id=>S.legacy[id]||0;
+const legacyCost=q=>Math.ceil(q.base*Math.pow(q.g,lgv(q.id)));
+
 /* ---------- stakeholders ---------- */
 const PEOPLE=[['Head of Marketing','HM','#b23a48'],['The Client','CL','#2d6a9f'],['Legal','LG','#5b5f66'],['Procurement','PR','#7a5c1e'],['Brand Police','BP','#8e44ad'],['The CEO’s nephew','CN','#c0612b'],['Regional VP','VP','#1f7a6c']];
 const shMax=()=>5+(perk('whisper')?1:0);
+
+/* ---------- office ladder ---------- */
+const pick2=a=>a[Math.floor(Math.random()*a.length)];
+// [name, icon, blurb, window sky, window view, default wall, default floor index]
+const OFFICES=[
+ ['Kitchen table','🏠','It’s you, a laptop and a kettle.','linear-gradient(#bfe3ff,#eaf7ff)','🏡🌳','#efe6d8',0],
+ ['Co-working hot desk','☕','Someone is always on a loud call.','linear-gradient(#cfe8ff,#f3f9ff)','🏙️☁️','#e7ecef',2],
+ ['Garden shed studio','🌳','Cosy. The spiders are part of the team.','linear-gradient(#bfe9c5,#effbe9)','🌳🌻🐦','#cdb18a',0],
+ ['Office above a chip shop','🍟','Everything smells of vinegar. Worth it.','linear-gradient(#dce9f5,#f5f8fb)','🚌🍟','#f1e3c8',1],
+ ['Railway arch','🚆','Trains every four minutes. Exposed brick, very on-brand.','linear-gradient(#d6dbe0,#eef1f4)','🚆🧱','#b8674a',2],
+ ['Warehouse loft','🏭','Exposed pipes and a table-tennis table.','linear-gradient(#f0dcc0,#fff4e4)','🏭🌆','#d9d2c7',2],
+ ['High-street studio','🏪','Actual signage. Your mum came to visit.','linear-gradient(#cfe6ff,#f1f8ff)','🏪🚲🌳','#f4efe6',0],
+ ['Canal-side offices','🛶','Ducks outside. Bike racks inside.','linear-gradient(#bfe0f0,#eaf6fb)','🛶🦆🌿','#e4efe9',0],
+ ['Two floors in a tech hub','🏢','There’s a slide. Nobody uses the slide.','linear-gradient(#cde2ff,#f2f7ff)','🏢🏢☁️','#f6f6f6',3],
+ ['Glass tower, floor 40','🌆','View over the whole city. The lifts take ages.','linear-gradient(#7fb7ff,#d9ecff)','🌆☁️🕊️','#eef3f7',3],
+ ['The whole glass tower','🏙️','Your logo on the roof, lit up at night.','linear-gradient(#1c2a4a,#3a5f9a)','🌃✨🌙','#e9edf2',3],
+ ['Campus with a lake','🏞️','Golf buggies between buildings.','linear-gradient(#bfe9ff,#effaff)','🏞️🦢🌲','#eef0e6',0],
+ ['Private island HQ','🏝️','Commute by seaplane.','linear-gradient(#7fd3ff,#ffe9b0)','🏝️🌊🐬','#fbf1dc',0],
+ ['Floating ocean platform','🌊','Wave-powered. Seasick-friendly desks.','linear-gradient(#5aa7e0,#0e4f8a)','🌊🐋🌊','#dff0f7',6],
+ ['Orbital station','🛰️','Zero-g stand-ups. Pens float away.','linear-gradient(#050814,#101a3a)','🌍✨🛰️','#d7dde6',6],
+ ['Moon base','🌕','Low gravity, high productivity.','linear-gradient(#0a0a14,#20202e)','🌏✨🌑','#cfd2d8',2],
+ ['Mars dome','🔴','Red dust in every keyboard.','linear-gradient(#e8845a,#7a2e1a)','🏜️🔴🛰️','#f1d9c8',2],
+ ['Asteroid belt hub','☄️','Mining the belt for spare pixels.','linear-gradient(#0a0612,#241a3a)','☄️🪨✨','#c8c3d6',2],
+ ['Jupiter cloud city','🪐','Floating among storms bigger than Earth.','linear-gradient(#d9a066,#8a4f2a)','🪐⛈️🌩️','#f4e2cc',3],
+ ['Dyson Sphere HQ','☀️','An office wrapped around a star. Unlimited power, unlimited deadlines.','radial-gradient(circle at 50% 60%,#fffbd0,#ffb020 30%,#b8420a 62%,#1a0a14)','☀️','#fff3d6',6],
+];
+const STARS=['Proxima Centauri','Sirius','Vega','Betelgeuse','Rigel','Polaris','Tau Ceti','Aldebaran','Antares','Deneb','Arcturus','the galactic core'];
+const FIXN=[
+ ['A proper chair','Second-hand laptop','Fairy lights','Noise-cancelling headphones','A door that locks'],
+ ['A reserved desk','Free coffee refills','Monitor arm','Phone-booth access','Members’ lounge'],
+ ['Insulation','Extension cable','Heater','Skylight','Actual Wi-Fi'],
+ ['Extractor fan','Free chips on Fridays','Standing desks','Window blinds','Sign in the window'],
+ ['Soundproofing','Exposed-brick lighting','Bike storage','Espresso bar','Neon logo'],
+ ['Table-tennis table','Industrial pendant lights','Breakout area','Projector wall','Rooftop access'],
+ ['Shopfront signage','A meeting room','Reception desk','Display window','Doorbell that plays a jingle'],
+ ['Duck-feeding rota','Waterside terrace','Kayak commute','Boathouse meeting room','Towpath running club'],
+ ['The slide','Nap pods','Kombucha tap','Hot-desking app','Games room'],
+ ['Floor-to-ceiling windows','Fast lifts','Sky lounge','Executive boardroom','Helipad access'],
+ ['Logo on the roof','Private gym','Staff restaurant','Auditorium','Roof garden'],
+ ['Golf buggies','Lakeside cabins','On-site nursery','Amphitheatre','Swan security team'],
+ ['Seaplane commute','Beach huts','Hammock desks','Coconut delivery','Volcano lair (dormant)'],
+ ['Wave generators','Submarine meeting room','Whale-watching deck','Desalinated coffee','Anti-seasickness desks'],
+ ['Velcro keyboards','Zero-g stand-ups','Observation dome','Space-walk team building','Artificial gravity (mostly)'],
+ ['Crater quad','Moon-buggy fleet','Low-g ping-pong','Earthrise windows','Helium-3 generator'],
+ ['Dust filters','Terraformed garden','Rover car pool','Olympus Mons boardroom','Martian coffee'],
+ ['Mining drones','Pixel refinery','Hollow-asteroid atrium','Gravity tethers','Rock-hopping shuttles'],
+ ['Storm shields','Floating walkways','Gas-giant turbines','Moon-view terraces','Great Red Spot boardroom'],
+ ['Solar collectors','Star-lifting pumps','Photon desks','Habitat rings','The Sun’s own Wi-Fi'],
+];
+const FIX_ENDLESS=['Solar collectors','Star-lifting pumps','Photon desks','Habitat rings','Stellar Wi-Fi'];
+const FIX_SPECIAL=['Quick wins 10% more often','Dog pets ×2','Hold 25% more shares','10 more coffee cups','Feedback returns 5% more'];
+const FIX_DESC=i=>['Whole team +15%','Clicks ×1.5','Whole team +25%',null,'Whole team +50%'][i];
+const officeName=l=>l<=20?OFFICES[l-1][0]:`Dyson Sphere ${ROMAN(l-19)} around ${STARS[(l-21)%STARS.length]}`;
+const officeIcon=l=>l<=20?OFFICES[l-1][1]:'🌟';
+const officeDesc=l=>l<=20?OFFICES[l-1][2]:'Another star, another sphere. The universe is your office now.';
+const officeCost=l=>l<=20?Math.pow(10,5+4.5*(l-2)):Math.pow(10,86+8*(l-20));
+const officeBase=l=>l===1?500:officeCost(l);
+const officeMult=l=>Math.pow(3,Math.min(l,20)-1)*Math.pow(10,Math.max(0,l-20));
+const fixName=(l,i)=>l<=20?FIXN[l-1][i]:`${FIX_ENDLESS[i]} ${ROMAN(l-19)}`;
+const fixCost=(l,i)=>officeBase(l)*[.2,1,5,25,100][i];
+const fixDesc=(l,i)=>i===3?FIX_SPECIAL[l%5]:FIX_DESC(i);
+const WALLS=['#efe6d8','#dfe9f2','#e3f0e1','#f4e1e1','#ece2f5','#fff3c4','#2d3440','#1f2d2a','#3a2233','#101820'];
+const FLOORS_T=[['Oak','#b98a5a'],['Carpet','#7b8a99'],['Concrete','#9a9a96'],['Marble','linear-gradient(135deg,#f1efe9,#d9d6cf)'],['Chequerboard','repeating-conic-gradient(#2a2a2a 0 25%,#eeeeee 0 50%) 0 0/32px 32px'],['Astroturf','#4f9a4f'],['Glass','linear-gradient(#bfe3ff,#6fa8d8)'],['Neon grid','linear-gradient(#1a0a2e,#1a0a2e) padding-box,repeating-linear-gradient(90deg,#ff3fd8 0 2px,transparent 2px 30px)']];
+const LIGHTS=[['Daylight','transparent'],['Golden hour','rgba(255,170,60,.22)'],['Night shift','rgba(20,30,90,.42)'],['Neon','linear-gradient(135deg,rgba(255,0,200,.25),rgba(0,200,255,.25))'],['Candlelit','rgba(255,120,40,.3)']];
+// [id, emoji, name, min office level]
+const DECOR=[
+ ['plant','🪴','Pot plant',1],['cactus','🌵','Cactus',1],['lamp','💡','Desk lamp',1],['poster','🖼️','Framed poster',1],['clock','🕰️','Wall clock',2],['books','📚','Bookshelf',2],
+ ['coffee','☕','Espresso machine',3],['sofa','🛋️','Sofa',4],['beanbag','🫘','Beanbag',4],['guitar','🎸','Office guitar',5],['fish','🐠','Fish tank',5],['arcade','🕹️','Arcade cabinet',6],
+ ['pingpong','🏓','Ping-pong table',6],['disco','🪩','Disco ball',7],['neon','🌈','Neon rainbow',7],['cat','🐈','Office cat',8],['trophy','🏆','Trophy cabinet',9],['piano','🎹','Grand piano',10],
+ ['tree','🌴','Indoor palm',11],['parrot','🦜','Office parrot',11],['fountain','⛲','Fountain',12],['crystal','🔮','Crystal ball',12],['statue','🗿','Suspicious statue',13],['surf','🏄','Surfboard',13],
+ ['telescope','🔭','Telescope',14],['robot','🤖','Robot receptionist',15],['rocket','🚀','Model rocket',15],['satellite','📡','Satellite dish',16],['alien','👽','Alien intern',17],['ufo','🛸','Parked UFO',18],
+ ['comet','☄️','Pet comet',18],['planet','🪐','Desk planet',19],['star','🌟','Pet star',20],['blackhole','🕳️','Tiny black hole',20],
+];
+const DECOR_SLOTS=[[56,20],[66,18],[76,20],[86,18],[95,22],[56,44],[66,46],[76,44],[86,46],[95,44],[5,80],[27,86],[39,80],[51,88],[63,82],[75,88],[87,82],[96,88]];
+
+/* ---------- dogs ---------- */
+// shape: bw body width, bh body height, leg, hr head radius, sn snout, ear, tail, mark
+const BREEDS=[
+ {id:'mutt',n:'Office mutt',coat:'#c98b4f',s:[16,9,10,8,5,'flop','wag',''],fx:{dogPts:1.25},p:'Pets earn 25% more',min:1},
+ {id:'corgi',n:'Corgi',coat:'#d9892f',s:[17,8,5,8,5,'point','stub','chest'],fx:{fetch:1.5},p:'Fetches quick wins 50% more often',min:1},
+ {id:'lab',n:'Labrador',coat:'#e2c28a',s:[17,9.5,11,8.5,6,'flop','whip',''],fx:{dogPts:1.5},p:'Pets earn 50% more',min:1},
+ {id:'pug',n:'Pug',coat:'#e0c9a0',s:[13,9,8,8.5,2.5,'tiny','curl','mask'],fx:{dogHappy:1.5},p:'Cheers up 50% faster',min:1},
+ {id:'grey',n:'Greyhound',coat:'#9aa3ad',s:[15,7,15,6.5,8,'tiny','whip',''],fx:{zoomDur:1.5},p:'Zoomies last 50% longer',min:2},
+ {id:'dachs',n:'Dachshund',coat:'#8a4a25',s:[21,7,5,7.5,6.5,'long','whip',''],fx:{click:1.25},p:'Clicks +25%',min:2},
+ {id:'husky',n:'Husky',coat:'#7d8894',s:[16,9.5,11,8.5,5.5,'point','fluff','mask'],fx:{all:1.05},p:'Whole team +5%',min:3},
+ {id:'collie',n:'Border collie',coat:'#2b2b2b',s:[16,9,11,8,6,'point','fluff','chest'],fx:{shRet:.1},p:'Herds stakeholders: feedback returns 10% more',min:4},
+ {id:'golden',n:'Golden retriever',coat:'#e0a84a',s:[17,9.5,11,8.5,6,'flop','fluff',''],fx:{winFreq:1.15},p:'Quick wins 15% more often',min:5},
+ {id:'shiba',n:'Shiba Inu',coat:'#d9803a',s:[14,8.5,10,8,5,'point','curl','mask'],fx:{winDur:1.2},p:'Quick wins last 20% longer',min:6},
+ {id:'poodle',n:'Poodle',coat:'#f3efe8',s:[14,9,12,8,5.5,'fluff','fluff','fluffy'],fx:{cRegen:1.25},p:'Coffee brews 25% faster',min:7},
+ {id:'dalm',n:'Dalmatian',coat:'#fafafa',s:[16,8.5,12,8,6,'flop','whip','spots'],fx:{all:1.1},p:'Whole team +10%',min:8},
+ {id:'space',n:'Space dog',coat:'#b8c4d6',s:[15,9,10,8,5,'point','wag','helmet'],fx:{all:1.2},p:'Whole team +20%. Comes with a bubble helmet.',min:15},
+ {id:'robo',n:'Robo-hound',coat:'#9aa5b1',s:[16,9,11,8,5,'point','stub','robot'],fx:{click:2},p:'Clicks ×2. Runs on batteries and belly rubs.',min:17},
+ {id:'star',n:'Star hound',coat:'#ffd36b',s:[16,9,11,8.5,5.5,'point','fluff','glow'],fx:{all:1.5},p:'Whole team +50%. Made of actual starlight.',min:20},
+];
+const BREED={};BREEDS.forEach((b,i)=>{b.i=i;BREED[b.id]=b});
+const adoptCost=b=>b.i===0?0:1e6*Math.pow(40,b.i-1);
+const COATS=['#c98b4f','#e2c28a','#d9803a','#8a4a25','#5a3a2a','#2b2b2b','#7d8894','#b0b0b0','#f3efe8','#fafafa','#f7d7a8','#ffd36b','#e59bb7','#7fb0e0'];
+const COLLARS=['#e5484d','#3a8fb3','#4f9a6a','#b7860b','#8e44ad','#222222','#ff8fb1','#ffffff','#ff9a2e','#16b8a6'];
+// [id, emoji, name, slot]
+const ACCS=[
+ ['bow','🎀','A bow','neck'],['bandana','🧣','A scarf','neck'],['tophat','🎩','A top hat','head'],['cap','🧢','A baseball cap','head'],['crown','👑','A crown','head'],['grad','🎓','A mortarboard','head'],
+ ['flower','🌸','A flower','head'],['party','🎉','Party streamers','head'],['shades','🕶️','Sunglasses','face'],['goggles','🥽','Goggles','face'],['phones','🎧','Headphones','head'],['helmet','⛑️','A rescue helmet','head'],
+ ['bone','🦴','A bone','mouth'],['ball2','🎾','A tennis ball','mouth'],['pizza','🍕','A slice of pizza','mouth'],['rose','🌹','A rose','mouth'],['star','⭐','A gold star','neck'],['medal','🏅','A medal','neck'],
+];
+const accCost=()=>Math.max(1e4,M.base*300)*Math.pow(1.45,S.accs.length);
+
+/* ---------- stock market ---------- */
+// [ticker, name, blurb, base price $, volatility, min office level]
+const TICKERS=[
+ ['TASK','Taskwall Inc','Us. Obviously a brilliant investment.',40,.03,1],
+ ['BEAN','Bean & Co Coffee','Every office runs on it.',12,.05,1],
+ ['WOOF','Woof Holdings','Dog treats, beds and tiny lanyards.',25,.04,1],
+ ['PIXL','Pixel Pushers','Stock photos of people laughing at salad.',8,.07,1],
+ ['MEET','Meetly','Video calls that could have been emails.',60,.035,1],
+ ['FONT','Typecase Foundry','Charges per glyph.',18,.05,1],
+ ['SYNR','Synergy Global','Nobody knows what they sell.',90,.025,1],
+ ['CLIP','Clipart Corp','Back from the dead, somehow.',5,.09,1],
+ ['MEME','MemeStock Ltd','Goes up when people post rocket emojis.',3,.15,1],
+ ['ORBT','Orbital Offices','Desks with a view of the whole planet.',150,.04,15],
+ ['LUNA','Moon Real Estate','Low gravity, high rent.',220,.05,16],
+ ['SPHR','Dyson Sphere Holdings','Owns a star. Literally.',500,.03,20],
+];
+const MOODS={stable:[0,1],rise:[.006,1],fall:[-.006,1],boom:[.03,1.2],crash:[-.04,1.4],chaos:[0,3]};
+const MOOD_W=[['stable',30],['rise',25],['fall',25],['boom',5],['crash',5],['chaos',10]];
+const MOOD_NEWS={boom:['is booming after a surprise product launch','shoots up on rumours of a merger','soars as analysts discover it exists'],crash:['plunges after the CEO’s awkward keynote','crashes as the office coffee runs out','tanks after a typo in the annual report'],chaos:['is going absolutely haywire','can’t decide what it wants to be','is being traded entirely by interns']};
 
 /* ---------- trophies ---------- */
 const ACH=[];const ach=(id,n,d,cat,test,shadow)=>ACH.push({id,n,d,cat,test,shadow});
@@ -373,8 +589,45 @@ ach('hoard','Hoarder','Have 1B story points in the bank with fewer than 50 hires
 [[1,'Good boy'],[100,'Best friends'],[1000,'Who’s a good boy?']].forEach(([v,n],i)=>ach('dog'+i,n,`Pet the office dog ${v} time${v>1?'s':''}`,'Office life',s=>s.pets>=v));
 ach('zoom','Zoomies','Make the office dog so happy it gets the zoomies','Office life',s=>s.zoomies>=1);
 ach('fetch','Fetch!','Have the office dog fetch you a quick win','Office life',s=>s.fetches>=1);
+[[1e100,'Googol','Earn a googol (1e100) points in one rebrand'],[1e200,'Googol squared','Earn 1e200 points in one rebrand'],[1e303,'Centillion','Hit the absolute ceiling: 1e303 points']].forEach(([v,n,d],i)=>ach('big'+i,n,d,'Output',s=>s.total>=v));
+OFFICES.forEach((o,i)=>{if(i)ach('off'+(i+1),`Moved in: ${o[0]}`,`Move the studio to the ${o[0].toLowerCase()}`,'Office',s=>s.office.lvl>=i+1)});
+ach('fitted','Fully fitted','Buy all five fit-out upgrades in one office','Office',s=>Object.keys(s.office.fix).length>0&&OFFICES.some((_,i)=>[0,1,2,3,4].every(k=>s.office.fix[(i+1)+'_'+k])));
+ach('custom','Make it yours','Change the office walls, floor or lighting','Office',s=>s.office.custom);
+ach('decor10','Nesting','Own 10 pieces of decor','Office',s=>s.office.decor.length>=10);
+ach('decorAll','Maximalist','Own every piece of decor','Office',s=>s.office.decor.length>=DECOR.length);
+ach('pack2','Pack leader','Adopt a second dog','Dogs & stocks',s=>s.dogs.length>=2);
+ach('pack5','Dog person','Adopt five dogs','Dogs & stocks',s=>s.dogs.length>=5);
+ach('packAll','Best in show','Adopt every breed','Dogs & stocks',s=>s.dogs.length>=BREEDS.length);
+ach('named','Who’s this, then?','Rename one of your dogs','Dogs & stocks',s=>s.dogNamed);
+ach('acc1','Dressed up','Buy a dog accessory','Dogs & stocks',s=>s.accs.length>=1);
+ach('accAll','Fashion hound','Own every dog accessory','Dogs & stocks',s=>s.accs.length>=ACCS.length);
+ach('stk0','First trade','Buy a share of anything','Dogs & stocks',s=>s.stkTrades>=1);
+ach('stk1','Portfolio','Hold 1,000 shares at once','Dogs & stocks',s=>Object.values(s.stk).reduce((a,x)=>a+(x.own||0),0)>=1000);
+ach('stk2','Buy low, sell high','Sell a share for at least double what you paid','Dogs & stocks',s=>s.stkDouble);
+ach('stk3','Wolf of Floor Street','Make 1T points of profit on the market','Dogs & stocks',s=>s.stkProfit>=1e12);
 const ACHM={};ACH.forEach(a=>ACHM[a.id]=a);
-const morale=()=>S.ach.length*.04;
+const FAM=[
+ {id:'fpts',n:'Backlog singularity',cat:'Output',v:s=>s.total,t:i=>1e21*Math.pow(100,i),d:x=>`Earn ${fmt(x)} points in one rebrand`},
+ {id:'fvel',n:'Velocity rank',cat:'Output',v:()=>M.base,t:i=>1e12*Math.pow(10,i),d:x=>`Reach a velocity of ${fmt(x)}/s`},
+ {id:'fclk',n:'Tendons of steel',cat:'Output',v:s=>s.clicksAll,t:i=>1e5*Math.pow(2,i),d:x=>`Tick off ${fmt(x)} subtasks by hand`},
+ {id:'fcard',n:'Throughput legend',cat:'Output',v:s=>s.cardsAll,t:i=>5000*Math.pow(2,i),d:x=>`Finish ${fmt(x)} cards yourself`},
+ {id:'fepic',n:'Epic saga',cat:'Output',v:s=>s.epics,t:i=>25*Math.pow(2,i),d:x=>`Close ${fmt(x)} Epics`},
+ {id:'fstaff',n:'Headcount',cat:'Team',v:()=>staff(),t:i=>2000*Math.pow(2,i),d:x=>`Have ${fmt(x)} people on the team`},
+ ...HIRES.map(h=>({id:'fo_'+h.id,n:`${h.n} campus`,cat:'Team',v:s=>s.own[h.id],t:i=>150+50*i,d:x=>`Have ${fmt(x)} ${h.pl}`})),
+ {id:'faw',n:'Hall of fame',cat:'Legacy',v:s=>s.awards,t:i=>10*Math.pow(3,i),d:x=>`Hold ${fmt(x)} awards`},
+ {id:'fwin',n:'Lucky streak',cat:'Legacy',v:s=>s.winsAll,t:i=>150*Math.pow(2,i),d:x=>`Grab ${fmt(x)} quick wins`},
+ {id:'fpet',n:'Dog whisperer',cat:'Legacy',v:s=>s.pets,t:i=>2000*Math.pow(2,i),d:x=>`Pet the office dog ${fmt(x)} times`},
+ {id:'fcon',n:'Client favourite',cat:'Legacy',v:s=>s.cl.done,t:i=>5*Math.pow(2,i),d:x=>`Complete ${fmt(x)} client contracts`},
+ {id:'ftier',n:'Big-name clients',cat:'Legacy',v:s=>s.cl.best,t:i=>10+10*i,d:x=>`Reach client tier ${fmt(x)}`},
+ {id:'ffloor',n:'Office empire',cat:'Legacy',v:s=>Object.values(s.floors).reduce((a,b)=>a+b,0),t:i=>10*Math.pow(2,i),d:x=>`Build ${fmt(x)} levels of office`},
+ {id:'fday',n:'Regular',cat:'Legacy',v:s=>s.daily.best,t:i=>3+4*i,d:x=>`Play ${fmt(x)} days in a row`},
+ {id:'foff',n:'Stellar landlord',cat:'Legacy',v:s=>s.office.lvl,t:i=>21+i,d:x=>`Move into office level ${fmt(x)}`},
+ {id:'fstk',n:'Market mover',cat:'Legacy',v:s=>s.stkProfit,t:i=>1e15*Math.pow(1e3,i),d:x=>`Make ${fmt(x)} points of stock profit`},
+ {id:'funi',n:'Multiversal',cat:'Legacy',v:s=>s.universes,t:i=>Math.pow(2,i),d:x=>`Own ${fmt(x)} universe${x>1?'s':''}`},
+];
+const famRank=id=>S.fam[id]||0;
+const trophyCount=s=>s.ach.length+Object.values(s.fam||{}).reduce((a,b)=>a+b,0);
+const morale=()=>trophyCount(S)*.04;
 
 /* ---------- activity ticker ---------- */
 const TICK=[
@@ -396,9 +649,21 @@ const TICK=[
  [s=>s.total>=1e9,'The board now has more story points than there are people on Earth.'],[s=>s.total>=1e12,'Scientists warn the backlog may now have its own gravity.'],
  [s=>s.resets>0,'The new brand guidelines are just the old ones in a different font.'],[s=>s.awards>=10,'Your awards shelf is now load-bearing.'],
  [s=>kitchenOpen(),'The kitchen coffee machine is making a noise. It’s fine. It’s fine.'],[s=>s.ach.length>=20,'Team morale is “cautiously positive”, says a survey nobody filled in.'],
- [s=>hasDog(s),'Biscuit has stolen a sandwich from the client. The client said “it’s fine”. It is not fine.'],[s=>hasDog(s),'Biscuit sat on a keyboard and shipped a feature. It’s the best one this quarter.'],
- [s=>hasDog(s),'Biscuit is asleep under Priya’s desk. Nobody is allowed to move.'],[s=>hasDog(s),'Biscuit has been promoted to Head of Morale. No pay rise, but loads of treats.'],
- [s=>hasDog(s),'Someone put a tiny lanyard on Biscuit. Security let them straight in.'],[s=>s.ups.includes('pups'),'There are now four puppies in the studio. All meetings are cancelled.'],
+ [s=>hasDog(s),()=>`${dogName()} has stolen a sandwich from the client. The client said “it’s fine”. It is not fine.`],[s=>hasDog(s),()=>`${dogName()} sat on a keyboard and shipped a feature. It’s the best one this quarter.`],
+ [s=>hasDog(s),()=>`${dogName()} is asleep under Priya’s desk. Nobody is allowed to move.`],[s=>hasDog(s),()=>`${dogName()} has been promoted to Head of Morale. No pay rise, but loads of treats.`],
+ [s=>hasDog(s),()=>`Someone put a tiny lanyard on ${dogName()}. Security let them straight in.`],[s=>s.dogs.length>=2,'The dogs have formed a committee. Its only agenda item is “walkies”.'],
+ [s=>s.dogs.length>=5,'The office now has more dogs than meeting rooms. Nobody is complaining.'],[s=>s.accs.length>0,()=>`${dogName()} is wearing ${ACCS.find(a=>a[0]===S.accs[0])[2].toLowerCase()} and refuses to take it off.`],
+ [s=>1,()=>`Someone has left a passive-aggressive note on the fridge at the ${officeName(S.office.lvl).toLowerCase()}.`],[s=>s.office.lvl<=3,'The Wi-Fi password is on a sticky note. It is “password1”.'],
+ [s=>s.office.lvl>=5,'The new office has a meeting room called “The Think Tank”. It has no windows.'],[s=>s.office.lvl>=9,'Nobody has used the slide. Priya says she will, one day.'],
+ [s=>s.office.lvl>=13,'The seaplane was late again. Tom blamed the tide.'],[s=>s.office.lvl>=15,'Pens keep floating out of reach in zero-g. The stationery budget has tripled.'],
+ [s=>s.office.lvl>=16,'Moon-base Wi-Fi has a 2.5-second delay. Stand-ups are now very awkward.'],[s=>s.office.lvl>=17,'Red dust has got into the keyboards. The E key is permanently orange.'],
+ [s=>s.office.lvl>=19,'A storm bigger than Earth is outside the window. The creative director calls it “moody”.'],[s=>s.office.lvl>=20,'The office is wrapped around a star. Someone still asked to turn the heating up.'],
+ [s=>stocksOpen(),'Analysts say the market is “doing market things”. Very insightful.'],[s=>stocksOpen(),'MEME is up 400% because someone posted a rocket emoji.'],
+ [s=>s.stkTrades>=10,'Your accountant has asked you to stop day-trading on the work laptop.'],[s=>s.total>=1e100,'You have more points than there are atoms in the observable universe. By a lot.'],
+[s=>s.ups.includes('pups'),'There are now four puppies in the studio. All meetings are cancelled.'],
+ [s=>s.cl&&s.cl.done>0,'A client has asked if you can “just quickly” redo the whole thing. It’s in the contract.'],[s=>s.cl&&s.cl.tier>=10,'Your client list is so big it has its own client list.'],
+ [s=>s.universes>0,'Somewhere in a collapsed universe, a stakeholder is still waiting for a reply.'],[s=>s.universes>0,'Physicists have named the heat death of the backlog after you. It’s an honour, apparently.'],
+ [s=>Object.keys(s.floors||{}).length>0,'The lift now goes to more floors than the building technically has.'],[s=>s.daily&&s.daily.streak>=3,'You’ve logged in three days running. HR have flagged it as “concerning dedication”.'],
  [s=>s.epics>0,'An epic has been closed. Nobody remembers what it was for.'],[s=>s.sprintsWon>0,'The sprint retro has produced 40 sticky notes and one action: “fewer retros”.'],
 ];
 const WINS=["Client: ‘love it, no changes’","Meeting cancelled — free hour!","Printer works first time","Found the missing font","Sign-off on round one","Wi-Fi is fast today","Someone brought doughnuts","The file actually saved","Legal approved it, no comments","Laptop update can wait till tomorrow"];
@@ -408,7 +673,7 @@ function fresh(){
   const own={};HIRES.forEach(h=>own[h.id]=0);
   return {v:2,pts:0,total:0,allTime:0,cards:0,teamCards:0,cardsAll:0,clicks:0,clicksAll:0,hand:0,handAll:0,prog:0,cur:null,todo:[],done:[],own,ups:[],ach:[],
     winsAll:0,awards:0,clout:0,perks:[],resets:0,coffee:10,spells:0,sh:[],shPopped:0,sprint:null,sprintsWon:0,epics:0,sinceEpic:0,buffs:[],kitchenSeen:false,
-    pets:0,happy:0,zoomies:0,fetches:0,escPresses:0,runTime:0,playTime:0,firstPlayed:Date.now(),t:Date.now(),seed:0,klog:[],settings:{mode:'hire',amt:1,fmt:'short',ticker:true,floats:true}};
+    pets:0,happy:0,zoomies:0,fetches:0,fam:{},cl:{tier:0,best:0,done:0,failed:0,kudos:0,kudosAll:0,offers:[],active:null,refreshAt:0},floors:{},legacy:{},awardsBase:0,universes:0,crunches:0,clientsSeen:false,daily:{last:'',streak:0,best:0},capWarned:false,office:{lvl:1,fix:{},wall:null,flr:0,light:0,decor:[],placed:[],custom:false},dogs:[],pack:[],accs:[],dogNamed:false,stk:{},stkT:0,stkProfit:0,stkTrades:0,stkSeen:false,stkDouble:false,escPresses:0,runTime:0,playTime:0,firstPlayed:Date.now(),t:Date.now(),seed:0,klog:[],settings:{mode:'hire',amt:1,fmt:'short',ticker:true,floats:true}};
 }
 const V1_MAP={intern2:'h_intern_0',intern3:'h_intern_1',free2:'h_free_0',free3:'h_free_1',jr2:'h_jr_0',jr3:'h_jr_1',sr2:'h_sr_0',ad2:'h_ad_0',agency2:'h_agency_0',farm2:'h_farm_0',studio2:'h_studio_0',ai2:'h_ai_0'};
 function hydrate(s){
@@ -421,7 +686,12 @@ function hydrate(s){
     return n;
   }
   const o=Object.assign(n,s);o.own=Object.assign(fresh().own,s.own);o.settings=Object.assign(fresh().settings,s.settings||{});
-  o.ups=(o.ups||[]).filter(id=>UP[id]);o.ach=(o.ach||[]).filter(id=>ACHM[id]);o.perks=(o.perks||[]).filter(id=>PERKS.some(p=>p.id===id));
+  o.ups=(o.ups||[]).filter(id=>getUp(id));
+  o.cl=Object.assign(fresh().cl,s.cl||{});o.floors=Object.assign({},s.floors||{});o.legacy=Object.assign({},s.legacy||{});o.fam=Object.assign({},s.fam||{});o.daily=Object.assign(fresh().daily,s.daily||{});
+  if(s.awardsBase==null)o.awardsBase=o.awards||0;o.ach=(o.ach||[]).filter(id=>ACHM[id]);o.perks=(o.perks||[]).filter(id=>PERKS.some(p=>p.id===id));
+  const fo=fresh().office;o.office=Object.assign(fo,s.office||{});o.office.fix=Object.assign({},(s.office||{}).fix||{});o.office.decor=Array.isArray(o.office.decor)?o.office.decor:[];o.office.placed=Array.isArray(o.office.placed)?o.office.placed:[];
+  o.dogs=Array.isArray(s.dogs)?s.dogs:[];o.pack=Array.isArray(s.pack)?s.pack:[];o.accs=Array.isArray(s.accs)?s.accs:[];o.stk=s.stk&&typeof s.stk==='object'?s.stk:{};
+  if(!o.dogs.length&&(o.ups.includes('dog')||o.pets>0)){o.dogs=[{id:1,breed:'mutt',name:'Biscuit',coat:null,collar:'#e5484d',acc:null}];o.pack=[1]}
   o.sh=Array.isArray(o.sh)?o.sh:[];o.buffs=Array.isArray(o.buffs)?o.buffs:[];o.klog=Array.isArray(o.klog)?o.klog:[];
   return o;
 }
@@ -438,9 +708,11 @@ function fmt(n){
   if(n<1000) return n<10&&n%1?(Math.floor(n*10)/10).toFixed(1):Math.floor(n).toLocaleString('en-GB');
   if(f==='full'&&n<1e21) return Math.floor(n).toLocaleString('en-GB');
   if(f==='sci') return n.toExponential(2).replace('e+','e');
-  const u=['K','M','B','T','Qa','Qi','Sx','Sp','Oc','No','Dc'];let i=-1;while(n>=1000&&i<u.length-1){n/=1000;i++}
-  if(n>=1000) return (n*Math.pow(1000,i+1)).toExponential(2).replace('e+','e');
-  return (n<10?n.toFixed(2):n<100?n.toFixed(1):Math.floor(n))+u[i];
+  let i=Math.min(100,Math.floor(Math.log10(n)/3)-1),m=n/Math.pow(10,(i+1)*3);
+  if(m>=999.995&&i<100){m/=1000;i++}
+  const ms=m<10?m.toFixed(2):m<100?m.toFixed(1):Math.floor(m);
+  if(f==='words'){if(n>=1e100&&n<1e103)return (n/1e100).toFixed(2)+' googol';return ms+' '+illion(i)}
+  return ms+U_SHORT[i];
 }
 const fmtT=s=>{s=Math.floor(s);const h=Math.floor(s/3600),m=Math.floor(s%3600/60),x=s%60;return h?`${h}h ${m}m`:m?`${m}m ${x}s`:`${x}s`};
 const staff=()=>HIRES.reduce((a,h)=>a+S.own[h.id],0);
@@ -448,7 +720,7 @@ function recalc(){
   const m={dogPts:1,dogHappy:1,zoomDur:1,fetch:1,click:1,pct:0,hm:{},all:1,kit:[],fingers:0,fmul:1,syn:[],winFreq:1,winDur:1,epic:1,sprint:1,cMax:0,cRegen:1,shRet:0};
   HIRES.forEach(h=>m.hm[h.id]=1);
   let buddy=false;
-  for(const id of S.ups){const u=UP[id];if(!u)continue;const f=u.fx;
+  for(const id of S.ups){const u=getUp(id);if(!u)continue;const f=u.fx;
     if(f.click)m.click*=f.click;if(f.pct)m.pct+=f.pct;if(f.h)m.hm[f.h]*=f.m;if(f.all)m.all*=f.all;if(f.kit)m.kit.push(f.kit);
     if('fingers' in f){if(f.fingers===0)buddy=true;else m.fmul*=f.fingers}
     if(f.syn)m.syn.push(f.syn);if(f.winFreq)m.winFreq*=f.winFreq;if(f.winDur)m.winDur*=f.winDur;if(f.epic)m.epic*=f.epic;if(f.sprint)m.sprint*=f.sprint;
@@ -459,7 +731,19 @@ function recalc(){
   if(perk('keyboard'))m.pct+=.02;
   m.awardMult=1+S.awards*(perk('legend')?.015:.01);
   m.perkMult=(perk('cat')?1.25:1)*(perk('dynasty')?1.5:1);
-  m.kitMult=m.kit.reduce((a,f)=>a*(1+S.ach.length*.04*f),1);
+  m.kitMult=m.kit.reduce((a,f)=>a*(1+trophyCount(S)*.04*f),1);
+  m.all*=1+.1*flv('floor');m.winFreq*=Math.pow(1.05,flv('snacks'));
+  m.stkCap=1;
+  m.officeMult=officeMult(S.office.lvl);m.all*=m.officeMult;
+  for(const k in S.office.fix){const [l,i]=k.split('_').map(Number);
+    if(i===0)m.all*=1.15;else if(i===1)m.click*=1.5;else if(i===2)m.all*=1.25;else if(i===4)m.all*=1.5;
+    else{const sp=l%5;if(sp===0)m.winFreq*=1.1;else if(sp===1)m.dogPts*=2;else if(sp===2)m.stkCap*=1.25;else if(sp===3)m.cMax+=10;else m.shRet+=.05}}
+  m.all*=1+S.office.decor.length*.03*(perk('interior')?2:1);
+  m.all*=1+S.accs.length*.01;
+  for(const d of packDogs()){const f=(BREED[d.breed]||BREED.mutt).fx;
+    if(f.dogPts)m.dogPts*=f.dogPts;if(f.fetch)m.fetch*=f.fetch;if(f.dogHappy)m.dogHappy*=f.dogHappy;if(f.zoomDur)m.zoomDur*=f.zoomDur;if(f.click)m.click*=f.click;
+    if(f.all)m.all*=f.all;if(f.shRet)m.shRet+=f.shRet;if(f.winFreq)m.winFreq*=f.winFreq;if(f.winDur)m.winDur*=f.winDur;if(f.cRegen)m.cRegen*=f.cRegen}
+  m.legacyMult=1+.1*lgv('rep');m.uni=Math.pow(1+S.universes,1.5);
   const nonIntern=staff()-S.own.intern;
   m.each={};let raw=0;
   for(const h of HIRES){
@@ -468,9 +752,9 @@ function recalc(){
     if(h.id==='intern')e+=m.fingers*nonIntern;
     m.each[h.id]=e;raw+=e*S.own[h.id];
   }
-  m.global=m.all*m.kitMult*m.awardMult*m.perkMult;
-  m.base=raw*m.global;
-  m.clickBase=(m.click+m.fingers*nonIntern)*m.awardMult*(perk('dynasty')?1.5:1);
+  m.global=m.all*m.kitMult*m.awardMult*m.perkMult*m.legacyMult*m.uni;
+  m.base=Math.min(CAP,raw*m.global);
+  m.clickBase=Math.min(CAP,(m.click+m.fingers*nonIntern)*m.awardMult*(perk('dynasty')?1.5:1)*(1+.15*flv('chairs'))*m.uni);
   M=m;
 }
 const activeBuffs=()=>{const n=Date.now();return S.buffs.filter(b=>b.until>n)};
@@ -478,8 +762,8 @@ const velBuff=()=>activeBuffs().reduce((a,b)=>a*(b.vel||1),1);
 const clickBuff=()=>activeBuffs().reduce((a,b)=>a*(b.click||1),1);
 const shFactor=()=>1-.05*S.sh.length;
 const vel=()=>M.base*velBuff()*shFactor();
-const clickVal=()=>(M.clickBase+M.base*velBuff()*M.pct)*clickBuff();
-const disc=()=>perk('rolodex')?.95:1;
+const clickVal=()=>Math.min(CAP,(M.clickBase+M.base*velBuff()*M.pct)*clickBuff());
+const disc=()=>(perk('rolodex')?.95:1)*Math.pow(.98,flv('pipeline'));
 function hireCost(h,n){const b=h.cost*Math.pow(1.15,S.own[h.id]);return Math.ceil(b*(Math.pow(1.15,n)-1)/.15*disc())}
 function sellValue(h,n){n=Math.min(n,S.own[h.id]);if(!n)return 0;const b=h.cost*Math.pow(1.15,S.own[h.id]-n);return Math.floor(b*(Math.pow(1.15,n)-1)/.15*disc()*.25)}
 const upCost=u=>Math.ceil(u.cost*(perk('negot')?.95:1));
@@ -538,7 +822,15 @@ function renderTeam(){
   $('amtSeg').querySelectorAll('button').forEach(b=>b.classList.toggle('on',+b.dataset.amt===n));
   refreshBuy();
 }
-const availUps=()=>U.filter(u=>!S.ups.includes(u.id)&&u.req(S)).sort((a,b)=>a.cost-b.cost);
+function availUps(){
+  const out=U.filter(u=>!S.ups.includes(u.id)&&u.req(S)),dyn=[];
+  HIRES.forEach(h=>{if(S.own[h.id]>=250)dyn.push(nextGen(`h_${h.id}_`,7))});
+  if(S.ups.includes('equity'))dyn.push(nextGen('op_',0));
+  if(S.ups.includes('telepathy'))dyn.push(nextGen('ck_',0));
+  if(S.ups.includes('retreat'))dyn.push(nextGen('ms_',0));
+  dyn.forEach(id=>{const u=getUp(id);if(u&&u.req(S))out.push(u)});
+  return out.sort((a,b)=>a.cost-b.cost);
+}
 let upKey='';
 function renderUps(force){
   const a=availUps(),k=a.map(u=>u.id).join();
@@ -549,7 +841,7 @@ function renderUps(force){
 function refreshBuy(){
   const sell=S.settings.mode==='sell',n=S.settings.amt;
   document.querySelectorAll('#team [data-h]').forEach(b=>{const h=H[b.dataset.h];b.disabled=sell?S.own[h.id]<1:S.pts<hireCost(h,n)});
-  document.querySelectorAll('#ups [data-u]').forEach(b=>b.disabled=S.pts<upCost(UP[b.dataset.u]));
+  document.querySelectorAll('#ups [data-u]').forEach(b=>b.disabled=S.pts<upCost(getUp(b.dataset.u)));
 }
 let spKey='';
 function renderSprint(){
@@ -586,13 +878,14 @@ function renderSH(force){
 let viewsHtml='';
 function renderViews(force){
   const k=kitchenOpen(),c=Math.floor(S.coffee);
-  const v=[['board','Board'],['kitchen',k?`Kitchen ☕${c}`:'Kitchen 🔒'],['trophies',`Trophies ${S.ach.length}/${ACH.length}`],['portfolio',`Portfolio${pendingAwards()>0?' <span class="dot"></span>':''}`],['stats','Stats']];
+  const ca=S.cl.active;
+  const v=[['board','Board'],['office',`Office ${officeIcon(S.office.lvl)} L${S.office.lvl}`],['dogs',hasDog(S)?`Dogs 🐕${S.dogs.length}`:'Dogs 🔒'],['stocks',stocksOpen()?'Stocks 📈':'Stocks 🔒'],['kitchen',k?`Kitchen ☕${c}`:'Kitchen 🔒'],['clients',clientsOpen()?`Clients${ca?` · ${Math.min(100,Math.floor(conProgress(ca)/ca.target*100))}%`:` 💼${fmt(S.cl.kudos)}`}`:'Clients 🔒'],['trophies',`Trophies ${trophyCount(S)}`],['portfolio',`Portfolio${pendingAwards()>0||crunchGain()>0?' <span class="dot"></span>':''}`],['stats','Stats']];
   const html=v.map(([id,n])=>`<button class="chip${view===id?' on':''}" data-view="${id}">${n}</button>`).join('');
   if(html!==viewsHtml&&(force||!ptrDown)){viewsHtml=html;$('views').innerHTML=html}
 }
 
 /* ---------- render: other boards ---------- */
-function list(title,count,body,wide){return `<section class="list${wide?' wide':''}"><div class="list-h">${title} <span>${count??''}</span></div><div class="cards">${body}</div></section>`}
+function list(title,count,body,wide){return `<section class="list${wide==='x'?' xwide':wide?' wide':''}"><div class="list-h">${title} <span>${count??''}</span></div><div class="cards">${body}</div></section>`}
 function renderKitchen(){
   const el=$('v-kitchen');
   if(!kitchenOpen()){el.innerHTML=list('Kitchen','',`<div class="card"><div class="ttl"><b>The kitchen is locked</b></div><p class="p desc">Hire 10 Interns and they’ll find the coffee machine. You own ${S.own.intern}.</p></div>`);return}
@@ -603,48 +896,62 @@ function renderKitchen(){
    +list('Kitchen log',S.klog.length,S.klog.map(l=>`<div class="card"><div class="desc" style="margin:0">${l}</div></div>`).join('')||'<div class="mute">Nothing ordered yet.</div>');
 }
 function renderTrophies(){
-  const cats=['Output','Team','Office life'];
+  const cats=['Output','Team','Office','Dogs & stocks','Office life'];
   const mk=a=>{const got=S.ach.includes(a.id);return `<div class="card"><div class="tro${got?'':' no'}"><span class="ic">${got?'★':'☆'}</span><div><div class="ttl">${got||!a.shadow?a.n:'???'}</div><div class="desc">${got||!a.shadow?a.d:'A secret. Keep playing.'}</div></div></div></div>`};
   const kits=U.filter(u=>u.k==='Morale');
-  $('v-trophies').innerHTML=list('Team spirit','',`<div class="card"><div class="big">${S.ach.length} / ${ACH.length}</div><p class="p desc">Every trophy adds 4% morale. You’re on <b>${Math.round(morale()*100)}%</b>.</p><p class="p desc">Morale does nothing by itself. Team socials turn it into velocity: right now they add <b>+${Math.round((M.kitMult-1)*100)}%</b>.</p></div>`
-      +kits.map(u=>{const got=S.ups.includes(u.id);return `<div class="card${got?'':' locked'}"><div class="ttl"><b>${u.n}</b></div><div class="desc">${got?'Approved':S.ach.length>=u.achReq?'Waiting in Requests':'Unlocks at '+u.achReq+' trophies'}</div></div>`}).join(''))
-    +cats.map(c=>{const as=ACH.filter(a=>a.cat===c);return list(c,`${as.filter(a=>S.ach.includes(a.id)).length}/${as.length}`,as.map(mk).join(''))}).join('');
+  const famCard=f=>{const r=famRank(f.id),nx=f.t(r),cur=f.v(S),pct=Math.max(0,Math.min(100,cur/nx*100));return `<div class="card"><div class="tro${r?'':' no'}"><span class="ic">${r?'★':'☆'}</span><div><div class="ttl">${f.n}${r?' '+ROMAN(r):''}</div><div class="desc">Next: ${f.d(nx)}</div><div class="gauge" style="height:5px"><i style="width:${pct}%;background:var(--gold)"></i></div></div></div></div>`};
+  const famList=['Output','Team','Legacy'].map(c=>{const fs=FAM.filter(f=>f.cat===c);return list(`Endless: ${c}`,fs.reduce((a,f)=>a+famRank(f.id),0),fs.map(famCard).join(''))}).join('');
+  $('v-trophies').innerHTML=list('Team spirit','',`<div class="card"><div class="big">${trophyCount(S)}</div><p class="p desc">${S.ach.length} of ${ACH.length} classic trophies, plus ${trophyCount(S)-S.ach.length} endless ranks that never run out.</p><p class="p desc">Every trophy adds 4% morale. You’re on <b>${Math.round(morale()*100)}%</b>.</p><p class="p desc">Morale does nothing by itself. Team socials turn it into velocity: right now they add <b>+${Math.round((M.kitMult-1)*100)}%</b>.</p></div>`
+      +kits.map(u=>{const got=S.ups.includes(u.id);return `<div class="card${got?'':' locked'}"><div class="ttl"><b>${u.n}</b></div><div class="desc">${got?'Approved':trophyCount(S)>=u.achReq?'Waiting in Requests':'Unlocks at '+u.achReq+' trophies'}</div></div>`}).join(''))
+    +famList+cats.map(c=>{const as=ACH.filter(a=>a.cat===c);return list(c,`${as.filter(a=>S.ach.includes(a.id)).length}/${as.length}`,as.map(mk).join(''))}).join('');
 }
-function pendingAwards(){return Math.max(0,awardsFor(S.allTime)-S.awards)}
+const awardGain=()=>(1+.05*flv('pr'))*(1+.05*lgv('alumni'))*(1+.25*S.universes);
+const rawAwards=()=>Math.max(0,awardsFor(S.allTime)-S.awardsBase);
+function pendingAwards(){return Math.floor(rawAwards()*awardGain())}
+const crunchGain=()=>S.total>=1e100?Math.floor((Math.log10(S.total)-100)/5)+1:0;
+let crArmed=false;
 let rbArmed=false;
 function renderPortfolio(){
-  const p=pendingAwards(),nextAt=Math.pow(S.awards+p+1,3)*1e9;
+  const p=pendingAwards(),nextAt=Math.pow(awardsFor(S.allTime)+1,3)*1e9;
   const intro=`<div class="card"><div class="ttl"><b>Rebrand the studio</b></div><p class="p desc">Start again with a new name. You lose points, hires and requests, but keep trophies, perks and awards.</p><p class="p desc">Each award is worth <b>+${perk('legend')?1.5:1}% velocity</b> forever, and you can spend awards as clout on perks.</p></div>`;
-  $('v-portfolio').innerHTML=list('Rebrand','',intro+`<div class="card"><div class="srow"><span>Awards held</span><b>${S.awards} (+${fmt((M.awardMult-1)*100)}%)</b></div><div class="srow"><span>Clout to spend</span><b>${S.clout}</b></div><div class="srow"><span>Points earned, all time</span><b>${fmt(S.allTime)}</b></div><div class="srow"><span>Awards if you rebrand now</span><b style="color:var(--gold)">+${p}</b></div><div class="srow"><span>Next award at</span><b>${fmt(nextAt)} all-time</b></div>
-      <button class="buy gold" id="rbBtn" ${p<1?'disabled':''}>${p<1?'Earn 1B points all-time to win an award':rbArmed?'Click again to rebrand. Really.':`Rebrand for ${p} award${p>1?'s':''}`}</button></div>`)
+  $('v-portfolio').innerHTML=list('Rebrand','',intro+`<div class="card"><div class="srow"><span>Awards held</span><b>${fmt(S.awards)} (+${fmt((M.awardMult-1)*100)}%)</b></div><div class="srow"><span>Clout to spend</span><b>${fmt(S.clout)}</b></div><div class="srow"><span>Points earned, all time</span><b>${fmt(S.allTime)}</b></div><div class="srow"><span>Awards if you rebrand now</span><b style="color:var(--gold)">+${fmt(p)}</b></div><div class="srow"><span>Next award at</span><b>${fmt(nextAt)} all-time</b></div>
+      <button class="buy gold" id="rbBtn" ${p<1?'disabled':''}>${p<1?'Earn 1B points all-time to win an award':rbArmed?'Click again to rebrand. Really.':`Rebrand for ${fmt(p)} award${p>1?'s':''}`}</button></div>`)
    +list('Perks',`${S.perks.length}/${PERKS.length}`,PERKS.map(q=>{const got=perk(q.id);return `<div class="card${got?' owned-up':''}"><div class="ttl"><b>${q.n}</b></div><div class="desc">${q.d}</div>${got?'<div class="hint" style="color:var(--good)">✓ Yours for keeps</div>':`<button class="buy gold" data-perk="${q.id}" ${S.clout<q.cost?'disabled':''}>Buy · ${q.cost} clout</button>`}</div>`}).join(''),true)
+   +list('Legacy (repeatable)','',`<div class="card"><p class="p desc">Clout sinks with no top level. Buy them as often as you can afford.</p></div>`+LEGACY.map(q=>{const l=lgv(q.id),c=legacyCost(q);return `<div class="card"><div class="ttl"><b>${q.n}</b> <span class="mute">lvl ${l}</span></div><div class="desc">${q.d(l)}</div><button class="buy gold" data-legacy="${q.id}" ${S.clout<c?'disabled':''}>Level up · ${fmt(c)} clout</button></div>`}).join(''))
+   +((S.total>=1e80||S.universes>0)?list('Heat death','',`<div class="card"><div class="ttl"><b>The heat death of the backlog</b></div><p class="p desc">Collapse this universe and start a new one. You lose awards, clout, perks and legacy, but keep trophies, clients, office floors and the dog.</p><p class="p desc">Each universe multiplies velocity and clicks, and makes every rebrand worth 25% more awards. There’s always another universe.</p></div>
+      <div class="card"><div class="srow"><span>Universes</span><b>${S.universes} (×${fmt(Math.pow(1+S.universes,1.5))})</b></div><div class="srow"><span>This rebrand’s points</span><b>${fmt(S.total)}</b></div><div class="srow"><span>Universes from a crunch now</span><b style="color:var(--gold)">+${crunchGain()}</b></div><div class="srow"><span>Available from</span><b>1e100 points in one rebrand</b></div>
+      <button class="buy gold" id="crBtn" ${crunchGain()<1?'disabled':''}>${crunchGain()<1?'Not enough entropy yet':crArmed?'Click again. Say goodbye to this universe.':`Collapse the universe for ${crunchGain()}`}</button></div>`):'')
    +list('Past rebrands',S.resets,S.resets?BOARDS.slice(0,Math.min(S.resets,BOARDS.length)).map((b,i)=>`<div class="card done-card"><div class="ttl"><span class="tick">✓</span>${b}</div><div class="meta"><span>Rebrand ${i+1}</span></div></div>`).join(''):'<div class="mute">No rebrands yet. The logo is still the one the founder drew on a napkin.</div>');
 }
 function renderStatsView(){
   const row=(a,b)=>`<div class="srow"><span>${a}</span><b>${b}</b></div>`;
-  const approved=S.ups.map(id=>UP[id]).filter(Boolean);
-  $('v-stats').innerHTML=list('How to play','',`<div class="card"><p class="p"><b>Click the card in Doing</b> to tick off subtasks. Ten ticks moves it to Done.</p><p class="p">Spend points on <b>hires</b> in Team. They earn points every second (your velocity), even while you’re away.</p><p class="p">Approve <b>requests</b> for big multipliers. New ones show up as your team grows.</p><p class="p">Grab <b>quick wins</b> when they pop up. <b>Stakeholders</b> slowly siphon your velocity, but click them later and they pay back more than they took.</p><p class="p">Every 25 cards comes an <b>Epic</b>. <b>Sprints</b> are short challenges with big rewards. With 10 Interns, the <b>Kitchen</b> opens.</p><p class="p">Some requests bring more than numbers. Keep an eye on the office perks.</p><p class="p">Once you’ve earned a billion points all-time, <b>rebrand</b> in Portfolio to win awards and keep going. Esc hides everything.</p></div>`,true)
+  const approved=S.ups.map(id=>getUp(id)).filter(Boolean);
+  $('v-stats').innerHTML=list('How to play','',`<div class="card"><p class="p"><b>Click the card in Doing</b> to tick off subtasks. Ten ticks moves it to Done.</p><p class="p">Spend points on <b>hires</b> in Team. They earn points every second (your velocity), even while you’re away.</p><p class="p">Approve <b>requests</b> for big multipliers. New ones show up as your team grows.</p><p class="p">Grab <b>quick wins</b> when they pop up. <b>Stakeholders</b> slowly siphon your velocity, but click them later and they pay back more than they took.</p><p class="p">Every 25 cards comes an <b>Epic</b>. <b>Sprints</b> are short challenges with big rewards. With 10 Interns, the <b>Kitchen</b> opens.</p><p class="p">Some requests bring more than numbers. Keep an eye on the office perks.</p><p class="p">Once you’ve earned a billion points all-time, <b>rebrand</b> in Portfolio to win awards and keep going.</p><p class="p">At 100K points, <b>Clients</b> start calling with contracts that scale forever. Spend the kudos on <b>office floors</b> with no level cap.</p><p class="p"><b>Office</b>: fit out your space, customise it, then move up the property ladder from your kitchen table to a Dyson sphere. <b>Dogs</b>: adopt breeds with their own perks, dress them up and walk a pack. <b>Stocks</b> open at office level 3: buy low, sell high.</p><p class="p">Requests, trophies and legacy perks never run out. At 1e100 points, collapse the universe for a <b>heat death</b> and start again, stronger. It never ends. Esc hides everything.</p></div>`,true)
    +list('Numbers','',`<div class="card">${[
      ['Story points in the bank',fmt(S.pts)],['Earned this rebrand',fmt(S.total)],['Earned all time',fmt(S.allTime)],['Velocity (base)',fmt(M.base)+'/s'],['Velocity right now',fmt(vel())+'/s'],['Each click',fmt(clickVal())],
      ['Cards you finished',`${fmt(S.cards)} (${fmt(S.cardsAll)} all time)`],['Cards the team finished',fmt(S.teamCards)],['Subtasks ticked',`${fmt(S.clicks)} (${fmt(S.clicksAll)} all time)`],['Points from clicking',`${fmt(S.hand)} (${fmt(S.handAll)} all time)`],
-     ['Team size',fmt(staff())],['Requests approved',`${S.ups.length} / ${U.length}`],['Trophies',`${S.ach.length} / ${ACH.length}`],['Quick wins grabbed',S.winsAll],['Feedback addressed',S.shPopped],['Sprints won',S.sprintsWon],['Epics closed',S.epics],['Kitchen orders',S.spells],['Office dog pets',S.pets],
-     ['Rebrands',S.resets],['Awards',S.awards],['Time this rebrand',fmtT(S.runTime)],['Time played',fmtT(S.playTime)]].map(r=>row(...r)).join('')}</div>`)
+     ['Team size',fmt(staff())],['Requests approved',fmt(S.ups.length)],['Trophies',fmt(trophyCount(S))],['Client tier',`${S.cl.tier} (best ${S.cl.best})`],['Contracts done',S.cl.done],['Kudos earned',fmt(S.cl.kudosAll)],['Office floor levels',Object.values(S.floors).reduce((a,b)=>a+b,0)],['Daily streak',`${S.daily.streak} (best ${S.daily.best})`],['Universes',S.universes],['Office',`L${S.office.lvl} · ${officeName(S.office.lvl)}`],['Decor owned',`${S.office.decor.length} / ${DECOR.length}`],['Dogs adopted',`${S.dogs.length} / ${BREEDS.length}`],['Dog accessories',`${S.accs.length} / ${ACCS.length}`],['Stock trades',S.stkTrades],['Stock profit',fmt(S.stkProfit)],['Quick wins grabbed',S.winsAll],['Feedback addressed',S.shPopped],['Sprints won',S.sprintsWon],['Epics closed',S.epics],['Kitchen orders',S.spells],['Office dog pets',S.pets],
+     ['Rebrands',S.resets],['Awards',fmt(S.awards)],['Clout',fmt(S.clout)],['Time this rebrand',fmtT(S.runTime)],['Time played',fmtT(S.playTime)]].map(r=>row(...r)).join('')}</div>`)
    +list('Approved requests',approved.length,approved.slice().reverse().map(u=>`<div class="card"><div class="labels"><span class="lbt" style="background:${KIND_C[u.k]}">${u.k}</span></div><div class="ttl">${u.n}</div></div>`).join('')||'<div class="mute">Nothing approved yet.</div>')
    +list('Settings','',`<div class="card">
-      <div class="set"><span>Numbers</span><div class="seg" id="fmtSeg">${[['short','1.2M'],['full','1,200,000'],['sci','1.2e6']].map(([k,n])=>`<button data-fmt="${k}" class="${S.settings.fmt===k?'on':''}">${n}</button>`).join('')}</div></div>
+      <div class="set"><span>Numbers</span><div class="seg" id="fmtSeg">${[['short','1.2M'],['words','1.2 million'],['full','1,200,000'],['sci','1.2e6']].map(([k,n])=>`<button data-fmt="${k}" class="${S.settings.fmt===k?'on':''}">${n}</button>`).join('')}</div></div>
       <div class="set"><span>Activity ticker</span><div class="seg"><button data-set="ticker" data-val="1" class="${S.settings.ticker?'on':''}">On</button><button data-set="ticker" data-val="0" class="${S.settings.ticker?'':'on'}">Off</button></div></div>
       <div class="set"><span>Floating numbers</span><div class="seg"><button data-set="floats" data-val="1" class="${S.settings.floats?'on':''}">On</button><button data-set="floats" data-val="0" class="${S.settings.floats?'':'on'}">Off</button></div></div></div>
      <div class="card"><div class="ttl"><b>Save file</b></div><p class="p desc">The game saves itself every few seconds. Copy this to move your board to another browser.</p><textarea class="save" id="saveTxt" spellcheck="false"></textarea><div style="display:flex;gap:6px;margin-top:6px"><button class="buy" data-act="export">Copy save</button><button class="buy" data-act="import">Load pasted save</button></div></div>
      <div class="card"><div class="ttl"><b>Archive board</b></div><p class="p desc">Wipes everything, including trophies and awards. There is no undo.</p><button class="buy sell" data-act="wipe">${wipeArmed?'Click again. Everything goes.':'Archive board and start over'}</button></div>`);
 }
 function renderView(){
-  ['board','kitchen','trophies','portfolio','stats'].forEach(v=>$('v-'+v).hidden=view!==v);
-  if(view==='kitchen')renderKitchen();else if(view==='trophies')renderTrophies();else if(view==='portfolio')renderPortfolio();else if(view==='stats')renderStatsView();
+  ['board','office','dogs','stocks','kitchen','clients','trophies','portfolio','stats'].forEach(v=>$('v-'+v).hidden=view!==v);
+  if(view==='office')renderOffice();else if(view==='dogs')renderDogs();else if(view==='stocks')renderStocks();else if(view==='clients')renderClients();else if(view==='kitchen')renderKitchen();else if(view==='trophies')renderTrophies();else if(view==='portfolio')renderPortfolio();else if(view==='stats')renderStatsView();
   renderViews(true);
 }
 
 /* ---------- actions ---------- */
-function earn(n){S.pts+=n;S.total+=n;S.allTime+=n}
+function earn(n){
+  if(!(n>0))return;
+  S.pts=Math.min(CAP,S.pts+n);S.total=Math.min(CAP,S.total+n);S.allTime=Math.min(CAP,S.allTime+n);
+  if(S.total>=CAP&&!S.capWarned){S.capWarned=true;toast('<b>The backlog has collapsed into a singularity.</b> Points can’t go any higher. Head to Portfolio: heat death is the only way forward.')}
+}
 function floatAt(x,y,txt){
   if(!S.settings.floats)return;
   const s=document.createElement('span');s.className='float';s.textContent=txt;s.style.left=(x-10)+'px';s.style.top=(y-20)+'px';
@@ -676,8 +983,10 @@ function hire(id){
   recalc();renderTeam();renderUps();renderStats();save();
 }
 function buyUp(id){
-  const u=UP[id],c=upCost(u);if(S.pts<c||S.ups.includes(id))return;
-  S.pts-=c;S.ups.push(id);recalc();renderUps(true);renderTeam();renderStats();save();
+  const u=getUp(id);if(!u)return;const c=upCost(u);if(S.pts<c||S.ups.includes(id))return;
+  S.pts-=c;S.ups.push(id);
+  if(id==='dog'&&!S.dogs.length){S.dogs.push({id:1,breed:'mutt',name:'Biscuit',coat:null,collar:'#e5484d',acc:null});S.pack=[1]}
+  recalc();renderUps(true);renderTeam();renderStats();save();
   toast(`Approved: <b>${u.n}</b>. ${typeof u.d==='function'?u.d():u.d}.`);
 }
 let toastT;function toast(t){const el=$('toast');el.innerHTML=t;el.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>el.hidden=true,4500)}
@@ -716,6 +1025,7 @@ function grabWin(){
   const opts=[['lucky',45],['frenzy',35],['rush',8]];
   if(owned.length)opts.push(['surge',10]);
   if(free.length)opts.push(['free',2]);
+  opts.push(['viral',6]);if(stocksOpen())opts.push(['tip',6]);
   let r=Math.random()*opts.reduce((a,o)=>a+o[1],0),pick='lucky';
   for(const [k,w] of opts){if((r-=w)<0){pick=k;break}}
   const d=durMult();
@@ -723,6 +1033,8 @@ function grabWin(){
   else if(pick==='frenzy'){addBuff({id:'frenzy',name:'In the zone ×7',vel:7,cls:'good'},77*d);toast('<b>Quick win!</b> Everyone’s in the zone. Velocity ×7.')}
   else if(pick==='rush'){addBuff({id:'rush',name:'Deadline rush ×777',click:777,cls:'gold'},13*d);toast('<b>Deadline rush!</b> Clicks ×777 for a few seconds. Go go go.')}
   else if(pick==='surge'){const h=owned[Math.floor(Math.random()*owned.length)],m=1+.1*S.own[h.id];addBuff({id:'surge',name:`${h.pl} on fire ×${fmt(m)}`,vel:m,cls:'good'},30*d);toast(`<b>Quick win!</b> Your ${h.pl} are on fire. Velocity ×${fmt(m)}.`)}
+  else if(pick==='viral'){addBuff({id:'viral',name:'Gone viral ×15',vel:15,cls:'gold'},15*d);toast('<b>Your post went viral!</b> Velocity ×15 while the likes roll in.')}
+  else if(pick==='tip'){const t=pick2(TICKERS.filter(x=>stockUnlocked(x)));const st=stk(t[0]);st.mode='boom';st.mt=8;toast(`<b>Hot tip:</b> ${t[1]} (${t[0]}) is about to boom. Totally legal, apparently. Check Stocks.`)}
   else{const u=free[0];S.ups.push(u.id);recalc();renderUps(true);renderTeam();toast(`<b>Quick win!</b> Finance waved through <b>${u.n}</b> for free.`)}
   checkAch();renderStats();save();
 }
@@ -787,6 +1099,11 @@ function cast(id,discount){
   }else if(s.id==='flatwhite'){
     if(fail)msg='Spilt the flat white. Nothing happens, except a stain.';
     else{clearTimeout(winT);spawnWin();msg='Flat white ordered. A quick win appeared!'}
+  }else if(s.id==='doughnuts'){
+    if(packDogs().length){S.happy=100;triggerZoomies();msg='Doughnuts! The dogs have gone feral. Zoomies all round.'}
+    else{addBuff({id:'sugar',name:'Sugar rush ×5 clicks',click:5,cls:'gold'},20*d);msg='No dogs to share with, so you ate the lot. Clicks ×5 for 20 seconds.'}
+  }else if(s.id==='energy'){
+    addBuff({id:'energy',name:'Energy drink ×3',vel:3,cls:'good'},20*d);setTimeout(()=>addBuff({id:'crash',name:'Sugar crash ×0.8',vel:.8,cls:'bad'},40),20000*d);msg='Energy drink. Velocity ×3 for 20 seconds. The crash is coming.';
   }else if(s.id==='mystery'){
     const others=SPELLS.filter(x=>x.id!=='mystery'&&x.id!=='flatwhite');const o=others[Math.floor(Math.random()*others.length)];
     klog(`Mystery brew turned out to be… ${o.n}.`);cast(o.id,.5);renderView();return;
@@ -798,82 +1115,350 @@ function klog(m){const t=new Date().toLocaleTimeString('en-GB',{hour:'2-digit',m
 /* ---------- trophies ---------- */
 function unlock(id){
   if(S.ach.includes(id)||!ACHM[id])return;S.ach.push(id);recalc();
-  toast(`<b>Trophy unlocked:</b> ${ACHM[id].n}. Morale is up.`);renderViews();if(view==='trophies')renderTrophies();
+  toast(`<b>Trophy unlocked:</b> ${ACHM[id].n}${/[.!?]$/.test(ACHM[id].n)?'':'.'} Morale is up.`);renderViews();if(view==='trophies')renderTrophies();
 }
-function checkAch(){for(const a of ACH)if(!S.ach.includes(a.id)&&a.test(S))unlock(a.id)}
+function checkAch(){
+  for(const a of ACH)if(!S.ach.includes(a.id)&&a.test(S))unlock(a.id);
+  for(const f of FAM){let r=famRank(f.id),n=0;while(n<60&&f.v(S)>=f.t(r)){r++;n++}if(n){S.fam[f.id]=r;recalc();toast(`<b>Endless trophy:</b> ${f.n} ${ROMAN(r)}. Morale is up.`);renderViews();if(view==='trophies')renderTrophies()}}
+}
 
 /* ---------- rebrand ---------- */
 function rebrand(){
   const p=pendingAwards();if(p<1)return;
   S.sh.forEach(x=>earn(x.eaten*shReturn()));
-  const keep=['pets','zoomies','fetches','allTime','cardsAll','clicksAll','handAll','winsAll','awards','clout','perks','resets','spells','shPopped','sprintsWon','epics','escPresses','playTime','firstPlayed','ach','settings','kitchenSeen','klog'];
+  const rawP=rawAwards();
+  const keep=['office','dogs','pack','accs','dogNamed','stk','stkT','stkProfit','stkTrades','stkSeen','stkDouble','fam','cl','floors','legacy','awardsBase','universes','crunches','clientsSeen','daily','pets','zoomies','fetches','allTime','cardsAll','clicksAll','handAll','winsAll','awards','clout','perks','resets','spells','shPopped','sprintsWon','epics','escPresses','playTime','firstPlayed','ach','settings','kitchenSeen','klog'];
   const k={};keep.forEach(x=>k[x]=S[x]);
-  S=Object.assign(fresh(),k);S.awards+=p;S.clout+=p;S.resets++;
+  S=Object.assign(fresh(),k);S.awards+=p;S.clout+=p;S.resets++;S.awardsBase+=rawP;
   if(perk('headstart')){S.own.intern=10;S.own.free=5}
+  if(lgv('heads')){const n=lgv('heads')*5;S.own.intern+=n;S.own.free+=n;S.own.jr+=n}
   if(perk('savings')){S.pts=1e5}
   for(let i=0;i<5;i++)S.todo.push(pickTask());S.cur=pickTask();
   recalc();S.coffee=Math.min(coffeeMax(),10);
   document.querySelectorAll('.win').forEach(e=>e.remove());
   nextSprintAt=Date.now()+4*60e3;upKey='';rbArmed=false;view='board';
   renderAll();checkAch();save();
-  toast(`<b>Rebranded!</b> Welcome to ${boardName()}. You won ${p} award${p>1?'s':''}: +${p*(perk('legend')?1.5:1)}% velocity, forever.`);
+  toast(`<b>Rebranded!</b> Welcome to ${boardName()}. You won ${fmt(p)} award${p>1?'s':''}: +${fmt(p*(perk('legend')?1.5:1))}% velocity, forever.`);
 }
-const boardName=()=>BOARDS[Math.min(S.resets,BOARDS.length-1)]+(S.resets>=BOARDS.length?` ${S.resets-BOARDS.length+2}`:'');
+function crunch(){
+  const g=crunchGain();if(g<1)return;
+  const keep=['office','dogs','pack','accs','dogNamed','stkProfit','stkTrades','stkDouble','fam','cl','floors','universes','crunches','clientsSeen','daily','pets','zoomies','fetches','cardsAll','clicksAll','handAll','winsAll','resets','spells','shPopped','sprintsWon','epics','escPresses','playTime','firstPlayed','ach','settings','kitchenSeen','klog'];
+  const k={};keep.forEach(x=>k[x]=S[x]);
+  S=Object.assign(fresh(),k);S.universes+=g;S.crunches++;
+  S.office=Object.assign(fresh().office,{wall:k.office.wall,flr:k.office.flr,light:k.office.light,decor:k.office.decor,placed:k.office.placed,custom:k.office.custom});
+  for(let i=0;i<5;i++)S.todo.push(pickTask());S.cur=pickTask();
+  recalc();S.coffee=Math.min(coffeeMax(),10);
+  document.querySelectorAll('.win').forEach(e=>e.remove());
+  nextSprintAt=Date.now()+4*60e3;upKey='';crArmed=false;rbArmed=false;view='board';
+  renderAll();checkAch();save();
+  toast(`<b>Universe collapsed.</b> A new one blinks into existence. You now own ${S.universes} universe${S.universes>1?'s':''}: velocity and clicks ×${fmt(Math.pow(1+S.universes,1.5))}.`);
+}
+const boardName=()=>(S.universes?`U${S.universes+1} · `:'')+BOARDS[Math.min(S.resets,BOARDS.length-1)]+(S.resets>=BOARDS.length?` ${S.resets-BOARDS.length+2}`:'');
 
 
-/* ---------- the office dog ---------- */
-const DOG='Biscuit';
-const DOG_SAYS=['*happy wag*','Woof!','*sniffs your lunch*','*rolls over*','Is that a biscuit?','*brings you a sock*','*sneezes*','*leans on your leg*'];
-let dogEl=null,dogPos=.5,dogNext=0,fetchAt=Date.now()+(3+Math.random()*3)*60e3,petCool=0,sayT;
-function dogSync(){
-  const on=hasDog(S)&&!boss;
-  if(!on){if(dogEl){dogEl.remove();dogEl=null}return}
-  if(!dogEl){
-    dogEl=document.createElement('button');dogEl.className='dog game';dogEl.title=`${DOG}, the office dog. Give them a pet.`;
-    dogEl.innerHTML=`<span class="b" aria-hidden="true">🐕</span><span class="tag">${DOG}</span><span class="mood"><i></i></span>`;
-    dogEl.addEventListener('click',petDog);document.body.appendChild(dogEl);placeDog(true);
-    if(!S.pets)toast(`<b>Meet ${DOG}, the office dog.</b> Give them a pet. A happy dog is a productive studio.`);
-  }
-  dogEl.querySelector('.mood i').style.width=S.happy+'%';
+/* ---------- the dog pack ---------- */
+const DOG_SAYS=['*happy wag*','Woof!','*sniffs your lunch*','*rolls over*','Is that a biscuit?','*brings you a sock*','*sneezes*','*leans on your leg*','*tippy taps*','*judges your kerning*'];
+const packSize=()=>Math.min(7,1+Math.floor(S.office.lvl/5)+(perk('kennel')?1:0));
+function packDogs(){return S.pack.map(id=>S.dogs.find(d=>d.id===id)).filter(Boolean)}
+const dogName=()=>{const d=packDogs()[0]||S.dogs[0];return d?d.name:'Biscuit'};
+function mix(hex,amt,to){const a=parseInt(hex.slice(1),16),b=parseInt((to||'#ffffff').slice(1),16);const c=[16,8,0].map(sh=>Math.round(((a>>sh)&255)*(1-amt)+((b>>sh)&255)*amt));return '#'+c.map(x=>x.toString(16).padStart(2,'0')).join('')}
+function dogSVG(d,size){
+  const b=BREED[d.breed]||BREED.mutt,[bw,bh,leg,hr,sn,ear,tail,mark]=b.s,coat=d.coat||b.coat,dark=mix(coat,.28,'#000000'),light=mix(coat,.6);
+  const G=54,cx=31,cy=G-leg-bh*.55,hx=cx+bw-3,hy=cy-bh-hr*.2,tx=cx-bw+2;
+  const col=d.collar||'#e5484d',stroke=mark==='robot'?' stroke="#56606b" stroke-width="1"':'';
+  let o='';
+  // tail
+  if(tail==='wag')o+=`<path d="M${tx},${cy-2} Q${tx-9},${cy-8} ${tx-6},${cy-15}" stroke="${coat}" stroke-width="3.5" fill="none" stroke-linecap="round"/>`;
+  else if(tail==='curl')o+=`<path d="M${tx},${cy-3} q-8,-3 -6,-9 q3,-5 7,-1" stroke="${coat}" stroke-width="3.5" fill="none" stroke-linecap="round"/>`;
+  else if(tail==='stub')o+=`<circle cx="${tx-1}" cy="${cy-3}" r="3" fill="${coat}"/>`;
+  else if(tail==='fluff')o+=`<ellipse cx="${tx-5}" cy="${cy-7}" rx="8" ry="4" fill="${mark==='glow'?'#fff3b0':coat}" transform="rotate(-40 ${tx-5} ${cy-7})"/>`;
+  else o+=`<path d="M${tx},${cy} Q${tx-12},${cy+2} ${tx-15},${cy-8}" stroke="${coat}" stroke-width="2" fill="none" stroke-linecap="round"/>`;
+  // legs
+  const ly=cy+bh*.35,lh=G-ly;[cx-bw+3,cx-bw+9,cx+bw-12,cx+bw-6].forEach((x,i)=>{o+=`<rect x="${x}" y="${ly}" width="4.5" height="${lh}" rx="2" fill="${i%2?coat:dark}"${stroke}/>`});
+  // body
+  o+=`<ellipse cx="${cx}" cy="${cy}" rx="${bw}" ry="${bh}" fill="${coat}"${stroke}/>`;
+  if(mark==='fluffy')[[-9,-3],[0,-5],[9,-3],[-5,3],[6,3]].forEach(([x,y])=>o+=`<circle cx="${cx+x}" cy="${cy+y}" r="${bh*.55}" fill="${coat}"/>`);
+  if(mark==='spots')[[-8,-3],[-2,2],[5,-4],[10,1],[-11,2],[2,-6]].forEach(([x,y])=>o+=`<circle cx="${cx+x}" cy="${cy+y}" r="1.8" fill="#222"/>`);
+  if(mark==='chest')o+=`<ellipse cx="${cx+bw-5}" cy="${cy+2}" rx="5" ry="${bh*.7}" fill="#fff7ec"/>`;
+  if(mark==='robot')o+=`<path d="M${cx-bw+5},${cy} h${bw*1.6}" stroke="#56606b" stroke-width="1"/><circle cx="${cx}" cy="${cy-3}" r="1.6" fill="#4ef0ff"/>`;
+  // collar
+  o+=`<rect x="${hx-hr*.75}" y="${hy+hr*.55}" width="${hr*1.2}" height="3.2" rx="1.5" fill="${col}"/>`;
+  // head
+  o+=`<circle cx="${hx}" cy="${hy}" r="${hr}" fill="${coat}"${stroke}/>`;
+  if(mark==='fluffy')o+=`<circle cx="${hx-1}" cy="${hy-hr*.8}" r="${hr*.55}" fill="${coat}"/>`;
+  if(mark==='mask')o+=`<ellipse cx="${hx+hr*.35}" cy="${hy+hr*.25}" rx="${hr*.75}" ry="${hr*.6}" fill="${b.id==='pug'?'#3a2f2a':light}"/>`;
+  // ears
+  if(ear==='flop')o+=`<ellipse cx="${hx-hr*.45}" cy="${hy+hr*.05}" rx="${hr*.36}" ry="${hr*.78}" fill="${dark}" transform="rotate(18 ${hx-hr*.45} ${hy})"/>`;
+  else if(ear==='point')o+=`<polygon points="${hx-hr*.7},${hy-hr*.45} ${hx-hr*.25},${hy-hr*1.65} ${hx+hr*.15},${hy-hr*.7}" fill="${mark==='robot'?'#7d8894':dark}"/>`;
+  else if(ear==='long')o+=`<ellipse cx="${hx-hr*.45}" cy="${hy+hr*.45}" rx="${hr*.38}" ry="${hr*1.05}" fill="${dark}"/>`;
+  else if(ear==='tiny')o+=`<ellipse cx="${hx-hr*.5}" cy="${hy-hr*.7}" rx="${hr*.32}" ry="${hr*.24}" fill="${dark}"/>`;
+  else o+=`<circle cx="${hx-hr*.55}" cy="${hy+hr*.2}" r="${hr*.55}" fill="${coat}"/><circle cx="${hx-hr*.7}" cy="${hy+hr*.8}" r="${hr*.45}" fill="${coat}"/>`;
+  // snout, nose, eye
+  o+=`<ellipse cx="${hx+hr*.72}" cy="${hy+hr*.32}" rx="${sn}" ry="${hr*.42}" fill="${mark==='mask'&&b.id!=='pug'?'#fff7ec':light}"/>`;
+  o+=`<circle cx="${hx+hr*.72+sn-1}" cy="${hy+hr*.18}" r="1.8" fill="#1c1c1c"/>`;
+  o+=`<circle cx="${hx+hr*.3}" cy="${hy-hr*.22}" r="1.6" fill="${mark==='robot'?'#4ef0ff':'#1c1c1c'}"/><circle cx="${hx+hr*.36}" cy="${hy-hr*.3}" r=".5" fill="#fff"/>`;
+  if(mark==='robot')o+=`<path d="M${hx},${hy-hr} v-5" stroke="#56606b" stroke-width="1.2"/><circle cx="${hx}" cy="${hy-hr-5.5}" r="1.6" fill="#e5484d"/>`;
+  if(mark==='helmet'&&!d.acc)o+=`<circle cx="${hx+1}" cy="${hy}" r="${hr+3.5}" fill="rgba(180,220,255,.25)" stroke="#dfefff" stroke-width="1.2"/>`;
+  // accessory
+  const ac=d.acc&&ACCS.find(a=>a[0]===d.acc);
+  if(ac){const [x,y,fs]=ac[3]==='head'?[hx-1,hy-hr+1,hr*1.35]:ac[3]==='face'?[hx+hr*.45,hy-hr*.05,hr*.95]:ac[3]==='mouth'?[hx+hr+sn*.5,hy+hr*.9,hr*.95]:[hx-hr*.15,hy+hr*1.15,hr*.9];o+=`<text x="${x}" y="${y}" font-size="${fs}" text-anchor="middle">${ac[1]}</text>`}
+  const glow=mark==='glow'?' style="filter:drop-shadow(0 0 6px #ffd36b)"':'';
+  return `<svg viewBox="0 0 72 56" width="${size}" height="${Math.round(size*56/72)}"${glow} aria-hidden="true">${o}</svg>`;
 }
-function placeDog(instant){
-  if(!dogEl)return;
-  const w=Math.max(0,innerWidth-80),x=dogPos*w,old=parseFloat(dogEl.dataset.x||x);
-  dogEl.style.setProperty('--dir',x>old?-1:1);dogEl.dataset.x=x;
-  if(instant){dogEl.style.transition='none';dogEl.style.transform=`translateX(${x}px)`;void dogEl.offsetWidth;dogEl.style.transition=''}
-  else dogEl.style.transform=`translateX(${x}px)`;
+const dogKey=d=>[d.breed,d.coat,d.collar,d.acc,d.name,S.ups.includes('pups')].join('|');
+let dogEls={},fetchAt=Date.now()+(3+Math.random()*3)*60e3,petCool=0;
+function dogSync(force){
+  const want=boss?[]:packDogs();
+  for(const id in dogEls)if(!want.some(d=>String(d.id)===id)){dogEls[id].el.remove();delete dogEls[id]}
+  want.forEach((d,i)=>{
+    let o=dogEls[d.id];
+    if(!o){
+      const el=document.createElement('button');el.className='dog game';el.dataset.dog=d.id;
+      el.addEventListener('click',()=>petDog(d.id));document.body.appendChild(el);
+      o=dogEls[d.id]={el,pos:.15+.7*Math.random(),next:0,key:''};placeDog(o,true);
+      if(!S.pets&&i===0)toast(`<b>Meet ${d.name}, the office dog.</b> Give them a pet. A happy dog is a productive studio.`);
+    }
+    const k=dogKey(d);
+    if(k!==o.key||force){o.key=k;o.el.title=`${d.name} the ${BREED[d.breed].n}. Give them a pet.`;
+      o.el.innerHTML=`<span class="b">${dogSVG(d,58)}</span>${i===0&&S.ups.includes('pups')?`<span class="pups">${dogSVG(d,26)}${dogSVG(d,24)}</span>`:''}<span class="tag">${d.name}</span><span class="mood"><i></i></span>`}
+    o.el.querySelector('.mood i').style.width=S.happy+'%';
+  });
 }
-function dogSay(t){if(!dogEl)return;clearTimeout(sayT);let b=dogEl.querySelector('.say');if(!b){b=document.createElement('span');b.className='say';dogEl.appendChild(b)}b.textContent=t;sayT=setTimeout(()=>b.remove(),2200)}
+function placeDog(o,instant){
+  const w=Math.max(0,innerWidth-80),x=o.pos*w,old=parseFloat(o.el.dataset.x||x);
+  o.el.style.setProperty('--dir',x>=old?1:-1);o.el.dataset.x=x;
+  if(instant){o.el.style.transition='none';o.el.style.transform=`translateX(${x}px)`;void o.el.offsetWidth;o.el.style.transition=''}
+  else o.el.style.transform=`translateX(${x}px)`;
+}
+function dogSay(id,t){const o=dogEls[id];if(!o)return;let b=o.el.querySelector('.say');if(!b){b=document.createElement('span');b.className='say';o.el.appendChild(b)}b.textContent=t;clearTimeout(o.sayT);o.sayT=setTimeout(()=>b.remove(),2200)}
 function dogTick(){
-  dogSync();if(!dogEl)return;
-  const now=Date.now();
-  S.happy=Math.max(0,S.happy-.5);
+  dogSync();const ids=Object.keys(dogEls);if(!ids.length)return;
+  const now=Date.now();S.happy=Math.max(0,S.happy-.5);
   const zoom=activeBuffs().some(b=>b.id==='zoomies');
-  dogEl.classList.toggle('zoom',zoom);dogEl.classList.toggle('nap',S.happy<5&&!zoom);
-  if(zoom||now>dogNext){dogPos=zoom?(dogPos<.5?.9:.1):Math.random();placeDog();dogNext=now+(S.happy<5?20000:4000+Math.random()*6000)}
-  if(S.happy<5&&Math.random()<.05)dogSay('zzz…');
+  ids.forEach(id=>{const o=dogEls[id];o.el.classList.toggle('zoom',zoom);o.el.classList.toggle('nap',S.happy<5&&!zoom);
+    if(zoom||now>o.next){o.pos=zoom?(o.pos<.5?.85+Math.random()*.1:.05+Math.random()*.1):Math.random();placeDog(o);o.next=now+(S.happy<5?20000:4000+Math.random()*6000)}});
+  if(S.happy<5&&Math.random()<.05)dogSay(pick2(ids),'zzz…');
   if(now>fetchAt&&!document.hidden){
-    fetchAt=now+(3+Math.random()*3)*60e3/M.fetch;
-    const r=dogEl.getBoundingClientRect();S.fetches++;spawnWin({x:r.left+r.width/2,y:r.top});dogSay('*drops something at your feet*');
-    toast(`<b>${DOG} fetched a quick win!</b> Grab it before someone else does.`);checkAch();
+    fetchAt=now+(3+Math.random()*3)*60e3/M.fetch/Math.sqrt(ids.length);
+    const id=pick2(ids),r=dogEls[id].el.getBoundingClientRect(),d=S.dogs.find(x=>String(x.id)===id);
+    S.fetches++;spawnWin({x:r.left+r.width/2,y:r.top});dogSay(id,'*drops something at your feet*');
+    toast(`<b>${d?d.name:'The dog'} fetched a quick win!</b> Grab it before someone else does.`);checkAch();
   }
 }
-function petDog(e){
-  const now=performance.now();
-  const r=dogEl.getBoundingClientRect();
+function triggerZoomies(){
+  S.happy=40;S.zoomies++;addBuff({id:'zoomies',name:`Zoomies ×${packDogs().length>1?2+packDogs().length*.5:2}`,vel:packDogs().length>1?2+packDogs().length*.5:2,cls:'good'},30*durMult()*M.zoomDur);
+  Object.keys(dogEls).forEach(id=>dogSay(id,'ZOOMIES!'));toast(`<b>Zoomies!</b> ${packDogs().length>1?'The whole pack is':dogName()+' is'} tearing round the office. Velocity boosted.`);
+}
+function petDog(id){
+  const o=dogEls[id];if(!o)return;const now=performance.now();
+  const r=o.el.getBoundingClientRect();
   const h=document.createElement('span');h.className='heart';h.textContent='♥';h.style.left=(r.left+r.width/2-6+(Math.random()*20-10))+'px';h.style.top=(r.top-6)+'px';document.body.appendChild(h);setTimeout(()=>h.remove(),900);
-  dogEl.classList.remove('wag');void dogEl.offsetWidth;dogEl.classList.add('wag');
+  o.el.classList.remove('wag');void o.el.offsetWidth;o.el.classList.add('wag');
   if(now<petCool)return;petCool=now+600;
   const g=(M.base*velBuff()*10+clickVal()*5)*M.dogPts;earn(g);S.pets++;lastClick=Date.now();
   floatAt(r.left+r.width/2,r.top-20,'+'+fmt(g));
   S.happy=Math.min(100,S.happy+8*M.dogHappy);
-  if(S.happy>=100){
-    S.happy=40;S.zoomies++;addBuff({id:'zoomies',name:`${DOG} has the zoomies ×2`,vel:2,cls:'good'},30*durMult()*M.zoomDur);
-    dogSay('ZOOMIES!');toast(`<b>${DOG} has the zoomies!</b> The whole studio is energised. Velocity ×2.`);
-  }else if(Math.random()<.3)dogSay(DOG_SAYS[Math.floor(Math.random()*DOG_SAYS.length)]);
+  if(S.happy>=100)triggerZoomies();else if(Math.random()<.3)dogSay(id,pick2(DOG_SAYS));
   dogSync();renderStats();checkAch();
 }
-addEventListener('resize',()=>placeDog(true));
+addEventListener('resize',()=>Object.values(dogEls).forEach(o=>placeDog(o,true)));
+
+/* ---------- office ---------- */
+const fixCount=l=>[0,1,2,3,4].filter(i=>S.office.fix[l+'_'+i]).length;
+const moveCost=()=>officeCost(S.office.lvl+1)*(perk('architect')?.75:1);
+const decorCost=()=>Math.max(250,M.base*120)*Math.pow(1.5,S.office.decor.length);
+const officeFocus=()=>document.activeElement&&document.activeElement.matches&&document.activeElement.matches('.name-in');
+function sceneHTML(){
+  const l=S.office.lvl,o=OFFICES[Math.min(l,20)-1],endless=l>20;
+  const wall=S.office.wall||o[5],flr=FLOORS_T[S.office.flr!=null&&S.office.custom?S.office.flr:o[6]][1],light=LIGHTS[S.office.light||0][1];
+  const sky=endless?'radial-gradient(circle,#fff6d0,#ffb347 25%,#3a5fb0 55%,#050814)':o[3],view=endless?'🌟☀️🌟':o[4];
+  const desks=Math.min(24,1+Math.floor(Math.log2(staff()+1)*1.6));
+  let h=`<div class="scene" style="--wall:${wall};--floor:${flr}"><div class="window" style="background:${sky}"><span>${view}</span></div><div class="floor"></div>`;
+  h+=`<div class="desks">${'🧑‍💻'.repeat(desks)}</div>`;
+  S.office.placed.slice(0,DECOR_SLOTS.length).forEach((id,i)=>{const dc=DECOR.find(x=>x[0]===id);if(!dc)return;const [x,y]=DECOR_SLOTS[i];h+=`<span class="it${y>60?' big':''}" style="left:${x}%;top:${y}%" title="${dc[2]}">${dc[1]}</span>`});
+  if(hasDog(S)){
+    if(S.ups.includes('bed'))h+=`<div class="bed" title="Dog bed"></div>`;
+    if(S.ups.includes('treats'))h+=`<span class="it" style="left:47%;top:60%" title="Treat jar">🫙</span>`;
+    h+=`<span class="it" style="left:30%;top:92%;font-size:20px" title="Water bowl">🥣</span>`;
+    if(S.ups.includes('ball'))h+=`<span class="it" style="left:35%;top:94%;font-size:16px" title="Tennis ball">🎾</span>`;
+    if(S.ups.includes('walkies'))h+=`<span class="it" style="left:49%;top:30%;font-size:22px" title="Lead on a hook">🦮</span>`;
+    packDogs().forEach((d,i)=>{h+=`<span class="sdog" style="left:${18+i*11}%">${dogSVG(d,54)}</span>`});
+    if(S.ups.includes('pups'))h+=`<span class="sdog" style="left:${20+packDogs().length*11}%">${dogSVG(packDogs()[0]||{breed:'mutt'},26)}</span>`;
+  }
+  h+=`<div class="light" style="background:${light}"></div><div class="oname">L${l} · ${officeIcon(l)} ${officeName(l)}</div></div>`;
+  return h;
+}
+function renderOffice(){
+  const l=S.office.lvl,fc=fixCount(l),mc=moveCost();
+  const info=`<div class="card"><div class="srow"><span>Office bonus</span><b>×${fmt(officeMult(l))}</b></div><div class="srow"><span>Fit-out done here</span><b>${fc} / 5</b></div><div class="srow"><span>Decor bonus</span><b>+${Math.round(S.office.decor.length*3*(perk('interior')?2:1))}%</b></div><div class="srow"><span>Dogs you can walk</span><b>${packSize()}</b></div></div>`;
+  const move=`<div class="card"><div class="ttl"><b>Next: ${officeIcon(l+1)} ${officeName(l+1)}</b></div><div class="desc">${officeDesc(l+1)} Moving makes the whole team ×${l+1>20?10:3}.${fc<3?` Buy ${3-fc} more fit-out upgrade${3-fc>1?'s':''} here first.`:''}</div><button class="buy gold" data-office="move" ${fc<3||S.pts<mc?'disabled':''}>Move in · ${fmt(mc)} pts</button></div>`;
+  const fix=[0,1,2,3,4].map(i=>{const got=S.office.fix[l+'_'+i],c=fixCost(l,i);return `<div class="card${got?' owned-up':''}"><div class="ttl"><b>${fixName(l,i)}</b></div><div class="desc">${fixDesc(l,i)}</div>${got?'<div class="hint" style="color:var(--good)">✓ Fitted</div>':`<button class="buy" data-fix="${l}_${i}" ${S.pts<c?'disabled':''}>Fit · ${fmt(c)} pts</button>`}</div>`}).join('');
+  const walls=WALLS.map((w,i)=>`<button class="sw${S.office.wall===w?' on':''}" style="background:${w}" data-wall="${i}" title="Wall colour"></button>`).join('')+`<button class="opt" data-wall="-1">Default</button>`;
+  const floors=FLOORS_T.map(([n],i)=>`<button class="opt${S.office.custom&&S.office.flr===i?' on':''}" data-flr="${i}">${n}</button>`).join('');
+  const lights=LIGHTS.map(([n],i)=>`<button class="opt${(S.office.light||0)===i?' on':''}" data-light="${i}">${n}</button>`).join('');
+  const custom=`<div class="card"><div class="ttl"><b>Walls</b></div><div class="opts">${walls}</div></div><div class="card"><div class="ttl"><b>Floor</b></div><div class="opts">${floors}</div></div><div class="card"><div class="ttl"><b>Lighting</b></div><div class="opts">${lights}</div></div>`;
+  const dc=decorCost();
+  const decor=`<div class="card"><p class="p desc">Each piece is +${3*(perk('interior')?2:1)}% velocity for good. Show or hide it in the office whenever you like.</p></div>`+DECOR.map(([id,e,n,min])=>{const own=S.office.decor.includes(id),placed=S.office.placed.includes(id);
+    if(!own&&l<min)return `<div class="card locked"><span class="emo">❔</span><b>Locked</b><div class="desc">Unlocks in the ${officeName(min).toLowerCase()} (L${min})</div></div>`;
+    return `<div class="card"><span class="emo">${e}</span><b>${n}</b>${own?`<button class="buy${placed?' sell':''}" data-dplace="${id}">${placed?'Put in storage':'Put out'}</button>`:`<button class="buy gold" data-dbuy="${id}" ${S.pts<dc?'disabled':''}>Buy · ${fmt(dc)} pts</button>`}</div>`}).join('');
+  const ladder=Array.from({length:Math.max(20,l+1)},(_,k)=>k+1).map(k=>`<div class="card${k>l?' locked':''}"><span class="emo">${k>l+1?'🔒':officeIcon(k)}</span><b>L${k} · ${k>l+1?'???':officeName(k)}</b><div class="desc">${k<l?'Moved out':k===l?'You are here':k===l+1?'Next move':'Keep growing'} · ×${fmt(officeMult(k))}</div></div>`).join('');
+  $('v-office').innerHTML=list('Your office',`Level ${l}`,`<div class="card" style="padding:6px">${sceneHTML()}</div>`+info+move,'x')+list('Fit-out',`${fc}/5`,fix)+list('Customise','',custom)+list('Decor',`${S.office.decor.length}/${DECOR.length}`,decor)+list('Property ladder',`${Math.min(l,20)}/20`,ladder);
+}
+function officeClick(e){
+  const t=e.target.closest('button');if(!t)return;const ds=t.dataset;
+  if(ds.office==='move'){const c=moveCost(),l=S.office.lvl;if(fixCount(l)<3||S.pts<c)return;S.pts-=c;S.office.lvl++;recalc();renderAll();checkAch();save();
+    toast(`<b>Moved in: ${officeIcon(S.office.lvl)} ${officeName(S.office.lvl)}!</b> ${officeDesc(S.office.lvl)} Whole team ×${S.office.lvl>20?10:3}.`);return}
+  if(ds.fix){const [l,i]=ds.fix.split('_').map(Number),c=fixCost(l,i);if(S.pts<c||S.office.fix[ds.fix])return;S.pts-=c;S.office.fix[ds.fix]=1;recalc();renderOffice();renderTeam();renderStats();checkAch();save();toast(`Fitted: <b>${fixName(l,i)}</b>. ${fixDesc(l,i)}.`);return}
+  if(ds.wall!=null){S.office.wall=+ds.wall<0?null:WALLS[+ds.wall];S.office.custom=true;renderOffice();checkAch();save();return}
+  if(ds.flr!=null){S.office.flr=+ds.flr;S.office.custom=true;renderOffice();checkAch();save();return}
+  if(ds.light!=null){S.office.light=+ds.light;S.office.custom=true;renderOffice();checkAch();save();return}
+  if(ds.dbuy){const c=decorCost();if(S.pts<c||S.office.decor.includes(ds.dbuy))return;S.pts-=c;S.office.decor.push(ds.dbuy);S.office.placed.push(ds.dbuy);recalc();renderOffice();renderStats();checkAch();save();return}
+  if(ds.dplace){const p=S.office.placed,i=p.indexOf(ds.dplace);if(i>=0)p.splice(i,1);else p.push(ds.dplace);renderOffice();save()}
+}
+
+/* ---------- kennel ---------- */
+let editDog=null;
+function renderDogs(){
+  const el=$('v-dogs');
+  if(!hasDog(S)){el.innerHTML=list('Dogs','',`<div class="card"><div class="ttl"><b>No dogs yet</b></div><p class="p desc">Approve the <b>Office dog</b> request (it shows up in Requests once you’ve earned 100M points) and the kennel opens.</p></div>`);return}
+  const ps=packSize(),inPack=S.pack.length;
+  const card=(d,walking)=>{const b=BREED[d.breed];return `<div class="card"><div class="portrait">${dogSVG(d,110)}</div><div class="ttl"><b>${d.name}</b> <span class="mute">${b.n}</span></div><div class="desc">${b.p}${walking?'':' (only while walking)'}</div><div class="row2"><button class="buy" data-dedit="${d.id}">${editDog===d.id?'Done':'Customise'}</button>${walking?`<button class="buy sell" data-dhome="${d.id}" ${inPack<=1?'disabled':''}>Rest</button>`:`<button class="buy gold" data-dwalk="${d.id}" ${inPack>=ps?'disabled':''}>${inPack>=ps?'Pack full':'Walk'}</button>`}</div></div>`};
+  const pack=packDogs().map(d=>card(d,true)).join('');
+  const kennel=S.dogs.filter(d=>!S.pack.includes(d.id)).map(d=>card(d,false)).join('')||'<div class="mute">Everyone’s out walking.</div>';
+  let editor='<div class="mute">Pick a dog and hit Customise.</div>';
+  const d=S.dogs.find(x=>x.id===editDog);
+  if(d){const b=BREED[d.breed];
+    editor=`<div class="card"><div class="portrait" style="height:120px">${dogSVG(d,150)}</div><div class="ttl"><b>Name</b></div><input class="name-in" maxlength="16" value="${d.name.replace(/"/g,'&quot;')}" data-dname="${d.id}"><div class="desc">Press Enter or click away to save.</div></div>
+    <div class="card"><div class="ttl"><b>Coat</b></div><div class="opts">${COATS.map(c=>`<button class="sw${(d.coat||b.coat)===c?' on':''}" style="background:${c}" data-dcoat="${c}"></button>`).join('')}<button class="opt" data-dcoat="">Breed default</button></div></div>
+    <div class="card"><div class="ttl"><b>Collar</b></div><div class="opts">${COLLARS.map(c=>`<button class="sw${d.collar===c?' on':''}" style="background:${c}" data-dcollar="${c}"></button>`).join('')}</div></div>
+    <div class="card"><div class="ttl"><b>Wearing</b></div><div class="opts"><button class="opt${!d.acc?' on':''}" data-dacc="">Nothing</button>${S.accs.map(id=>{const a=ACCS.find(x=>x[0]===id);return `<button class="opt${d.acc===id?' on':''}" data-dacc="${id}">${a[1]} ${a[2]}</button>`}).join('')}</div>${S.accs.length?'':'<div class="desc">Buy accessories in the shop list.</div>'}</div>`}
+  const ac=accCost();
+  const shop=`<div class="card"><p class="p desc">Every accessory is +1% velocity for good, whoever wears it.</p></div>`+ACCS.map(([id,e,n])=>{const own=S.accs.includes(id);return `<div class="card${own?' owned-up':''}"><span class="emo">${e}</span><b>${n}</b>${own?'<div class="hint" style="color:var(--good)">✓ In the wardrobe</div>':`<button class="buy gold" data-accbuy="${id}" ${S.pts<ac?'disabled':''}>Buy · ${fmt(ac)} pts</button>`}</div>`}).join('');
+  const adopt=BREEDS.filter(b=>!S.dogs.some(x=>x.breed===b.id)).map(b=>{const c=adoptCost(b),lock=S.office.lvl<b.min;return `<div class="card${lock?' locked':''}"><div class="portrait">${lock?'<span class="emo" style="font-size:44px">❔</span>':dogSVG({breed:b.id},96)}</div><div class="ttl"><b>${lock?'???':b.n}</b></div><div class="desc">${lock?`Found at office level ${b.min}`:b.p}</div>${lock?'':`<button class="buy gold" data-adopt="${b.id}" ${S.pts<c?'disabled':''}>Adopt · ${fmt(c)} pts</button>`}</div>`}).join('')||'<div class="mute">You’ve adopted every breed. Legend.</div>';
+  const stuff=[['dog','🐕','Office dog','Gets the whole thing started'],['treats','🫙','Dog treats','Pets earn ×3'],['bed','🛏️','Dog bed','Cheers up twice as fast'],['walkies','🦮','Lunchtime walkies','Zoomies last twice as long'],['ball','🎾','Tennis ball','Fetches twice as often'],['pups','🐶','Puppies','Whole team +20%, and they follow the pack around']].map(([id,e,n,dd])=>{const got=S.ups.includes(id)||(id==='dog'&&S.dogs.length);return `<div class="card${got?'':' locked'}"><span class="emo">${e}</span><b>${n}</b><div class="desc">${dd}. ${got?'✓ Got it':'Shows up in Requests when the dogs are ready'}</div></div>`}).join('');
+  el.innerHTML=list('Walking',`${inPack}/${ps}`,pack)+list('Customise','',editor)+list('Kennel',S.dogs.length-inPack,kennel)+list('Adopt',`${S.dogs.length}/${BREEDS.length}`,adopt)+list('Wardrobe',`${S.accs.length}/${ACCS.length}`,shop)+list('Dog stuff','',stuff);
+}
+function dogsClick(e){
+  const t=e.target.closest('button');if(!t)return;const ds=t.dataset;
+  if(ds.dedit){editDog=editDog==+ds.dedit?null:+ds.dedit;renderDogs();return}
+  if(ds.dwalk){if(S.pack.length<packSize()&&!S.pack.includes(+ds.dwalk)){S.pack.push(+ds.dwalk);recalc();dogSync();renderDogs();save()}return}
+  if(ds.dhome){if(S.pack.length>1){S.pack=S.pack.filter(x=>x!==+ds.dhome);recalc();dogSync();renderDogs();save()}return}
+  if(ds.adopt){const b=BREED[ds.adopt],c=adoptCost(b);if(S.pts<c||S.office.lvl<b.min)return;S.pts-=c;const id=Math.max(0,...S.dogs.map(x=>x.id))+1;S.dogs.push({id,breed:b.id,name:pick2(['Pickle','Waffles','Bean','Noodle','Mochi','Pixel','Kerning','Scout','Pepper','Tofu','Nugget','Maple','Ziggy','Olive','Crumpet']),coat:null,collar:pick2(COLLARS),acc:null});if(S.pack.length<packSize())S.pack.push(id);recalc();dogSync();renderDogs();renderStats();checkAch();save();toast(`<b>Adopted a ${b.n}!</b> ${b.p}.`);return}
+  if(ds.accbuy){const c=accCost();if(S.pts<c||S.accs.includes(ds.accbuy))return;S.pts-=c;S.accs.push(ds.accbuy);const d=S.dogs.find(x=>x.id===editDog)||packDogs()[0];if(d&&!d.acc)d.acc=ds.accbuy;recalc();dogSync();renderDogs();renderStats();checkAch();save();return}
+  const d=S.dogs.find(x=>x.id===editDog);if(!d)return;
+  if(ds.dcoat!=null){d.coat=ds.dcoat||null;dogSync();renderDogs();save();return}
+  if(ds.dcollar){d.collar=ds.dcollar;dogSync();renderDogs();save();return}
+  if(ds.dacc!=null){d.acc=ds.dacc||null;dogSync();renderDogs();save()}
+}
+
+/* ---------- stock market ---------- */
+const stocksOpen=()=>S.stkSeen||S.office.lvl>=3;
+const stockUnlocked=t=>S.office.lvl>=t[5];
+const dollar=()=>Math.max(1,M.base*10);
+const stkCapN=()=>Math.floor((50+25*S.office.lvl)*(perk('broker')?1.5:1)*M.stkCap);
+function stk(id){const t=TICKERS.find(x=>x[0]===id);let o=S.stk[id];if(!o){o=S.stk[id]={own:0,avg:0,p:t[3]*(0.8+Math.random()*.4),h:[],mode:'stable',mt:10}}return o}
+function gauss(){let u=0,v=0;while(!u)u=Math.random();while(!v)v=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v)}
+function stepStock(t,quiet){
+  const o=stk(t[0]);
+  if(--o.mt<=0){let r=Math.random()*100,m='stable';for(const [k,w] of MOOD_W){if((r-=w)<0){m=k;break}}o.mode=m;o.mt=5+Math.floor(Math.random()*25);
+    if(!quiet&&MOOD_NEWS[m]&&stockUnlocked(t)&&Math.random()<.5)stkNews=`${t[1]} (${t[0]}) ${pick2(MOOD_NEWS[m])}.`}
+  const [dr,vm]=MOODS[o.mode];
+  o.p=Math.max(.5,o.p*Math.exp(dr+t[4]*vm*gauss())+(t[3]-o.p)*.015);
+  o.h.push(Math.round(o.p*100)/100);if(o.h.length>60)o.h.shift();
+}
+let stkNews='';
+function stkTick(){
+  if(!stocksOpen())return;
+  if(!S.stkSeen){S.stkSeen=true;TICKERS.forEach(t=>{const o=stk(t[0]);for(let i=0;i<20;i++)stepStock(t,true)});toast('<b>The stock market is open.</b> Buy low, sell high, blame the interns. Check the Stocks tab.');renderViews(true)}
+  const now=Date.now();if(now-S.stkT<20000)return;S.stkT=now;
+  TICKERS.forEach(t=>stepStock(t));
+  if(stkNews){toast(`<b>Market news:</b> ${stkNews}`);stkNews=''}
+  if(view==='stocks'&&!ptrDown)renderStocks();
+}
+function stkCatchUp(){if(!S.stkSeen||!S.stkT)return;const n=Math.min(60,Math.floor((Date.now()-S.stkT)/20000));for(let i=0;i<n;i++)TICKERS.forEach(t=>stepStock(t,true));if(n)S.stkT=Date.now()}
+function spark(h){
+  if(h.length<2)return '';const mn=Math.min(...h),mx=Math.max(...h),r=mx-mn||1;
+  const pts=h.map((v,i)=>`${(i/(h.length-1)*200).toFixed(1)},${(38-(v-mn)/r*34).toFixed(1)}`).join(' ');
+  const up=h[h.length-1]>=h[0];return `<svg class="spark" viewBox="0 0 200 40" preserveAspectRatio="none"><polyline points="${pts}" fill="none" stroke="${up?'var(--good)':'var(--hot)'}" stroke-width="2" vector-effect="non-scaling-stroke"/></svg>`;
+}
+function renderStocks(){
+  const el=$('v-stocks');
+  if(!stocksOpen()){el.innerHTML=list('Stocks','',`<div class="card"><div class="ttl"><b>Market closed</b></div><p class="p desc">Move into the garden shed studio (office level 3) and you can start trading.</p></div>`);return}
+  const $1=dollar(),cap=stkCapN();
+  const card=t=>{const o=stk(t[0]),h=o.h,prev=h.length>1?h[h.length-2]:o.p,ch=(o.p-prev)/prev*100,pl=o.own?(o.p-o.avg)*o.own*$1:0;
+    const maxBuy=Math.max(0,Math.min(cap-o.own,Math.floor(S.pts/(o.p*1.005*$1))));
+    return `<div class="card"><div class="labels"><span class="lbt" style="background:var(--l4)">${t[0]}</span>${perk('insider')?`<span class="lbt" style="background:${o.mode==='boom'||o.mode==='rise'?'var(--good)':o.mode==='crash'||o.mode==='fall'?'var(--hot)':'var(--muted)'}">${o.mode}</span>`:''}</div>
+      <div class="ttl"><b>${t[1]}</b></div><div class="desc">${t[2]}</div>
+      <div class="srow"><span>Price</span><b>$${o.p.toFixed(2)} <span class="${ch>=0?'up-g':'dn-r'}">${ch>=0?'▲':'▼'}${Math.abs(ch).toFixed(1)}%</span></b></div>${spark(h)}
+      <div class="srow"><span>You hold</span><b>${o.own} / ${cap}</b></div>${o.own?`<div class="srow"><span>Paid on average</span><b>$${o.avg.toFixed(2)}</b></div><div class="srow"><span>Profit if sold</span><b class="${pl>=0?'up-g':'dn-r'}">${pl>=0?'+':'−'}${fmt(Math.abs(pl))}</b></div>`:''}
+      <div class="row2"><button class="buy" data-stk="${t[0]}:b:1" ${maxBuy<1?'disabled':''}>Buy 1</button><button class="buy" data-stk="${t[0]}:b:10" ${maxBuy<10?'disabled':''}>10</button><button class="buy" data-stk="${t[0]}:b:max" ${maxBuy<1?'disabled':''}>Max</button></div>
+      <div class="row2"><button class="buy sell" data-stk="${t[0]}:s:1" ${o.own<1?'disabled':''}>Sell 1</button><button class="buy sell" data-stk="${t[0]}:s:10" ${o.own<10?'disabled':''}>10</button><button class="buy sell" data-stk="${t[0]}:s:all" ${o.own<1?'disabled':''}>All</button></div></div>`};
+  const open=TICKERS.filter(stockUnlocked),locked=TICKERS.filter(t=>!stockUnlocked(t));
+  const head=`<div class="card"><div class="big">$1 = ${fmt($1)}</div><p class="p desc">A dollar is worth 10 seconds of your base velocity, so your shares grow with the studio. Prices move every 20 seconds. You can hold ${cap} of each stock.</p><div class="srow"><span>Trades</span><b>${S.stkTrades}</b></div><div class="srow"><span>Profit banked</span><b class="up-g">${fmt(S.stkProfit)}</b></div></div>`
+    +locked.map(t=>`<div class="card locked"><div class="ttl"><b>${t[0]} · ???</b></div><div class="desc">Lists when you reach office level ${t[5]}</div></div>`).join('');
+  const cols=[[],[],[]];open.forEach((t,i)=>cols[i%3].push(t));
+  el.innerHTML=list('Market','',head)+cols.map((c,i)=>list(['Blue chips','Mid caps','Wildcards'][i],c.length,c.map(card).join(''))).join('');
+}
+function stocksClick(e){
+  const b=e.target.closest('[data-stk]');if(!b)return;const [id,side,q]=b.dataset.stk.split(':'),o=stk(id),$1=dollar();
+  if(side==='b'){const cap=stkCapN(),max=Math.max(0,Math.min(cap-o.own,Math.floor(S.pts/(o.p*1.005*$1))));const n=q==='max'?max:Math.min(+q,max);if(n<1)return;
+    const cost=o.p*1.005*$1*n;S.pts-=cost;o.avg=(o.avg*o.own+o.p*n)/(o.own+n);o.own+=n;S.stkTrades++}
+  else{const n=q==='all'?o.own:Math.min(+q,o.own);if(n<1)return;const g=o.p*$1*n,profit=(o.p-o.avg)*$1*n;earn(g);if(profit>0)S.stkProfit+=profit;if(o.p>=o.avg*2)S.stkDouble=true;o.own-=n;if(!o.own)o.avg=0;S.stkTrades++}
+  renderStocks();renderStats();checkAch();save();
+}
+
+
+/* ---------- clients (endless contracts) ---------- */
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+function genOffer(){
+  const tier=S.cl.tier,v=Math.max(1,M.base*shFactor()),types=['earn','ticks','cards','hire','wins'];
+  if(hasDog(S))types.push('pets');if(S.runTime>300&&M.base>0)types.push('feedback');
+  const type=pick(types);let o;
+  if(type==='earn'){const dur=180+Math.floor(Math.random()*4)*60,f=1.25+Math.min(tier*.012,1.5);o={title:`Earn ${fmt(v*dur*f)} points`,target:v*dur*f,dur}}
+  else if(type==='ticks'){const n=Math.min(400,80+tier*8);o={title:`Tick off ${n} subtasks`,target:n,dur:Math.max(60,Math.round(n/2.2))}}
+  else if(type==='cards'){const n=Math.min(40,6+tier);o={title:`Finish ${n} cards yourself`,target:n,dur:n*18}}
+  else if(type==='hire'){const vis=teamVisible(),h=vis[Math.max(0,vis.length-1-Math.floor(Math.random()*Math.min(3,vis.length)))],n=Math.min(100,5+Math.floor(tier/2));o={title:`Hire ${n} more ${h.pl}`,target:n,dur:900,hire:h.id}}
+  else if(type==='wins'){const n=Math.min(5,1+Math.floor(tier/8));o={title:`Grab ${n} quick win${n>1?'s':''}`,target:n,dur:900+n*300}}
+  else if(type==='feedback'){const n=Math.min(6,1+Math.floor(tier/6));o={title:`Address feedback from ${n} stakeholder${n>1?'s':''}`,target:n,dur:1200}}
+  else{const n=Math.min(200,20+tier*4);o={title:`Pet ${dogName()} ${n} times`,target:n,dur:300}}
+  const kudos=1+Math.floor(tier/4)+(type==='earn'||type==='ticks'?1:0)+Math.floor(flv('lounge')/3);
+  return Object.assign(o,{type,client:pick(CLIENTS),kudos,id:Math.random().toString(36).slice(2,8)});
+}
+function conCounter(c){return c.type==='earn'?S.allTime:c.type==='ticks'?S.clicksAll:c.type==='cards'?S.cardsAll:c.type==='hire'?S.own[c.hire]:c.type==='wins'?S.winsAll:c.type==='feedback'?S.shPopped:S.pets}
+function conProgress(c){return Math.max(0,conCounter(c)-c.start)}
+const conPoints=()=>Math.min(CAP,Math.max(M.base*300,clickVal()*100,1000)*(1+S.cl.tier*.05)*(1+.2*flv('lounge')));
+function fillOffers(){while(S.cl.offers.length<3)S.cl.offers.push(genOffer())}
+function acceptCon(id){
+  if(S.cl.active)return;const i=S.cl.offers.findIndex(o=>o.id===id);if(i<0)return;
+  const c=S.cl.offers.splice(i,1)[0];c.start=conCounter(c);c.until=Date.now()+c.dur*1000;S.cl.active=c;fillOffers();renderClients();renderViews(true);save();
+  toast(`<b>Contract signed with ${c.client}.</b> ${c.title}. Clock’s ticking.`);
+}
+function endCon(won){
+  const c=S.cl.active;if(!c)return;S.cl.active=null;
+  if(won){const g=conPoints();earn(g);S.cl.kudos+=c.kudos;S.cl.kudosAll+=c.kudos;S.cl.done++;S.cl.tier++;S.cl.best=Math.max(S.cl.best,S.cl.tier);
+    toast(`<b>${c.client} are thrilled.</b> +${fmt(g)} points and +${c.kudos} kudos. Client tier ${S.cl.tier}: ${clTierName(S.cl.tier)}.`)}
+  else{S.cl.failed++;S.cl.tier=Math.max(0,S.cl.tier-1);toast(`${c.client} have taken their business elsewhere. Client tier drops to ${S.cl.tier}.`)}
+  checkAch();renderViews(true);if(view==='clients')renderClients();save();
+}
+function clTick(){
+  if(!clientsOpen())return;
+  if(!S.clientsSeen){S.clientsSeen=true;fillOffers();S.cl.refreshAt=Date.now()+15*60e3;toast('<b>Clients have found you.</b> Contracts are open in the Clients tab. Complete them for kudos, and spend kudos on office floors that never max out.')}
+  const c=S.cl.active,now=Date.now();
+  if(c){if(conProgress(c)>=c.target)endCon(true);else if(now>c.until)endCon(false)}
+  if(now>S.cl.refreshAt){S.cl.offers=[];fillOffers();S.cl.refreshAt=now+15*60e3;if(view==='clients'&&!ptrDown)renderClients()}
+}
+function renderClients(){
+  const el=$('v-clients');
+  if(!clientsOpen()){el.innerHTML=list('Clients','',`<div class="card"><div class="ttl"><b>No clients yet</b></div><p class="p desc">Earn 100K points in one go and clients start calling. Endless contracts, endless rewards.</p></div>`);return}
+  fillOffers();
+  const c=S.cl.active,now=Date.now();
+  const active=c?`<div class="card sprint active-s"><div class="labels"><span class="lbt" style="background:var(--hot)">${c.client} · ${Math.max(0,Math.ceil((c.until-now)/1000))}s left</span></div><div class="ttl"><b>${c.title}</b></div><div class="gauge"><i style="width:${Math.min(100,conProgress(c)/c.target*100)}%"></i></div><div class="desc">${fmt(conProgress(c))} / ${fmt(c.target)} · pays ${fmt(conPoints())} pts + ${c.kudos} kudos</div><button class="buy sell" data-con="drop">Walk away (tier −1)</button></div>`:'<div class="mute">No contract on the go. Pick one from the offers.</div>';
+  const offers=S.cl.offers.map(o=>`<div class="card"><div class="labels"><span class="lbt" style="background:var(--l4)">${o.client}</span><span class="lbt" style="background:var(--gold)">+${o.kudos} kudos</span></div><div class="ttl"><b>${o.title}</b></div><div class="desc">Within ${fmtT(o.dur)}. Pays ${fmt(conPoints())} points.</div><button class="buy" data-con="${o.id}" ${c?'disabled':''}>${c?'Finish your current contract first':'Sign the contract'}</button></div>`).join('')
+    +`<div class="card"><div class="desc" style="margin:0">New offers in ${fmtT(Math.max(0,(S.cl.refreshAt-now)/1000))}.</div><button class="buy gold" data-con="reroll" ${S.cl.kudos<1?'disabled':''}>New offers now · 1 kudos</button></div>`;
+  const floors=FLOORS.map(f=>{const l=flv(f.id),cost=floorCost(f);return `<div class="card"><div class="ttl"><b>${f.n}</b> <span class="mute">lvl ${l}</span></div><div class="desc">${f.d(l)}</div><button class="buy gold" data-floor="${f.id}" ${S.cl.kudos<cost?'disabled':''}>Build · ${fmt(cost)} kudos</button></div>`}).join('');
+  el.innerHTML=list('Client book','',`<div class="card"><div class="big">Tier ${S.cl.tier}</div><p class="p desc">${clTierName(S.cl.tier)}. Every contract you finish moves you up a tier: bigger targets, bigger payouts, forever. Miss one and you drop a tier.</p><div class="srow"><span>Kudos</span><b>${fmt(S.cl.kudos)}</b></div><div class="srow"><span>Contracts done</span><b>${S.cl.done}</b></div><div class="srow"><span>Best tier</span><b>${S.cl.best}</b></div><div class="srow"><span>Walked away / missed</span><b>${S.cl.failed}</b></div></div>`)
+    +list('On the go',c?1:0,active)+list('Offers',S.cl.offers.length,offers,true)+list('Office floors','∞',`<div class="card"><p class="p desc">Spend kudos on the building. No level cap, and it all survives rebrands and even the heat death.</p></div>`+floors,true);
+}
 
 /* ---------- disguise ---------- */
 const DECOY=[
@@ -893,7 +1478,7 @@ function toggleBoss(){
 /* ---------- input ---------- */
 $('filterBtn').onclick=toggleBoss;
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){e.preventDefault();toggleBoss()}});
-$('views').addEventListener('click',e=>{const b=e.target.closest('[data-view]');if(!b)return;view=b.dataset.view;rbArmed=false;wipeArmed=false;renderView();if(view==='stats')fillSave()});
+$('views').addEventListener('click',e=>{const b=e.target.closest('[data-view]');if(!b)return;view=b.dataset.view;rbArmed=false;crArmed=false;wipeArmed=false;renderView();if(view==='stats')fillSave()});
 $('team').addEventListener('click',e=>{const b=e.target.closest('[data-h]');if(b)hire(b.dataset.h)});
 $('ups').addEventListener('click',e=>{const b=e.target.closest('[data-u]');if(b)buyUp(b.dataset.u)});
 $('modeSeg').addEventListener('click',e=>{const b=e.target.closest('[data-mode]');if(b){S.settings.mode=b.dataset.mode;renderTeam()}});
@@ -904,8 +1489,21 @@ $('v-kitchen').addEventListener('click',e=>{const b=e.target.closest('[data-spel
 $('v-portfolio').addEventListener('click',e=>{
   const pb=e.target.closest('[data-perk]');
   if(pb){const q=PERKS.find(x=>x.id===pb.dataset.perk);if(q&&S.clout>=q.cost&&!perk(q.id)){S.clout-=q.cost;S.perks.push(q.id);recalc();renderPortfolio();renderTeam();renderUps(true);renderStats();save();toast(`Perk unlocked: <b>${q.n}</b>.`)}return}
+  const lg=e.target.closest('[data-legacy]');
+  if(lg){const q=LEGACY.find(x=>x.id===lg.dataset.legacy),c=legacyCost(q);if(S.clout>=c){S.clout-=c;S.legacy[q.id]=lgv(q.id)+1;recalc();renderPortfolio();renderStats();save();toast(`<b>${q.n}</b> is now level ${lgv(q.id)}.`)}return}
+  if(e.target.closest('#crBtn')){if(!crArmed){crArmed=true;renderPortfolio();setTimeout(()=>{if(crArmed){crArmed=false;if(view==='portfolio')renderPortfolio()}},4000);return}crunch();return}
   if(e.target.closest('#rbBtn')){if(!rbArmed){rbArmed=true;renderPortfolio();setTimeout(()=>{if(rbArmed){rbArmed=false;if(view==='portfolio')renderPortfolio()}},4000);return}rebrand()}
 });
+$('v-clients').addEventListener('click',e=>{
+  const b=e.target.closest('[data-con]');
+  if(b){const a=b.dataset.con;if(a==='drop')endCon(false);else if(a==='reroll'){if(S.cl.kudos>=1){S.cl.kudos--;S.cl.offers=[];fillOffers();renderClients();renderViews(true);save()}}else acceptCon(a);return}
+  const f=e.target.closest('[data-floor]');
+  if(f){const q=FLOORS.find(x=>x.id===f.dataset.floor),c=floorCost(q);if(S.cl.kudos>=c){S.cl.kudos-=c;S.floors[q.id]=flv(q.id)+1;recalc();renderClients();renderTeam();renderStats();checkAch();save();toast(`Built: <b>${q.n}</b> level ${flv(q.id)}.`)}}
+});
+$('v-office').addEventListener('click',officeClick);
+$('v-dogs').addEventListener('click',dogsClick);
+$('v-dogs').addEventListener('change',e=>{const t=e.target;if(t.matches('[data-dname]')){const d=S.dogs.find(x=>x.id==t.dataset.dname);const v=t.value.trim().slice(0,16);if(d&&v){d.name=v;S.dogNamed=true;dogSync(true);checkAch();save();renderDogs()}}});
+$('v-stocks').addEventListener('click',stocksClick);
 let wipeArmed=false;
 function fillSave(){const t=$('saveTxt');if(t){try{t.value=btoa(unescape(encodeURIComponent(JSON.stringify(S))))}catch(e){t.value=''}}}
 $('v-stats').addEventListener('click',e=>{
@@ -925,7 +1523,7 @@ $('v-stats').addEventListener('click',e=>{
 let tickI=0;
 function nextTick(){
   if(!S.settings.ticker)return;
-  const ok=TICK.filter(([c])=>c(S));const [,t]=ok[Math.floor(Math.random()*ok.length)];
+  const ok=TICK.filter(([c])=>c(S));let [,t]=ok[Math.floor(Math.random()*ok.length)];if(typeof t==='function')t=t(S);
   const sp=$('tickTxt');sp.style.opacity=0;setTimeout(()=>{sp.textContent=t;sp.style.opacity=1},350);
 }
 
@@ -942,6 +1540,15 @@ if(away>60&&M.base>0){
   S.coffee=Math.min(coffeeMax(),S.coffee+coffeeRegen()*away);
   unlock('away');toast(`While you were away the team closed <b>${fmt(g)}</b> points.`);renderStats();
 }
+(function daily(){
+  const k=d=>d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate(),now=new Date(),y=new Date(now);y.setDate(now.getDate()-1);
+  const t=k(now);if(S.daily.last===t)return;
+  S.daily.streak=S.daily.last===k(y)?S.daily.streak+1:1;S.daily.best=Math.max(S.daily.best,S.daily.streak);S.daily.last=t;
+  const kd=Math.min(S.daily.streak,7);S.cl.kudos+=kd;S.cl.kudosAll+=kd;
+  addBuff({id:'daily',name:'Morning coffee ×2',vel:2,cls:'good'},600);
+  setTimeout(()=>toast(`<b>Day ${S.daily.streak} streak!</b> Morning coffee: velocity ×2 for 10 minutes, and +${kd} kudos. Come back tomorrow for more.`),1200);
+})();
+stkCatchUp();
 nextTick();
 let last=performance.now(),acc=0,acc2=0,tickAcc=0;
 setInterval(()=>{
@@ -952,11 +1559,11 @@ setInterval(()=>{
   if(!document.hidden){S.playTime+=dt;S.runTime+=dt}
   acc+=dt;acc2+=dt;tickAcc+=dt;renderStats();
   if(acc>.5){
-    acc=0;refreshBuy();renderUps();if(S.total>0)renderTeamIfNew();renderSH();sprintTick();
+    acc=0;refreshBuy();renderUps();if(S.total>0)renderTeamIfNew();renderSH();sprintTick();clTick();stkTick();
     const before=S.buffs.length;S.buffs=activeBuffs();renderBuffs();if(S.buffs.length!==before)renderStats();
   }
   if(acc2>1){acc2=0;checkAch();maybeStakeholder();renderViews();dogTick();
-    if(!ptrDown){if(view==='kitchen')renderKitchen();else if(view==='portfolio'&&!rbArmed)renderPortfolio();else if(view==='stats'&&document.activeElement!==$('saveTxt')&&!wipeArmed){renderStatsView();fillSave()}}}
+    if(!ptrDown){if(view==='office'&&!officeFocus())renderOffice();else if(view==='dogs'&&!officeFocus())renderDogs();else if(view==='stocks')renderStocks();else if(view==='kitchen')renderKitchen();else if(view==='clients')renderClients();else if(view==='portfolio'&&!rbArmed&&!crArmed)renderPortfolio();else if(view==='stats'&&document.activeElement!==$('saveTxt')&&!wipeArmed){renderStatsView();fillSave()}}}
   if(tickAcc>9){tickAcc=0;nextTick()}
 },100);
 function renderTeamIfNew(){const vis=teamVisible(),k=vis.length+'|'+(S.settings.mode==='sell')+S.settings.amt;if(k!==teamKey)renderTeam()}

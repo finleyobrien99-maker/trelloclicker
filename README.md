@@ -46,7 +46,7 @@ To host it, turn on GitHub Pages for the repo (Settings → Pages → deploy fro
 
 The original Trello clicker has been rebuilt as a proper idle game. Old saves carry over.
 
-- **14 roles to hire.** They run from Interns up to Multiverse Studios. Hire or let go in batches of 1, 10 or 100.
+- **20 roles to hire.** They run from Interns up to Multiverse Studios, Galactic Agencies, Dev Consoles and literal Clones of You. Hire or let go in batches of 1, 10 or 100.
 - **148 requests to approve.** Every role has seven upgrade tiers. There are also click upgrades, an intern buddy scheme, cross-team synergies, office perks and morale boosters.
 - **106 trophies,** some of them secret. Each one adds 4% morale, and team socials turn morale into velocity.
 - **Quick wins** come in five flavours: a lucky payout, "In the zone" (×7 velocity), "Deadline rush" (×777 clicks), a team surge and a free request.
@@ -56,6 +56,22 @@ The original Trello clicker has been rebuilt as a proper idle game. Old saves ca
 - **The Kitchen** opens once you have 10 Interns. Coffee brews over time and you spend it on orders: stand-ups, biscuits, espresso, team breakfast, flat whites and a risky mystery brew.
 - **Rebranding** is the prestige system. Once you've earned 1B points all time, rebrand the studio to win awards (+1% velocity each, for good) and spend them as clout on 15 permanent perks.
 - **The office dog.** Approve the Office dog request and Biscuit wanders the board. Pet them for points, fill their mood bar to set off the zoomies (velocity ×2), and they'll fetch you quick wins. Five dog-only requests and five dog trophies to go with it.
+- **The office.** Start at your kitchen table and climb a 20-rung property ladder: a shed, a railway arch, a glass tower, a private island, an orbital station, the Moon, Mars, a Jupiter cloud city and finally a **Dyson Sphere HQ**. After that there are endless Dyson spheres around other stars. Every office has five fit-out upgrades, and every move multiplies the whole team.
+- **Customise it.** Walls, floors and lighting, plus 34 pieces of decor, from a pot plant to a tiny black hole. It all shows up in a live office scene, and each piece of decor adds velocity.
+- **A whole pack of dogs.** 15 breeds, each with its own perk: Corgi, Pug, Greyhound, Dachshund, Husky, Border collie, Golden retriever, Shiba, Poodle, Dalmatian, and late-game Space dogs, Robo-hounds and Star hounds.
+  - **Walk a pack.** A bigger office means more dogs out at once, and they all wander the board.
+  - **Make them yours.** Rename them, change their coat and collar, and dress them in 18 accessories: top hats, crowns, shades, a slice of pizza.
+  - **See their stuff.** The dog bed, treat jar, ball, lead and puppies all appear in the office.
+- **Stock market.** 12 tickers (TASK, BEAN, WOOF, MEME…) with live charts and market moods (booms, crashes, chaos) and market news. Buy low, sell high. Share prices are pegged to your velocity, so they grow with the studio.
+- **Ridiculous numbers.** Points go all the way to 1e303, with trophies for a googol, a googol squared and a centillion. Pick short (1.2Qag), scientific, or words ("1.23 quattuorvigintillion", "4.20 googol").
+- **It never ends.**
+  - **Requests keep coming.** Every role gets endless upgrade tiers (II, III, IV…) past 250 hires, and office perks, click techniques and team socials generate forever.
+  - **Clients.** At 100K points, clients start offering contracts: earn X, tick N subtasks, hire N people, pet the dog. Each one you finish raises your client tier, from local cafés up to the Universe itself, with bigger targets and payouts every time. Miss one and you drop a tier.
+  - **Office floors.** Contracts pay kudos, which you spend on office floors: seven upgrades with no level cap that survive every reset.
+  - **Endless trophies.** 25 families of ranked trophies (Velocity rank IV, Intern campus VI…) sit on top of the 111 classic ones, and all of them feed morale.
+  - **Legacy perks.** Repeatable clout sinks for after you've bought every perk.
+  - **Heat death.** At 1e100 points in one rebrand, collapse the universe for Universes, which multiply everything. Numbers are capped just below JavaScript's limit, so nothing ever breaks into Infinity.
+  - **Daily streaks.** Coming back each day gives a velocity boost and kudos.
 - **Also:** an activity ticker, a full stats page, number format settings, save export and import, and offline earnings.
 
 ### New in this version
