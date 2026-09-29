@@ -1,10 +1,10 @@
 # Look Busy
 
-Twenty-one browser games dressed up as the apps you already have open at work. From across the office each one looks like the real thing, and every one of them has a panic button.
+Twenty-two browser games dressed up as the apps you already have open at work. From across the office each one looks like the real thing, and every one of them has a panic button.
 
 **Press `Esc` in any game** and it turns into dull, convincing work: a budget spreadsheet, an approved timesheet, a security settings page. Press it again to get back to your game. It works on the home page too.
 
-This repo started life as `trelloclicker`, the Trello-looking idle clicker. That game is still here as **Taskwall**, alongside twenty others.
+This repo started life as `trelloclicker`, the Trello-looking idle clicker. That game is still here as **Taskwall**, alongside twenty-one others.
 
 ## Play
 
@@ -41,6 +41,17 @@ To host it, turn on GitHub Pages for the repo (Settings → Pages → deploy fro
 | Font Library | FontBase | Guess the font | `font-guess.html` |
 | Swatches | Coolors | Colour matching | `swatch-match.html` |
 | Password Reset | Okta | Rules puzzle | `password-rules.html` |
+| Q4 Retro | FigJam | Survivors-like | `retro-survivors.html` |
+
+### Q4 Retro (Retro Survivors)
+
+A Vampire Survivors-style game on a whiteboard. You're a multiplayer cursor on the Q4 retro board. Hordes of sticky notes (quick questions, bugs, meeting invites, reply-alls that split, feedback that shoots back, scope creep that grows, deadlines, out-of-office) swarm in from every side.
+
+- **Just move** (WASD, arrow keys, or drag on touch). Your whiteboard tools fire on their own.
+- **10 tools:** Comment, Lasso select, Eraser, Connector arrows, Thumbs-up stamp, orbiting Reactions, a bouncing Pen tool, Shape tool, Ctrl+Z (freezes stickies) and the Delete key. There are also 12 passives, like Coffee, Mechanical keyboard and Headphones.
+- **Evolutions.** Max a tool, own its partner passive, and open a chest to evolve it: Comment thread, Marquee of doom, Clean slate, Flowchart, Stamp storm, Reaction storm, Vector swarm, Component library, Version history, and Select all, delete.
+- **Bosses and events.** Elites carry chests, bug swarms sweep across, and bosses arrive at 5, 10 and 15 minutes: The Stakeholder, the Surprise Audit and The Client. Beat The Client to win, then keep going in endless mode.
+- **Between sessions.** Coins carry over to a perk shop with 14 permanent upgrades, 7 characters to unlock (including Biscuit the office dog), and 3 boards (Q4 Retro, Product roadmap, Crunch week).
 
 ### Taskwall, the deep version
 
