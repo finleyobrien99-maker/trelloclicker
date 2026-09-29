@@ -252,9 +252,10 @@ body.boss .game{display:none!important}
     <section class="list"><div class="list-h">Doing <span id="doingN">1</span></div><div class="cards"><div id="sprintBox"></div><div id="doing"></div></div></section>
     <section class="list"><div class="list-h">Done <span id="doneN">0</span></div><div class="cards" id="done"></div></section>
     <section class="list"><div class="list-h">Team <span id="teamN">0</span></div>
-      <div class="buyrow"><div class="seg" id="modeSeg"><button data-mode="hire">Hire</button><button data-mode="sell">Let go</button></div><div class="seg" id="amtSeg"><button data-amt="1">×1</button><button data-amt="10">×10</button><button data-amt="100">×100</button></div></div>
+      <div class="buyrow"><div class="seg" id="modeSeg"><button data-mode="hire">Hire</button><button data-mode="sell">Let go</button></div><div class="seg" id="amtSeg"><button data-amt="1">×1</button><button data-amt="10">×10</button><button data-amt="100">×100</button><button data-amt="0">Max</button></div></div>
+      <div class="buyrow" id="allRow"><button class="buy gold" id="hireAll" style="margin-top:0">Hire max of everyone</button></div>
       <div class="cards" id="team"></div></section>
-    <section class="list"><div class="list-h">Requests <span id="upN">0</span></div><div class="cards" id="ups"></div></section>
+    <section class="list"><div class="list-h">Requests <span id="upN">0</span></div><div class="buyrow"><button class="buy gold" id="upAll" style="margin-top:0">Approve everything I can afford</button></div><div class="cards" id="ups"></div></section>
   </div>
   <div class="board game" id="v-office" hidden></div>
   <div class="board game" id="v-dogs" hidden></div>
@@ -764,6 +765,12 @@ const shFactor=()=>1-.05*S.sh.length;
 const vel=()=>M.base*velBuff()*shFactor();
 const clickVal=()=>Math.min(CAP,(M.clickBase+M.base*velBuff()*M.pct)*clickBuff());
 const disc=()=>(perk('rolodex')?.95:1)*Math.pow(.98,flv('pipeline'));
+function maxHire(h){
+  const b=h.cost*Math.pow(1.15,S.own[h.id])*disc();if(!(S.pts>=b))return 0;
+  let n=Math.floor(Math.log(1+S.pts*.15/b)/Math.log(1.15));while(n>0&&hireCost(h,n)>S.pts)n--;return Math.max(0,n);
+}
+const amtFor=h=>S.settings.amt>0?S.settings.amt:S.settings.mode==='sell'?S.own[h.id]:Math.max(1,maxHire(h));
+const hireLabel=h=>{const n=amtFor(h);return S.settings.mode==='sell'?`Let go ${n>1?'×'+fmt(Math.min(n,S.own[h.id]||n))+' ':''}· +${fmt(sellValue(h,n))} pts`:`Hire${n>1||S.settings.amt===0?' ×'+fmt(n):''} · ${fmt(hireCost(h,n))} pts`};
 function hireCost(h,n){const b=h.cost*Math.pow(1.15,S.own[h.id]);return Math.ceil(b*(Math.pow(1.15,n)-1)/.15*disc())}
 function sellValue(h,n){n=Math.min(n,S.own[h.id]);if(!n)return 0;const b=h.cost*Math.pow(1.15,S.own[h.id]-n);return Math.floor(b*(Math.pow(1.15,n)-1)/.15*disc()*.25)}
 const upCost=u=>Math.ceil(u.cost*(perk('negot')?.95:1));
@@ -814,12 +821,13 @@ function renderTeam(){
   for(const h of vis){
     const each=M.each[h.id]*M.global,share=M.base?each*S.own[h.id]/M.base*100:0;
     html+=`<div class="card"><div class="hire"><span class="av" style="background:${h.c}">${h.ini}</span><div><div class="nm">${h.n}</div><div class="sub">${h.d}<br>+${fmt(each)}/s each${S.own[h.id]?` · ${share<1?share.toFixed(1):Math.round(share)}% of velocity`:''}</div></div><span class="own">${S.own[h.id]||''}</span></div>
-      ${sell?`<button class="buy sell" data-h="${h.id}">Let go ${n>1?'×'+Math.min(n,S.own[h.id]||n)+' ':''}· +${fmt(sellValue(h,n))} pts</button>`:`<button class="buy" data-h="${h.id}">Hire${n>1?' ×'+n:''} · ${fmt(hireCost(h,n))} pts</button>`}</div>`;
+      <button class="buy${sell?' sell':''}" data-h="${h.id}">${hireLabel(h)}</button></div>`;
   }
   if(vis.length<HIRES.length)html+=`<div class="card locked"><div class="hire"><span class="av" style="background:var(--muted)">?</span><div><div class="nm">Role not advertised yet</div><div class="sub">Keep shipping</div></div><span></span></div></div>`;
   $('team').innerHTML=html;$('teamN').textContent=staff();
   $('modeSeg').querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.mode===S.settings.mode));
   $('amtSeg').querySelectorAll('button').forEach(b=>b.classList.toggle('on',+b.dataset.amt===n));
+  $('allRow').hidden=sell;
   refreshBuy();
 }
 function availUps(){
@@ -839,9 +847,12 @@ function renderUps(force){
   $('upN').textContent=a.length;refreshBuy();
 }
 function refreshBuy(){
-  const sell=S.settings.mode==='sell',n=S.settings.amt;
-  document.querySelectorAll('#team [data-h]').forEach(b=>{const h=H[b.dataset.h];b.disabled=sell?S.own[h.id]<1:S.pts<hireCost(h,n)});
-  document.querySelectorAll('#ups [data-u]').forEach(b=>b.disabled=S.pts<upCost(getUp(b.dataset.u)));
+  const sell=S.settings.mode==='sell',mx=S.settings.amt===0;
+  document.querySelectorAll('#team [data-h]').forEach(b=>{const h=H[b.dataset.h];b.disabled=sell?S.own[h.id]<1:S.pts<hireCost(h,amtFor(h));if(mx){const t=hireLabel(h);if(b.textContent!==t)b.textContent=t}});
+  let cheapest=Infinity;
+  document.querySelectorAll('#ups [data-u]').forEach(b=>{const c=upCost(getUp(b.dataset.u));cheapest=Math.min(cheapest,c);b.disabled=S.pts<c});
+  $('upAll').disabled=!(S.pts>=cheapest);
+  $('hireAll').disabled=!teamVisible().some(h=>S.pts>=hireCost(h,1));
 }
 let spKey='';
 function renderSprint(){
@@ -977,16 +988,35 @@ function finishCard(v){
 }
 function completeCard(c,by){S.done.unshift({t:c.t,l:c.l,by});S.done=S.done.slice(0,6);renderDone()}
 function hire(id){
-  const h=H[id],n=S.settings.amt;
+  const h=H[id],n=amtFor(h);
   if(S.settings.mode==='sell'){const k=Math.min(n,S.own[id]);if(!k)return;const g=sellValue(h,k);S.own[id]-=k;S.pts+=g;toast(`Let ${k} ${k===1?h.n:h.pl} go. HR are drafting a very careful email. +${fmt(g)} points.`)}
   else{const c=hireCost(h,n);if(S.pts<c)return;S.pts-=c;S.own[id]+=n}
   recalc();renderTeam();renderUps();renderStats();save();
 }
-function buyUp(id){
-  const u=getUp(id);if(!u)return;const c=upCost(u);if(S.pts<c||S.ups.includes(id))return;
+function approve(id){
+  const u=getUp(id);if(!u)return null;const c=upCost(u);if(S.pts<c||S.ups.includes(id))return null;
   S.pts-=c;S.ups.push(id);
   if(id==='dog'&&!S.dogs.length){S.dogs.push({id:1,breed:'mutt',name:'Biscuit',coat:null,collar:'#e5484d',acc:null});S.pack=[1]}
-  recalc();renderUps(true);renderTeam();renderStats();save();
+  recalc();return u;
+}
+function approveAll(){
+  let n=0,spent=0,last=null;
+  for(let i=0;i<2000;i++){const u=availUps().find(x=>upCost(x)<=S.pts);if(!u)break;const c=upCost(u);if(!approve(u.id))break;n++;spent+=c;last=u}
+  if(!n)return;
+  renderUps(true);renderTeam();renderStats();checkAch();save();
+  toast(n===1?`Approved: <b>${last.n}</b>.`:`<b>Approved ${n} requests</b> for ${fmt(spent)} points. Finance are having a lie-down.`);
+}
+function hireAll(){
+  let n=0,spent=0;const vis=teamVisible();
+  for(let pass=0;pass<4;pass++){let any=false;
+    for(const h of vis.slice().reverse()){const k=maxHire(h);if(k>0){const c=hireCost(h,k);S.pts-=c;S.own[h.id]+=k;n+=k;spent+=c;any=true}}
+    recalc();if(!any)break}
+  if(!n)return;
+  renderTeam();renderUps();renderStats();checkAch();save();
+  toast(`<b>Hired ${fmt(n)} people</b> for ${fmt(spent)} points. HR has run out of lanyards.`);
+}
+function buyUp(id){
+  const u=approve(id);if(!u)return;renderUps(true);renderTeam();renderStats();save();
   toast(`Approved: <b>${u.n}</b>. ${typeof u.d==='function'?u.d():u.d}.`);
 }
 let toastT;function toast(t){const el=$('toast');el.innerHTML=t;el.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>el.hidden=true,4500)}
@@ -1482,6 +1512,8 @@ $('views').addEventListener('click',e=>{const b=e.target.closest('[data-view]');
 $('team').addEventListener('click',e=>{const b=e.target.closest('[data-h]');if(b)hire(b.dataset.h)});
 $('ups').addEventListener('click',e=>{const b=e.target.closest('[data-u]');if(b)buyUp(b.dataset.u)});
 $('modeSeg').addEventListener('click',e=>{const b=e.target.closest('[data-mode]');if(b){S.settings.mode=b.dataset.mode;renderTeam()}});
+$('upAll').onclick=approveAll;
+$('hireAll').onclick=hireAll;
 $('amtSeg').addEventListener('click',e=>{const b=e.target.closest('[data-amt]');if(b){S.settings.amt=+b.dataset.amt;renderTeam()}});
 $('shs').addEventListener('click',e=>{const b=e.target.closest('[data-sh]');if(b)popSH(+b.dataset.sh)});
 $('sprintBox').addEventListener('click',e=>{const b=e.target.closest('[data-sp]');if(!b)return;if(b.dataset.sp==='go')startSprint();else{S.sprint=null;nextSprintAt=Date.now()+(8+Math.random()*4)*60e3;renderSprint();renderDoing()}});
