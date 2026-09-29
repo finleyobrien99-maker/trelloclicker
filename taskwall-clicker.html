@@ -1559,6 +1559,19 @@ function nextTick(){
   const sp=$('tickTxt');sp.style.opacity=0;setTimeout(()=>{sp.textContent=t;sp.style.opacity=1},350);
 }
 
+/* ---------- keep scroll positions when lists redraw ---------- */
+function keepScroll(fn,root){return function(...args){
+  const el=root(),cards=[...el.querySelectorAll('.cards')].map(c=>c.scrollTop),left=el.scrollLeft;
+  const r=fn.apply(this,args);
+  el.querySelectorAll('.cards').forEach((c,i)=>{if(cards[i])c.scrollTop=cards[i]});if(left)el.scrollLeft=left;
+  return r}}
+renderTodo=keepScroll(renderTodo,()=>$('v-board'));renderDone=keepScroll(renderDone,()=>$('v-board'));
+renderTeam=keepScroll(renderTeam,()=>$('v-board'));renderUps=keepScroll(renderUps,()=>$('v-board'));
+renderOffice=keepScroll(renderOffice,()=>$('v-office'));renderDogs=keepScroll(renderDogs,()=>$('v-dogs'));
+renderStocks=keepScroll(renderStocks,()=>$('v-stocks'));renderKitchen=keepScroll(renderKitchen,()=>$('v-kitchen'));
+renderClients=keepScroll(renderClients,()=>$('v-clients'));renderTrophies=keepScroll(renderTrophies,()=>$('v-trophies'));
+renderPortfolio=keepScroll(renderPortfolio,()=>$('v-portfolio'));renderStatsView=keepScroll(renderStatsView,()=>$('v-stats'));
+
 /* ---------- loop ---------- */
 function renderAll(){renderViews();renderTodo();renderDoing();renderDone();renderTeam();renderUps(true);renderStats();renderBuffs();renderSH();renderSprint();renderView();$('boardName').textContent=boss?'Q3 Campaign Delivery':boardName();$('ticker').hidden=!S.settings.ticker}
 FMT=S.settings.fmt;recalc();
